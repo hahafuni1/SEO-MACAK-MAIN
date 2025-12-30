@@ -1,9 +1,20 @@
 import React, { useRef, useEffect, useLayoutEffect, useState } from 'react'
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 export default function PinnedHeroSection() {
   const containerRef = useRef(null)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleLogoClick = (e) => {
+    if (location.pathname === '/') {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      navigate('/')
+    }
+  }
 
   // Track scroll progress across the 2000vh container
   const { scrollYProgress } = useScroll({
@@ -18,48 +29,51 @@ export default function PinnedHeroSection() {
 
   // Transforms per spec
   const bgColor = useTransform(smoothProgress, [0, 0.12], ['#ffffff', '#000000'])
-  const heroOpacity = useTransform(smoothProgress, [0, 0.04], [1, 0])
+  const heroOpacity = useTransform(smoothProgress, [0, 0.06, 0.12], [1, 1, 0])
   const logoColor = useTransform(smoothProgress, [0, 0.12], ['#000000', '#ffffff'])
 
-  // "Šta Radimo?" TITLE - centered at top
-  const stataTitleOpacity = useTransform(smoothProgress, [0.08, 0.12], [0, 1])
+  // Container overlay that shows/hides content as background transitions - stays hidden until fully dark
+  const stickyContainerOpacity = useTransform(smoothProgress, [0.12, 0.13], [0, 1])
+  
+  // "Šta Radimo?" TITLE - appears, stays full opacity until card 3 fades, then fades in sync with card 3
+  const stataTitleOpacity = useTransform(smoothProgress, [0.12, 0.15, 0.50, 0.53], [0, 1, 1, 0])
   
   // "Šta Radimo?" animation - appears centered, moves to top-left and shrinks
-  const stataTitleScale = useTransform(smoothProgress, [0.15, 0.25], [1, 0.3])
-  const stataTitleY = useTransform(smoothProgress, [0.15, 0.25], [0, -350])
-  const stataTitleX = useTransform(smoothProgress, [0.15, 0.25], [0, -500])
+  const stataTitleScale = useTransform(smoothProgress, [0.15, 0.20], [1, 0.3])
+  const stataTitleY = useTransform(smoothProgress, [0.15, 0.20], [0, -350])
+  const stataTitleX = useTransform(smoothProgress, [0.15, 0.20], [0, -500])
   
-  // SEQUENTIAL CARDS - Šta Radimo (3 cards) - start after title animation finishes
+  // SEQUENTIAL CARDS - Šta Radimo (3 cards) - with smaller deadzone
   // Card 1: SEO
-  const card1Opacity = useTransform(smoothProgress, [0.25, 0.38, 0.48], [0, 1, 0])
-  const card1Y = useTransform(smoothProgress, [0.25, 0.38], [50, 0])
+  const card1Opacity = useTransform(smoothProgress, [0.20, 0.22, 0.28, 0.31], [0, 1, 1, 0])
+  const card1Y = useTransform(smoothProgress, [0.20, 0.22], [50, 0])
   
   // Card 2: Development
-  const card2Opacity = useTransform(smoothProgress, [0.48, 0.61, 0.71], [0, 1, 0])
-  const card2Y = useTransform(smoothProgress, [0.48, 0.61], [50, 0])
+  const card2Opacity = useTransform(smoothProgress, [0.31, 0.33, 0.39, 0.42], [0, 1, 1, 0])
+  const card2Y = useTransform(smoothProgress, [0.31, 0.33], [50, 0])
   
   // Card 3: Design
-  const card3Opacity = useTransform(smoothProgress, [0.71, 0.84, 0.94], [0, 1, 0])
-  const card3Y = useTransform(smoothProgress, [0.71, 0.84], [50, 0])
+  const card3Opacity = useTransform(smoothProgress, [0.42, 0.44, 0.50, 0.53], [0, 1, 1, 0])
+  const card3Y = useTransform(smoothProgress, [0.42, 0.44], [50, 0])
   
-  // "Kako Radimo?" TITLE - appears centered after card 3, moves to top-left and shrinks
-  const kakoTitleOpacity = useTransform(smoothProgress, [0.94, 0.98], [0, 1])
-  const kakoTitleScale = useTransform(smoothProgress, [1.02, 1.12], [1, 0.3])
-  const kakoTitleY = useTransform(smoothProgress, [1.02, 1.12], [0, -350])
-  const kakoTitleX = useTransform(smoothProgress, [1.02, 1.12], [0, -500])
+  // "Kako Radimo?" TITLE - appears centered at small scale, grows to 1, then moves to top-left and shrinks
+  const kakoTitleOpacity = useTransform(smoothProgress, [0.53, 0.58, 0.67], [0, 1, 1])
+  const kakoTitleScale = useTransform(smoothProgress, [0.53, 0.58, 0.67], [0.3, 1, 0.3])
+  const kakoTitleY = useTransform(smoothProgress, [0.58, 0.67], [0, -350])
+  const kakoTitleX = useTransform(smoothProgress, [0.58, 0.67], [0, -500])
   
-  // SEQUENTIAL CARDS - Kako Radimo (3 cards) - start after title animation finishes
+  // SEQUENTIAL CARDS - Kako Radimo (3 cards) - compressed timeline, Card 6 finishes early for viewing room
   // Card 4: Discovery
-  const card4Opacity = useTransform(smoothProgress, [1.12, 1.25, 1.35], [0, 1, 0])
-  const card4Y = useTransform(smoothProgress, [1.12, 1.25], [50, 0])
+  const card4Opacity = useTransform(smoothProgress, [0.67, 0.69, 0.73, 0.76], [0, 1, 1, 0])
+  const card4Y = useTransform(smoothProgress, [0.67, 0.69], [50, 0])
   
   // Card 5: Strategy
-  const card5Opacity = useTransform(smoothProgress, [1.35, 1.48, 1.58], [0, 1, 0])
-  const card5Y = useTransform(smoothProgress, [1.35, 1.48], [50, 0])
+  const card5Opacity = useTransform(smoothProgress, [0.76, 0.78, 0.81, 0.84], [0, 1, 1, 0])
+  const card5Y = useTransform(smoothProgress, [0.76, 0.78], [50, 0])
   
-  // Card 6: Execution
-  const card6Opacity = useTransform(smoothProgress, [1.58, 1.71, 1.81], [0, 1, 0])
-  const card6Y = useTransform(smoothProgress, [1.58, 1.71], [50, 0])
+  // Card 6: Results/Monitoring - only visible card
+  const card6Opacity = useTransform(smoothProgress, [0.84, 0.86, 0.90, 1.0], [0, 1, 1, 1])
+  const card6Y = useTransform(smoothProgress, [0.84, 0.86], [50, 0])
 
   useLayoutEffect(()=>{
     // ensure target has a non-static position for framer's offset calculations
@@ -137,12 +151,13 @@ export default function PinnedHeroSection() {
   }, [smoothProgress, heroOpacity, bgColor])
 
   return (
-    <div ref={containerRef} style={{ height: '1100vh', position: 'relative' }}>
+    <>
+    <div ref={containerRef} style={{ height: '1400vh', position: 'relative' }}>
       <motion.div style={{ position: 'fixed', inset: 0, zIndex: -1, backgroundColor: bgColor }} aria-hidden />
 
       <header className="site-header">
         <div className="container">
-          <Link to="/" className="logo">
+          <Link to="/" className="logo" onClick={handleLogoClick}>
             <span className="logo-mark" aria-hidden="true">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
                 <circle cx="20" cy="20" r="18" fill="#FDCA40" stroke="#000" strokeWidth="2" />
@@ -167,6 +182,16 @@ export default function PinnedHeroSection() {
       </header>
 
       <div className="pin-wrap" ref={pinWrapRef} style={{ position: pinReleased ? 'relative' : 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <motion.div 
+          style={{ 
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: '#000',
+            opacity: useTransform(smoothProgress, [0, 0.12], [0, 0]),
+            pointerEvents: 'none',
+            zIndex: 99
+          }}
+        />
         <section className="hero fullscreen">
           <div
             className="moving-dots"
@@ -198,10 +223,10 @@ export default function PinnedHeroSection() {
       </div>
       
       {/* STICKY CONTAINER FOR SEQUENTIAL CARDS */}
-      <motion.div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', zIndex: 100, background: '#000' }}>
+      <motion.div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', zIndex: 100, opacity: stickyContainerOpacity, pointerEvents: 'none' }}>
         
         {/* ŠTA RADIMO TITLE - appears and animates to top-left */}
-        <motion.h2 className="section-title" style={{ opacity: stataTitleOpacity, position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#fff', fontSize: 'clamp(4rem, 15vw, 12rem)', margin: 0, zIndex: 200, whiteSpace: 'nowrap', x: stataTitleX, y: stataTitleY, scale: stataTitleScale }}>
+        <motion.h2 className="section-title" style={{ opacity: stataTitleOpacity, position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 'clamp(4rem, 15vw, 12rem)', margin: 0, zIndex: 200, whiteSpace: 'nowrap', x: stataTitleX, y: stataTitleY, scale: stataTitleScale }}>
           Šta Radimo?
         </motion.h2>
 
@@ -284,7 +309,12 @@ export default function PinnedHeroSection() {
         </motion.div>
 
         {/* KAKO RADIMO TITLE - appears and animates to top-left */}
-        <motion.h2 className="section-title" style={{ opacity: kakoTitleOpacity, position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#fff', fontSize: 'clamp(4rem, 15vw, 12rem)', margin: 0, zIndex: 200, whiteSpace: 'nowrap', x: kakoTitleX, y: kakoTitleY, scale: kakoTitleScale }}>
+        <motion.h2 className="section-title" style={{ opacity: kakoTitleOpacity, position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 'clamp(4rem, 15vw, 12rem)', margin: 0, zIndex: 200, whiteSpace: 'nowrap', x: kakoTitleX, y: kakoTitleY, scale: kakoTitleScale }}>
+          Kako Radimo?
+        </motion.h2>
+
+        {/* KAKO RADIMO TITLE - appears with opacity wave effect then animates to top-left */}
+        <motion.h2 className="section-title" style={{ opacity: kakoTitleOpacity, position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 'clamp(4rem, 15vw, 12rem)', margin: 0, zIndex: 200, whiteSpace: 'nowrap', y: kakoTitleY, x: kakoTitleX, scale: kakoTitleScale }}>
           Kako Radimo?
         </motion.h2>
 
@@ -340,7 +370,7 @@ export default function PinnedHeroSection() {
           </div>
         </motion.div>
 
-        {/* CARD 6: Execution - Left Image, Right Text */}
+        {/* CARD 6: Results & Monitoring - Right Image, Left Text */}
         <motion.div
           style={{
             position: 'absolute',
@@ -353,28 +383,139 @@ export default function PinnedHeroSection() {
             padding: '100px 24px'
           }}
         >
-          <div style={{ maxWidth: '1200px', width: '100%', display: 'flex', gap: '60px', alignItems: 'center' }}>
+          <div style={{ maxWidth: '1200px', width: '100%', display: 'flex', gap: '60px', alignItems: 'center', flexDirection: 'row-reverse' }}>
             <div style={{ flex: 1, minHeight: '400px', background: '#1a1a1a', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
-              <span>Execution Image</span>
+              <span>Results Image</span>
             </div>
             <div style={{ flex: 1, color: '#fff' }}>
-              <h3 style={{ fontSize: '2.5rem', marginTop: 0, marginBottom: '20px' }}>Izvršavanje & Rezultati</h3>
+              <h3 style={{ fontSize: '2.5rem', marginTop: 0, marginBottom: '20px' }}>Rezultati & Monitoring</h3>
               <p style={{ fontSize: '1.1rem', lineHeight: '1.8' }}>
-                Implementiramo strategiju sa preciznošću i fokusom. Redovno pratimo progres, prilagođavamo pristup ako je potrebno, i dostavljamo rezultate. Transparency i komunikacija su ključne tokom celog procesa.
+                Pratimo sve metrike i KPI-je kako bismo osigurali da projekat dostiže željene rezultate. Redovni izveštaji i analize omogućavaju nam da kontinuirano optimizujemo strategiju i donosimo podatkom vođene odluke.
               </p>
             </div>
           </div>
         </motion.div>
         
       </motion.div>
-
-      {/* SPACER SECTION */}
-      <section style={{ height: '100vh', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '3rem', margin: 0 }}>Spremni za saradnju?</h2>
-          <p style={{ fontSize: '1.2rem', marginTop: '20px' }}>Kontaktirajte nas danas</p>
-        </div>
-      </section>
     </div>
+
+    {/* PORTFOLIO SECTION */}
+    <section style={{ minHeight: '100vh', padding: '100px 24px', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ maxWidth: '1200px', width: '100%' }}>
+        <h2 style={{ fontSize: '3rem', marginBottom: '20px', textAlign: 'center' }}>Portfolio</h2>
+        <p style={{ fontSize: '1.2rem', color: '#aaa', textAlign: 'center', marginBottom: '80px' }}>Pogledajte jedan od mojih radova</p>
+        
+        {/* PORTFOLIO CONTAINER WITH ARROWS */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '40px' }}>
+          
+          {/* LEFT ARROW */}
+          <div style={{ fontSize: '80px', color: '#FDCA40', fontWeight: 'bold', opacity: 0.6 }}>
+            →
+          </div>
+
+          {/* HIGHLIGHT PROJECT CARD */}
+          <div style={{ background: '#1a1a1a', borderRadius: '12px', overflow: 'hidden', flex: 1, maxWidth: '900px' }}>
+            <div style={{ height: '400px', background: '#2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '1.2rem' }}>
+              Project Image
+            </div>
+            <div style={{ padding: '50px' }}>
+              <h3 style={{ fontSize: '2.5rem', marginTop: 0, marginBottom: '20px' }}>E-Commerce Platforma</h3>
+              <p style={{ fontSize: '1.1rem', color: '#ccc', lineHeight: '1.8', marginBottom: '30px' }}>
+                Kompletna optimizacija i modernizacija e-commerce platforme. Kroz detaljnu SEO analizu, dizajnersko unapređenje i tehničku optimizaciju, dostigli smo povećanje konverzije od 45% i poboljšanje brzine učitavanja za 60%.
+              </p>
+              
+              <div style={{ marginBottom: '30px' }}>
+                <h4 style={{ color: '#fff', marginBottom: '15px' }}>Rezultati:</h4>
+                <ul style={{ color: '#aaa', lineHeight: '2', marginLeft: '20px' }}>
+                  <li>+45% povećanje konverzije</li>
+                  <li>+60% brža učitavanja stranica</li>
+                  <li>Top 3 rangiranje za ciljne ključne reči</li>
+                  <li>+200% organskog trafika</li>
+                </ul>
+              </div>
+
+              <div style={{ marginBottom: '30px' }}>
+                <h4 style={{ color: '#fff', marginBottom: '15px' }}>Usluge:</h4>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <span style={{ background: '#333', padding: '8px 16px', borderRadius: '20px', fontSize: '0.95rem' }}>SEO Optimizacija</span>
+                  <span style={{ background: '#333', padding: '8px 16px', borderRadius: '20px', fontSize: '0.95rem' }}>Web Design</span>
+                  <span style={{ background: '#333', padding: '8px 16px', borderRadius: '20px', fontSize: '0.95rem' }}>React Development</span>
+                  <span style={{ background: '#333', padding: '8px 16px', borderRadius: '20px', fontSize: '0.95rem' }}>Performance</span>
+                </div>
+              </div>
+
+              <button style={{ background: '#FDCA40', color: '#000', border: 'none', padding: '12px 30px', fontSize: '1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>
+                Saznaj više
+              </button>
+            </div>
+          </div>
+
+          {/* RIGHT ARROW */}
+          <div style={{ fontSize: '80px', color: '#FDCA40', fontWeight: 'bold', opacity: 0.6, transform: 'scaleX(-1)' }}>
+            →
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    {/* TEST SECTION 2 */}
+    <section style={{ minHeight: '100vh', padding: '100px 24px', background: '#1a1a1a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ maxWidth: '1200px', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '3rem', margin: '0 0 20px 0' }}>Još jedna sekcija</h2>
+        <p style={{ fontSize: '1.1rem', lineHeight: '1.8', color: '#aaa' }}>Dodaj sadržaj koji trebaš ovde. Može biti FAQ, testimonijali, pricing, ili bilo šta drugo.</p>
+      </div>
+    </section>
+
+    {/* FOOTER */}
+    <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333', position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '60px' }}>
+          {/* FOOTER COLUMN 1 - BRAND */}
+          <div>
+            <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
+            <p style={{ color: '#aaa', lineHeight: '1.8' }}>
+              Stručna SEO optimizacija, web development i dizajn za vaš biznis.
+            </p>
+          </div>
+
+          {/* FOOTER COLUMN 2 - LINKS */}
+          <div>
+            <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <li style={{ marginBottom: '10px' }}><Link to="/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Početna</Link></li>
+              <li style={{ marginBottom: '10px' }}><Link to="/izrada-sajtova/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Izrada sajtova</Link></li>
+              <li style={{ marginBottom: '10px' }}><Link to="/seo/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>SEO</Link></li>
+              <li style={{ marginBottom: '10px' }}><Link to="/blog/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Blog</Link></li>
+            </ul>
+          </div>
+
+          {/* FOOTER COLUMN 3 - MORE LINKS */}
+          <div>
+            <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <li style={{ marginBottom: '10px' }}><Link to="/about/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>O nama</Link></li>
+              <li style={{ marginBottom: '10px' }}><Link to="/kontakt/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Kontakt</Link></li>
+              <li style={{ marginBottom: '10px' }}><a href="#" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Privatnost</a></li>
+              <li style={{ marginBottom: '10px' }}><a href="#" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Uslovi</a></li>
+            </ul>
+          </div>
+
+          {/* FOOTER COLUMN 4 - CONTACT */}
+          <div>
+            <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
+            <p style={{ color: '#aaa', marginBottom: '10px' }}>email@example.com</p>
+            <p style={{ color: '#aaa', marginBottom: '10px' }}>+381 (0) 123 456 789</p>
+            <p style={{ color: '#aaa' }}>Beograd, Srbija</p>
+          </div>
+        </div>
+
+        {/* FOOTER BOTTOM */}
+        <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
+          <p style={{ margin: 0 }}>© 2024 SEO Mačak. Sva prava zadržana.</p>
+        </div>
+      </div>
+    </footer>
+    </>
   )
 }
