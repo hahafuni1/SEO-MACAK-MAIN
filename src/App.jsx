@@ -11,6 +11,24 @@ import Kontakt from './components/Kontakt'
 export default function App(){
   return (
     <Router>
+      <style>{`
+        @keyframes moveDiagonalDots {
+          from { background-position: 0px 0px; }
+          to { background-position: 60px -60px; }
+        }
+      `}</style>
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: -1,
+          backgroundImage: 'linear-gradient(45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%), linear-gradient(-45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%)',
+          backgroundSize: '60px 60px',
+          opacity: 0.8,
+          animation: 'moveDiagonalDots 4s linear infinite',
+          pointerEvents: 'none'
+        }}
+      />
       <PageTransition>
         <Routes>
           <Route path="/" element={<PinnedHeroSection />} />

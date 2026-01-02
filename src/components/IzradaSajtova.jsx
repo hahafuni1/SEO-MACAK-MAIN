@@ -1,5 +1,6 @@
 import React from 'react'
 import Header from './Header'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 const keyframes = `
@@ -135,66 +136,6 @@ export default function IzradaSajtova() {
         </div>
       </section>
 
-      {/* PORTFOLIO/CASE STUDIES */}
-      <section style={{ padding: '80px 24px', background: '#111', color: '#fff' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '50px', color: '#FDCA40' }}>Naši Projekti</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            {[
-              { name: 'Studija Slučaja 1', category: 'E-Commerce', result: '+150% online prodaje' },
-              { name: 'Studija Slučaja 2', category: 'Korporativni Sajt', result: 'Rang #1 za lokalne ključne riječi' },
-              { name: 'Studija Slučaja 3', category: 'Portfolio Sajt', result: '+300% upita iz sajta' }
-            ].map((project, idx) => (
-              <div key={idx} style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)', borderRadius: '8px', padding: '30px', cursor: 'pointer', transition: 'transform 0.3s' }}>
-                <div style={{ height: '200px', background: '#333', borderRadius: '5px', marginBottom: '20px' }}></div>
-                <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>{project.name}</h3>
-                <p style={{ color: '#FDCA40', fontSize: '0.9rem', marginBottom: '8px' }}>{project.category}</p>
-                <p style={{ color: '#999' }}>Rezultat: <strong>{project.result}</strong></p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS/SOCIAL PROOF */}
-      <section style={{ padding: '80px 24px', background: '#000', color: '#fff' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '50px', color: '#FDCA40' }}>Šta Kažu Naši Klijenti</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}>
-            {[
-              { name: 'Klijent 1', text: 'Odličan rad! Sajt je promijenio moj biznis.', rating: '★★★★★' },
-              { name: 'Klijent 2', text: 'Profesionalan tim, brz odgovori, odličan rezultat.', rating: '★★★★★' },
-              { name: 'Klijent 3', text: 'Preporuka svima koji trebaju kvalitetan sajt!', rating: '★★★★★' }
-            ].map((testimonial, idx) => (
-              <div key={idx} style={{ background: '#1a1a1a', padding: '25px', borderRadius: '8px', border: '1px solid #333' }}>
-                <p style={{ color: '#FDCA40', marginBottom: '15px', fontSize: '1.2rem' }}>{testimonial.rating}</p>
-                <p style={{ color: '#c0c0c0', marginBottom: '15px', fontStyle: 'italic' }}>"{testimonial.text}"</p>
-                <p style={{ color: '#888', fontWeight: '600' }}>— {testimonial.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ SECTION */}
-      <section style={{ padding: '80px 24px', background: '#111', color: '#fff' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '50px', color: '#FDCA40' }}>Često Postavljana Pitanja</h2>
-          <div style={{ display: 'grid', gap: '20px' }}>
-            {[
-              { q: 'Koliko traje izrada sajtova?', a: 'Zavisi od kompleksnosti, obično 4-12 sedmica.' },
-              { q: 'Koliko koštaju sajtovi?', a: 'Cijena se razlikuje - mali sajtovi od 500€, kompleksni od 2000€+.' },
-              { q: 'Dobijam li SEO uključen?', a: 'Da! Svi sajtovi su SEO-optimizovani od početka.' },
-              { q: 'Šta se dešava nakon lansiranja?', a: 'Pružamo 3-6 mjeseci besplatne podrške i opcije održavanja.' }
-            ].map((item, idx) => (
-              <div key={idx} style={{ background: '#1a1a1a', padding: '25px', borderRadius: '8px', border: '1px solid #333' }}>
-                <h4 style={{ fontSize: '1.2rem', marginBottom: '10px', color: '#FDCA40' }}>❓ {item.q}</h4>
-                <p style={{ color: '#b0b0b0', lineHeight: '1.6' }}>{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA SECTION - Final Call To Action */}
       {/* CTA SECTION - Final Call To Action */}
@@ -209,6 +150,85 @@ export default function IzradaSajtova() {
           </button>
         </div>
       </section>
+
+      {/* FOOTER */}
+      <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333', position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', gap: '80px', marginBottom: '60px', position: 'relative', alignItems: 'flex-start' }}>
+            {/* LEFT SIDE - COLUMNS */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(150px, auto))', gap: '40px', flex: '0 0 auto' }}>
+              {/* FOOTER COLUMN 1 - BRAND */}
+              <div>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
+                <p style={{ color: '#aaa', lineHeight: '1.8', fontSize: '0.9rem' }}>
+                  Stručna SEO optimizacija, web development i dizajn za vaš biznis.
+                </p>
+              </div>
+
+              {/* FOOTER COLUMN 2 - LINKS */}
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  <li style={{ marginBottom: '10px' }}><Link to="/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Početna</Link></li>
+                  <li style={{ marginBottom: '10px' }}><Link to="/izrada-sajtova/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Izrada sajtova</Link></li>
+                  <li style={{ marginBottom: '10px' }}><Link to="/seo/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>SEO</Link></li>
+                  <li style={{ marginBottom: '10px' }}><Link to="/blog/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Blog</Link></li>
+                </ul>
+              </div>
+
+              {/* FOOTER COLUMN 3 - MORE LINKS */}
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  <li style={{ marginBottom: '10px' }}><Link to="/about/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>O nama</Link></li>
+                  <li style={{ marginBottom: '10px' }}><Link to="/kontakt/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Kontakt</Link></li>
+                  <li style={{ marginBottom: '10px' }}><a href="#" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Privatnost</a></li>
+                  <li style={{ marginBottom: '10px' }}><a href="#" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Uslovi</a></li>
+                </ul>
+              </div>
+
+              {/* FOOTER COLUMN 4 - CONTACT */}
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>email@example.com</p>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 (0) 123 456 789</p>
+                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
+              </div>
+            </div>
+
+            {/* RIGHT SIDE - BUTTON */}
+            <div style={{ marginLeft: 'auto', marginRight: '-210npx', paddingRight: '24px', display: 'flex', alignItems: 'flex-start', marginTop: '40px' }}>
+              <Link to="/kontakt/" style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}>
+                <div style={{
+                  background: '#FDCA40',
+                  color: '#000',
+                  padding: '20px 50px',
+                  fontSize: '1.3rem',
+                  borderRadius: '6px',
+                  fontWeight: '700',
+                  transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  pointerEvents: 'auto',
+                  display: 'inline-block',
+                  whiteSpace: 'nowrap'
+                }} onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-8px) scale(1.08)';
+                  e.target.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
+                }} onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0) scale(1)';
+                  e.target.style.boxShadow = 'none';
+                }}>
+                  Kontakt
+                </div>
+              </Link>
+            </div>
+          </div>
+
+        {/* FOOTER BOTTOM */}
+        <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
+          <p style={{ margin: 0 }}>© 2024 SEO Mačak. Sva prava zadržana.</p>
+        </div>
+      </div>
+      </footer>
     </div>
     </>
   )

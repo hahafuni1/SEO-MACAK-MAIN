@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useLayoutEffect, useState } from 'react'
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import Link from './Link'
 import FAQSection from './FAQSection'
 import logoImg from '../../LOGO MAIN MAIN.png'
 
@@ -154,6 +155,12 @@ export default function PinnedHeroSection() {
 
   return (
     <>
+    <style>{`
+      @keyframes moveDiagonalDots {
+        from { background-position: 0px 0px; }
+        to { background-position: 60px -60px; }
+      }
+    `}</style>
     <div ref={containerRef} style={{ height: '1400vh', position: 'relative' }}>
       <motion.div style={{ position: 'fixed', inset: 0, zIndex: -1, backgroundColor: bgColor }} aria-hidden />
 
@@ -197,9 +204,10 @@ export default function PinnedHeroSection() {
               position: 'fixed',
               inset: 0,
               zIndex: -1,
-              backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.22) 4px, transparent 4px)',
-              backgroundSize: '40px 40px',
-              opacity: 0.95,
+              backgroundImage: 'linear-gradient(45deg, transparent 48%, rgba(0,0,0,0.15) 49%, rgba(0,0,0,0.15) 51%, transparent 52%), linear-gradient(-45deg, transparent 48%, rgba(0,0,0,0.15) 49%, rgba(0,0,0,0.15) 51%, transparent 52%)',
+              backgroundSize: '60px 60px',
+              opacity: 0.8,
+              animation: 'moveDiagonalDots 4s linear infinite'
             }}
           />
           <div className="hero-inner container">
