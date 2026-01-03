@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import Header from './Header'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 
 const keyframes = `
   @keyframes moveDiagonalDots {
@@ -11,6 +11,56 @@ const keyframes = `
 `
 
 export default function IzradaSajtova() {
+  const portfolioContainerRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: portfolioContainerRef,
+    offset: ['start start', 'end start'],
+  })
+
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 50, damping: 20 })
+
+  // Carousel horizontal scroll animation - all cards move together in a row
+  // Entire carousel track translates left as user scrolls
+  // Progress: 0 = start (cards visible from left), 1 = end (cards off-screen to left)
+  const carouselX = useTransform(smoothProgress, [0.10, 0.90], [0, -2200])
+
+  const projects = [
+    {
+      title: 'E-Commerce Platform za Modu',
+      desc: 'Razvili smo kompletan e-commerce sajt za poznatu modnu brend. Brzina učitavanja poboljšana za 45%.',
+      result: '+150% poredak online',
+      tech: 'React, Node.js, Stripe',
+      color: '#FF6B9D'
+    },
+    {
+      title: 'SaaS Aplikacija za Upravljanje',
+      desc: 'Custom SaaS rešenje sa složivim backend logikom i intuitivnim frontend interfejsom.',
+      result: '+50k aktivnih korisnika',
+      tech: 'React, PostgreSQL, AWS',
+      color: '#00BFFF'
+    },
+    {
+      title: 'SEO Optimizacija - Top 3 Ranking',
+      desc: 'Kompletan SEO audit i optimizacija dovela je do top 3 rangiranja na Google-u za konkurentne ključne reči.',
+      result: '1. mesto Google-a',
+      tech: 'Technical SEO, Content',
+      color: '#FFD700'
+    },
+    {
+      title: 'Dizajn & Branding - Rebranding',
+      desc: 'Kompletan rebranding uključujući novi logo, boju, tipografiju i web dizajn.',
+      result: '+200% engagement',
+      tech: 'Design, Web',
+      color: '#00FF88'
+    },
+    {
+      title: 'Mobile App Landing Page',
+      desc: 'Visoko konvertujući landing page za mobilnu aplikaciju sa optimizovanim call-to-action.',
+      result: '+35% conversion',
+      tech: 'Next.js, Vercel',
+      color: '#FF9500'
+    }
+  ]
   return (
     <>
     <style>{keyframes}</style>
@@ -52,66 +102,394 @@ export default function IzradaSajtova() {
       {/* WHY CHOOSE US - Trust & Authority */}
       <section style={{ padding: '80px 24px', background: '#000', color: '#fff' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '50px', color: '#FDCA40' }}>Zašto Izabrati Nas?</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}>
+          <h2 style={{ 
+            textAlign: 'center', 
+            fontSize: '2.8rem', 
+            marginBottom: '60px', 
+            fontWeight: '800',
+            background: 'linear-gradient(135deg, #FFFFFF 0%, #A0A0A0 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: '#FDCA40'
+          }}>Zašto Izabrati Nas?</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px', position: 'relative' }}>
             {[
-              { icon: '⚡', title: 'Brzi Sajtovi', desc: 'Optimizovani za brže učitavanje - veća konverzija i bolja SEO rangiranja' },
-              { icon: '🎨', title: 'Moderni Dizajn', desc: 'Responsive dizajn koji savršeno izgleda na svim uređajima' },
-              { icon: '🔍', title: 'SEO Optimizacija', desc: 'Ugrađene SEO najbolje prakse od početka - rang na Google-u' },
-              { icon: '📱', title: 'Mobilni First', desc: 'Prilagođeno za mobilne korisnike - većina trafika dolazi sa mobitela' },
-              { icon: '🔒', title: 'Sigurnost', desc: 'SSL certifikat, zaštita podataka i redovne sigurnosne nadogradnje' },
-              { icon: '💬', title: 'Podrška & Održavanje', desc: 'Dugoročna podrška, praćenje i redovne nadogradnje' }
-            ].map((item, idx) => (
-              <div key={idx} style={{ background: '#1a1a1a', padding: '30px', borderRadius: '8px', border: '1px solid #333' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '15px' }}>{item.icon}</div>
-                <h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>{item.title}</h3>
-                <p style={{ color: '#b0b0b0', lineHeight: '1.6' }}>{item.desc}</p>
-              </div>
-            ))}
+              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>', title: 'Brzi Sajtovi', desc: 'Optimizovani za brže učitavanje - veća konverzija i bolja SEO rangiranja', color: '#FFD700' },
+              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L15.09 8.26H22L17.55 12.5L18.91 18.76L12 14.5L5.09 18.76L6.45 12.5L2 8.26H8.91L12 2Z"/></svg>', title: 'Moderni Dizajn', desc: 'Responsive dizajn koji savršeno izgleda na svim uređajima', color: '#00BFFF' },
+              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>', title: 'SEO Optimizacija', desc: 'Ugrađene SEO najbolje prakse od početka - rang na Google-u', color: '#FF6B9D' },
+              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>', title: 'Mobilni First', desc: 'Prilagođeno za mobilne korisnike - većina trafika dolazi sa mobitela', color: '#00FF88' },
+              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', title: 'Sigurnost', desc: 'SSL certifikat, zaštita podataka i redovne sigurnosne nadogradnje', color: '#FF9500' },
+              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>', title: 'Podrška & Održavanje', desc: 'Dugoročna podrška, praćenje i redovne nadogradnje', color: '#FF1493' }
+            ].map((item, idx) => {
+              const isMiddleCard = idx === 3; // Srednja kartica (4. kartica - 0 indexed)
+              const bgGradient = 'radial-gradient(135% 135% at 0% 0%, rgba(255,255,255,0.05) 0%, transparent 50%)';
+              
+              return (
+                <div key={idx} style={{ 
+                  background: `linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%), ${bgGradient}`,
+                  padding: isMiddleCard ? '45px' : '40px', 
+                  borderRadius: '12px', 
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  transform: isMiddleCard ? 'scale(1.05)' : 'scale(1)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.border = `1px solid ${item.color}`;
+                  e.currentTarget.style.boxShadow = `0 0 20px ${item.color}40, inset 0 0 20px ${item.color}10`;
+                  e.currentTarget.style.transform = isMiddleCard ? 'scale(1.08)' : 'scale(1.03)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.transform = isMiddleCard ? 'scale(1.05)' : 'scale(1)';
+                }}>
+                  {/* Icon Container */}
+                  <div style={{ 
+                    width: '60px', 
+                    height: '60px', 
+                    borderRadius: '12px',
+                    background: `${item.color}15`,
+                    border: `2px solid ${item.color}40`,
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    marginBottom: '20px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = `${item.color}25`;
+                    e.currentTarget.style.boxShadow = `0 0 15px ${item.color}40`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = `${item.color}15`;
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}>
+                    <div style={{ color: item.color, width: '32px', height: '32px' }} dangerouslySetInnerHTML={{ __html: item.svg }} />
+                  </div>
+                  
+                  <h3 style={{ fontSize: '1.4rem', marginBottom: '12px', color: '#FFFFFF', fontWeight: '700' }}>{item.title}</h3>
+                  <p style={{ color: '#A0A0A0', lineHeight: '1.8', fontSize: '0.95rem' }}>{item.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* SERVICES - What We Offer */}
-      <section style={{ padding: '80px 24px', background: '#111', color: '#fff' }}>
+      <section style={{ padding: '100px 24px', background: '#000', color: '#fff' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '50px', color: '#FDCA40' }}>Naše Usluge</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={{ padding: '30px', border: 'left 4px solid #FDCA40' }}>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '15px' }}>Razvoj Custom Sajtova</h3>
-              <p style={{ color: '#c0c0c0', marginBottom: '15px' }}>Jedinstveni sajtovi napravljen od nule prema vašim potrebama i brendu.</p>
-              <ul style={{ color: '#a0a0a0', fontSize: '0.95rem', lineHeight: '1.8' }}>
-                <li>✓ Custom HTML/CSS/JavaScript</li>
-                <li>✓ React i moderne frontend tehnologije</li>
-                <li>✓ Pozadinska integracija</li>
-                <li>✓ Baze podataka</li>
-              </ul>
-            </div>
+          {/* Section Header with Sub-title */}
+          <div style={{ textAlign: 'center', marginBottom: '70px' }}>
+            <p style={{ fontSize: '0.85rem', letterSpacing: '2px', color: '#FDCA40', fontWeight: '700', marginBottom: '12px', textTransform: 'uppercase' }}>ŠTA RADIMO</p>
+            <h2 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '20px', color: '#FFFFFF' }}>Naše Usluge</h2>
+            <p style={{ fontSize: '1.1rem', color: '#A0A0A0', maxWidth: '600px', margin: '0 auto', lineHeight: '1.7' }}>Kompletna rešenja za vašu digitalnu transformaciju - od razvoja do optimizacije i održavanja</p>
+          </div>
 
-            <div style={{ padding: '30px', border: 'left 4px solid #FDCA40' }}>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '15px' }}>E-Commerce Rješenja</h3>
-              <p style={{ color: '#c0c0c0', marginBottom: '15px' }}>Prodaj online sa profesionalnim e-commerce platformama.</p>
-              <ul style={{ color: '#a0a0a0', fontSize: '0.95rem', lineHeight: '1.8' }}>
-                <li>✓ Katalog proizvoda</li>
-                <li>✓ Sigurna plaćanja</li>
-                <li>✓ Upravljanje zalihama</li>
-                <li>✓ Analitika i izvještaji</li>
-              </ul>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '40px' }}>
+            {[
+              {
+                svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3"></polyline><line x1="12" y1="12" x2="20" y2="7.5"></line><line x1="12" y1="12" x2="12" y2="21"></line><line x1="12" y1="12" x2="4" y2="7.5"></line></svg>',
+                title: 'Razvoj Custom Sajtova',
+                desc: 'Jedinstveni sajtovi napravljen od nule prema vašim potrebama i brendu.',
+                items: ['Custom HTML/CSS/JavaScript', 'React i moderne frontend tehnologije', 'Pozadinska integracija', 'Baze podataka']
+              },
+              {
+                svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>',
+                title: 'E-Commerce Rješenja',
+                desc: 'Prodaj online sa profesionalnim e-commerce platformama.',
+                items: ['Katalog proizvoda', 'Sigurna plaćanja', 'Upravljanje zalihama', 'Analitika i izvještaji']
+              },
+              {
+                svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"></circle><path d="M4.6 4.6L6.5 6.5"></path><path d="M19.4 4.6L17.5 6.5"></path><path d="M4.6 19.4L6.5 17.5"></path><path d="M19.4 19.4L17.5 17.5"></path><path d="M1 12h6"></path><path d="M17 12h6"></path><path d="M4.22 4.22A10 10 0 0 1 19.78 19.78"></path></svg>',
+                title: 'SEO Optimizacija',
+                desc: 'Rang na prvoj stranici Google-a sa našim SEO strategijom.',
+                items: ['Keyword istraživanje', 'On-page optimizacija', 'Technical SEO', 'Link building']
+              }
+            ].map((service, idx) => (
+              <div key={idx} style={{
+                background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+                padding: '45px',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                position: 'relative',
+                overflow: 'hidden',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.border = '1px solid rgba(253, 202, 64, 0.5)';
+                e.currentTarget.style.boxShadow = '0 0 30px rgba(253, 202, 64, 0.2), inset 0 0 30px rgba(253, 202, 64, 0.05)';
+                e.currentTarget.style.transform = 'translateY(-8px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}>
+                
+                {/* Icon Container */}
+                <div style={{
+                  width: '70px',
+                  height: '70px',
+                  borderRadius: '14px',
+                  background: 'rgba(253, 202, 64, 0.1)',
+                  border: '2px solid rgba(253, 202, 64, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '25px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(253, 202, 64, 0.15)';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(253, 202, 64, 0.3)';
+                  e.currentTarget.style.transform = 'scale(1.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(253, 202, 64, 0.1)';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}>
+                  <div style={{ color: '#FDCA40', width: '40px', height: '40px' }} dangerouslySetInnerHTML={{ __html: service.svg }} />
+                </div>
 
-            <div style={{ padding: '30px', border: 'left 4px solid #FDCA40' }}>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '15px' }}>SEO Optimizacija</h3>
-              <p style={{ color: '#c0c0c0', marginBottom: '15px' }}>Rang na prvoj stranici Google-a sa našim SEO strategijom.</p>
-              <ul style={{ color: '#a0a0a0', fontSize: '0.95rem', lineHeight: '1.8' }}>
-                <li>✓ Keyword istraživanje</li>
-                <li>✓ On-page optimizacija</li>
-                <li>✓ Technical SEO</li>
-                <li>✓ Link building</li>
-              </ul>
-            </div>
+                {/* Title */}
+                <h3 style={{
+                  fontSize: '1.6rem',
+                  fontWeight: '700',
+                  marginBottom: '12px',
+                  color: '#FFFFFF'
+                }}>{service.title}</h3>
+
+                {/* Description */}
+                <p style={{
+                  color: '#A0A0A0',
+                  marginBottom: '25px',
+                  lineHeight: '1.7',
+                  fontSize: '0.95rem'
+                }}>{service.desc}</p>
+
+                {/* Features List */}
+                <ul style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: '0 0 25px 0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px'
+                }}>
+                  {service.items.map((item, itemIdx) => (
+                    <li key={itemIdx} style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px',
+                      fontSize: '0.95rem',
+                      color: '#A0A0A0',
+                      lineHeight: '1.6'
+                    }}>
+                      <span style={{
+                        color: '#FDCA40',
+                        fontWeight: '700',
+                        marginTop: '2px',
+                        flexShrink: 0
+                      }}>✓</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA Button */}
+                <button style={{
+                  width: '100%',
+                  padding: '12px 24px',
+                  background: 'rgba(253, 202, 64, 0.1)',
+                  border: '1px solid rgba(253, 202, 64, 0.3)',
+                  borderRadius: '8px',
+                  color: '#FDCA40',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontSize: '0.95rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#FDCA40';
+                  e.currentTarget.style.color = '#000';
+                  e.currentTarget.style.transform = 'scale(1.02)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(253, 202, 64, 0.1)';
+                  e.currentTarget.style.color = '#FDCA40';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}>
+                  Saznaj više
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Main CTA Button */}
+          <div style={{ textAlign: 'center', marginTop: '60px' }}>
+            <button style={{
+              padding: '16px 50px',
+              fontSize: '1.1rem',
+              background: '#FDCA40',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#000',
+              cursor: 'pointer',
+              fontWeight: '700',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 10px 30px rgba(253, 202, 64, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 15px 40px rgba(253, 202, 64, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 10px 30px rgba(253, 202, 64, 0.3)';
+            }}>
+              Započni Projekat
+            </button>
           </div>
         </div>
       </section>
+
+      {/* CAROUSEL PORTFOLIO SECTION - Horizontal Scrolling Track */}
+      <div ref={portfolioContainerRef} style={{ position: 'relative', height: '600vh' }}>
+        <div style={{ 
+          position: 'sticky', 
+          top: 0, 
+          height: '100vh', 
+          background: '#000', 
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          zIndex: 100
+        }}>
+          {/* Static Section Title - Fixed at top, no animation */}
+          <div 
+            style={{
+              position: 'absolute',
+              top: '40px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              textAlign: 'center',
+              zIndex: 20,
+              pointerEvents: 'none'
+            }}
+          >
+            <h2 style={{ fontSize: '2.8rem', fontWeight: '800', color: '#FFFFFF', margin: 0 }}>Naše Usluge</h2>
+          </div>
+
+          {/* Horizontal Carousel Track - All cards in one row */}
+          <motion.div
+            style={{
+              x: carouselX,
+              display: 'flex',
+              gap: '80px',
+              paddingLeft: '24px',
+              paddingRight: '24px',
+              paddingTop: '120px',
+              minWidth: 'fit-content',
+              height: 'auto'
+            }}
+          >
+            {projects.map((project, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '60px',
+                flexShrink: 0,
+                flexWrap: 'wrap',
+                width: 'min(1200px, 90vw)'
+              }}>
+                {/* Card Content - Text */}
+                <div style={{ flex: '1 1 420px', paddingTop: '40px', minWidth: '280px' }}>
+                  <h3 style={{ fontSize: '2.5rem', fontWeight: '700', color: '#FFFFFF', marginBottom: '20px', lineHeight: '1.3' }}>
+                    {project.title}
+                  </h3>
+                  <p style={{ fontSize: '1.1rem', color: '#A0A0A0', marginBottom: '30px', lineHeight: '1.8', maxWidth: '550px' }}>
+                    {project.desc}
+                  </p>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '15px',
+                    maxWidth: '550px'
+                  }}>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '12px 16px',
+                      background: `${project.color}15`,
+                      border: `1px solid ${project.color}40`,
+                      borderRadius: '8px',
+                      width: 'fit-content'
+                    }}>
+                      <span style={{ color: project.color, fontWeight: '700' }}>✓</span>
+                      <span style={{ color: project.color, fontSize: '1rem', fontWeight: '600' }}>{project.result}</span>
+                    </div>
+                    <div style={{ color: '#808080', fontSize: '0.95rem' }}>
+                      <span style={{ fontWeight: '600', color: '#A0A0A0' }}>Tehnologije:</span> {project.tech}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Visual - Image/Placeholder */}
+                <div style={{
+                  flex: '1 1 420px',
+                  minWidth: '280px',
+                  height: '450px',
+                  background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+                  padding: '40px',
+                  borderRadius: '16px',
+                  border: `1px solid ${project.color}40`,
+                  backdropFilter: 'blur(10px)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: `0 0 30px ${project.color}30`,
+                  flexShrink: 0
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '3px',
+                    background: project.color,
+                    opacity: 0.8
+                  }} />
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    height: '100%',
+                    color: project.color,
+                    opacity: 0.3,
+                    fontSize: '3rem',
+                    fontWeight: '700',
+                    textAlign: 'center'
+                  }}>
+                    {project.title.split(' ')[0]}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
 
       {/* PROCESS - How We Work */}
       <section style={{ padding: '80px 24px', background: '#000', color: '#fff' }}>
