@@ -84,7 +84,7 @@ export default function IzradaSajtova() {
     <div>
       <Header />
 
-      {/* HERO SECTION - Value Proposition & CTA */}
+      {/* HER SECTION - Value Proposition & CTA */}
       <section style={{ padding: '100px 24px', background: '#000', color: '#fff', textAlign: 'center', minHeight: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
         {/* Animated moving background - diagonal pattern */}
         <div
