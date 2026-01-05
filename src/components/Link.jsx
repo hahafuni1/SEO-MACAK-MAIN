@@ -20,7 +20,7 @@ export default function Link({ to, children, ...props }) {
     setTimeout(() => {
       window.scrollTo(0, 0) // Scroll to top for better UX
       navigate(to)
-    }, 300)
+    }, 480)
   }
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Header from './Header'
-import { Link } from 'react-router-dom'
+import Link from './Link'
 import { motion } from 'framer-motion'
 
 const keyframes = `
@@ -871,37 +871,31 @@ export default function SEO() {
             </p>
 
             <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                style={{
-                  padding: '18px 50px',
-                  fontSize: '1.1rem',
+              <Link 
+                to="/kontakt/" 
+                style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}
+              >
+                <div style={{
                   background: '#000',
-                  border: 'none',
-                  borderRadius: '8px',
                   color: '#FDCA40',
-                  cursor: 'pointer',
-                  fontWeight: '900',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
-                }}
-              >
-                Zatraži Besplatni SEO Audit
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                style={{
-                  padding: '18px 50px',
-                  fontSize: '1.1rem',
-                  background: 'transparent',
-                  border: '2px solid #000',
-                  borderRadius: '8px',
-                  color: '#000',
-                  cursor: 'pointer',
-                  fontWeight: '900'
-                }}
-              >
-                Zakaži Konsultaciju
-              </motion.button>
+                  padding: '20px 50px',
+                  fontSize: '1.3rem',
+                  borderRadius: '6px',
+                  fontWeight: '700',
+                  transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  pointerEvents: 'auto',
+                  display: 'inline-block',
+                  whiteSpace: 'nowrap'
+                }} onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
+                  e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
+                }} onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}>
+                  Zatraži Besplatnu Konsultaciju
+                </div>
+              </Link>
             </div>
 
             <p style={{ marginTop: '30px', fontSize: '0.95rem', opacity: '0.8' }}>
@@ -953,32 +947,6 @@ export default function SEO() {
                   <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 (0) 123 456 789</p>
                   <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
                 </div>
-              </div>
-
-              {/* RIGHT SIDE - BUTTON */}
-              <div style={{ marginLeft: 'auto', marginRight: '-210npx', paddingRight: '24px', display: 'flex', alignItems: 'flex-start', marginTop: '40px' }}>
-                <Link to="/kontakt/" style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}>
-                  <div style={{
-                    background: '#FDCA40',
-                    color: '#000',
-                    padding: '20px 50px',
-                    fontSize: '1.3rem',
-                    borderRadius: '6px',
-                    fontWeight: '700',
-                    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    pointerEvents: 'auto',
-                    display: 'inline-block',
-                    whiteSpace: 'nowrap'
-                  }} onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-8px) scale(1.08)';
-                    e.target.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
-                  }} onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0) scale(1)';
-                    e.target.style.boxShadow = 'none';
-                  }}>
-                    Kontakt
-                  </div>
-                </Link>
               </div>
             </div>
 

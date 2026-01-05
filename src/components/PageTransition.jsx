@@ -16,7 +16,7 @@ export default function PageTransition({ children }) {
       // Adding 200ms buffer to ensure smooth transition
       const timer = setTimeout(() => {
         setIsTransitioning(false)
-      }, 400)
+      }, 680)
 
       return () => clearTimeout(timer)
     }
@@ -31,7 +31,7 @@ export default function PageTransition({ children }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            transition={{ duration: 0.45, ease: 'easeInOut' }}
             style={{
               position: 'fixed',
               top: 0,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import Link from './Link'
 import Header from './Header'
 
 const keyframes = `
@@ -548,36 +548,31 @@ export default function Blog() {
             </p>
 
             <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                style={{
-                  padding: '18px 50px',
-                  fontSize: '1.1rem',
+              <Link 
+                to="/kontakt/" 
+                style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}
+              >
+                <div style={{
                   background: '#000',
-                  border: 'none',
-                  borderRadius: '8px',
                   color: '#FDCA40',
-                  cursor: 'pointer',
-                  fontWeight: '900'
-                }}
-              >
-                Zatraži Besplatni Audit
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                style={{
-                  padding: '18px 50px',
-                  fontSize: '1.1rem',
-                  background: 'transparent',
-                  border: '2px solid #000',
-                  borderRadius: '8px',
-                  color: '#000',
-                  cursor: 'pointer',
-                  fontWeight: '900'
-                }}
-              >
-                Zakazi Konsultaciju
-              </motion.button>
+                  padding: '20px 50px',
+                  fontSize: '1.3rem',
+                  borderRadius: '6px',
+                  fontWeight: '700',
+                  transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  pointerEvents: 'auto',
+                  display: 'inline-block',
+                  whiteSpace: 'nowrap'
+                }} onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
+                  e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
+                }} onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}>
+                  Zatraži Besplatnu Konsultaciju
+                </div>
+              </Link>
             </div>
           </motion.div>
         </section>
