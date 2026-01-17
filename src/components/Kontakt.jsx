@@ -362,22 +362,34 @@ export default function Kontakt() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              whileHover={{ scale: 1.02, y: -2 }}
+              whileHover={{ scale: 1 }}
               whileTap={{ scale: 0.98 }}
               style={{
                 padding: '18px 0',
                 background: submitted ? 'rgba(253, 202, 64, 0.7)' : '#FDCA40',
-                border: 'none',
-                borderRadius: '12px',
+                border: '3px solid #000',
+                borderRadius: '50px',
                 color: '#000',
                 fontWeight: 900,
                 fontSize: '1.05rem',
                 cursor: submitted ? 'default' : 'pointer',
                 marginTop: '24px',
-                boxShadow: submitted ? 'none' : '0 12px 40px rgba(253, 202, 64, 0.25)',
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: submitted ? 'none' : '5px 5px 0px 0px #C79F00',
+                transition: 'all 0.1s ease',
                 letterSpacing: '0.5px',
                 fontFamily: 'Poppins, Inter, sans-serif'
+              }}
+              onMouseEnter={(e) => {
+                if (!submitted) {
+                  e.currentTarget.style.transform = 'translate(3px, 3px)';
+                  e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!submitted) {
+                  e.currentTarget.style.transform = 'translate(0, 0)';
+                  e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
+                }
               }}
               disabled={submitted}
             >

@@ -195,17 +195,26 @@ export default function Blog() {
                 <motion.button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1 }}
                   style={{
                     padding: '12px 28px',
                     background: selectedCategory === cat.id ? '#FDCA40' : 'transparent',
                     color: selectedCategory === cat.id ? '#000' : '#FDCA40',
-                    border: `2px solid ${selectedCategory === cat.id ? '#FDCA40' : 'rgba(253, 202, 64, 0.5)'}`,
-                    borderRadius: '8px',
+                    border: `3px solid #000`,
+                    borderRadius: '50px',
                     fontSize: '1rem',
                     fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.3s'
+                    transition: 'all 0.1s ease',
+                    boxShadow: selectedCategory === cat.id ? '5px 5px 0px 0px #C79F00' : '5px 5px 0px 0px white'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translate(3px, 3px)';
+                    e.currentTarget.style.boxShadow = selectedCategory === cat.id ? '2px 2px 0px 0px #C79F00' : '2px 2px 0px 0px white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translate(0, 0)';
+                    e.currentTarget.style.boxShadow = selectedCategory === cat.id ? '5px 5px 0px 0px #C79F00' : '5px 5px 0px 0px white';
                   }}
                 >
                   {cat.label}
@@ -415,17 +424,26 @@ export default function Blog() {
                 }}
               />
               <motion.button
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1 }}
                 style={{
                   padding: '14px 30px',
                   background: '#FDCA40',
-                  border: 'none',
-                  borderRadius: '8px',
+                  border: '3px solid #000',
+                  borderRadius: '50px',
                   color: '#000',
                   fontWeight: '800',
                   cursor: 'pointer',
                   fontSize: '1rem',
-                  boxShadow: '0 8px 24px rgba(253, 202, 64, 0.3)'
+                  boxShadow: '5px 5px 0px 0px #C79F00',
+                  transition: 'all 0.1s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translate(3px, 3px)';
+                  e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translate(0, 0)';
+                  e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
                 }}
               >
                 Pretplati Se
@@ -630,18 +648,20 @@ export default function Blog() {
                     color: '#000',
                     padding: '20px 50px',
                     fontSize: '1.3rem',
-                    borderRadius: '6px',
+                    borderRadius: '50px',
+                    border: '3px solid #000',
                     fontWeight: '700',
-                    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    transition: 'all 0.1s ease',
                     pointerEvents: 'auto',
                     display: 'inline-block',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    boxShadow: '5px 5px 0px 0px #C79F00'
                   }} onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-8px) scale(1.08)';
-                    e.target.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
+                    e.currentTarget.style.transform = 'translate(3px, 3px)';
+                    e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
                   }} onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0) scale(1)';
-                    e.target.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'translate(0, 0)';
+                    e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
                   }}>
                     Kontakt
                   </div>

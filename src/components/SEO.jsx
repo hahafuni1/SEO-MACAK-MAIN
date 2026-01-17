@@ -1,9 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from './Header'
 import Link from './Link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const keyframes = `
+  html, body {
+    overflow-x: hidden !important;
+    position: relative;
+  }
+
   @keyframes moveDiagonalDots {
     from { background-position: 0px 0px; }
     to { background-position: 60px -60px; }
@@ -18,13 +23,275 @@ const keyframes = `
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
   }
+  
+  @keyframes faqProgressBarFill {
+    from {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    to {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+  .faq-progress-bar {
+    animation: faqProgressBarFill 8s linear forwards !important;
+  }
 `
 
 export default function SEO() {
-  const [expandedFaq, setExpandedFaq] = useState(null)
+  const [expandedFaq, setExpandedFaq] = useState(0)
+  const [isFaqAutomatic, setIsFaqAutomatic] = useState(true)
+  const [hoveredFaqIndex, setHoveredFaqIndex] = useState(null)
+  const [hoveredBar, setHoveredBar] = useState(null)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [visibleStickers, setVisibleStickers] = useState([])
+  const [draggingIdx, setDraggingIdx] = useState(null)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [stickerPositions, setStickerPositions] = useState({})
+  const [stickerZIndex, setStickerZIndex] = useState({})
 
-  const toggleFaq = (idx) => {
-    setExpandedFaq(expandedFaq === idx ? null : idx)
+  const allStickers = [
+    // Originalne kartice (6)
+    { text: '93% saobraćaja kreće od Google-a', color: '#fff' },
+    { text: 'Tvoja konkurencija već gradi autoritet', color: '#A8FF5C' },
+    { text: 'SEO je digitalna imovina, ne trošak', color: '#fff' },
+    { text: 'Budi tamo gde te kupci traže', color: '#A8FF5C' },
+    { text: '3x viši ROI od plaćene reklame', color: '#fff' },
+    { text: 'Tvoj sajt radi 24/7 za tebe', color: '#fff' },
+    // Kategorija 1: Direktni odgovori (3)
+    { text: 'Besplatan saobraćaj. Zauvek.', color: '#A8FF5C' },
+    { text: 'Google-u treba vremena da te zavoli', color: '#fff' },
+    { text: '93% iskustava kreće od pretrage', color: '#fff' },
+    // Kategorija 2: Brojke (3)
+    { text: 'Top 3 mesta = 60% svih klikova', color: '#fff' },
+    { text: '0 RSD po svakom kliku', color: '#A8FF5C' },
+    // Kategorija 3: Pametna investicija (2)
+    { text: 'SEO je digitalna nekretnina', color: '#fff' },
+    { text: 'Oglasi gase svetlo, SEO ne', color: '#A8FF5C' },
+    { text: 'Dok ti čekaš, konkurencija profitira', color: '#FF6B6B' },
+    
+    // NOVA: Kategorija 4: "Statusni simbol" (4)
+    { text: 'Google ti je potpisao diplomu', color: '#fff' },
+    { text: 'Prva strana je digitalni centar grada', color: '#A8FF5C' },
+    { text: 'Nevidljiv si na drugoj strani Google-a', color: '#FF6B6B' },
+    { text: 'Tvoj brend na autopilotu', color: '#fff' },
+    
+    // NOVA: Kategorija 5: "Brutalne istine" (4)
+    { text: '75% ljudi nikada ne klikne \'Next\'', color: '#FF6B6B' },
+    { text: 'Plaćeni oglasi su iznajmljen stan', color: '#fff' },
+    { text: 'Svaki dan čekanja = +10 koraka iza rivala', color: '#FF6B6B' },
+    { text: 'Kupci veruju algoritmu, ne oglasu', color: '#A8FF5C' },
+    
+    // NOVA: Kategorija 6: "Investiciona magija" (4)
+    { text: 'SEO radi i kad budžet presuši', color: '#A8FF5C' },
+    { text: 'Smanji cenu po kupcu (CAC) na minimum', color: '#fff' },
+    { text: 'Ovo je jedini marketing koji ne zastareva', color: '#A8FF5C' },
+    { text: 'SEO je tvoj najjeftiniji radnik', color: '#A8FF5C' },
+    
+    // NOVA: Kategorija 7: "Finansijska inteligencija" (4)
+    { text: 'Oglasi su kirija, SEO je tvoja kuća', color: '#fff' },
+    { text: 'Plaćaj klikom ili vladaj tržištem', color: '#A8FF5C' },
+    { text: 'Investicija koja ne traži platu 24/7', color: '#A8FF5C' },
+    { text: 'Smanji trošak marketinga dok prodaja raste', color: '#fff' },
+    
+    // NOVA: Kategorija 8: "Psihologija i Poverenje" (4)
+    { text: 'Ljubav na prvi klik (i prvu stranu)', color: '#fff' },
+    { text: 'Kupci veruju Google-u, a Google veruje tebi', color: '#A8FF5C' },
+    { text: 'Budi autoritet, a ne samo opcija', color: '#fff' },
+    { text: 'Prva strana je dokaz da si najbolji', color: '#fff' },
+    
+    // NOVA: Kategorija 9: "Takmičarski duh" (4)
+    { text: 'Tvoja konkurencija ti upravo krade kupce', color: '#FF6B6B' },
+    { text: 'Dok ti oklevaš, oni grade zid', color: '#FF6B6B' },
+    { text: 'Pretekni ih dok još spavaju', color: '#A8FF5C' },
+    { text: 'Budi lovac, a ne plen na tržištu', color: '#fff' },
+    
+    // NOVA: Kategorija 10: "Realnost i Bolne tačke" (4)
+    { text: 'Druga strana Google-a je pustinja', color: '#FF6B6B' },
+    { text: 'Nevidljiv biznis je hobi, ne posao', color: '#fff' },
+    { text: 'Tvoj sajt zaslužuje više od nula poseta', color: '#fff' },
+    { text: 'Google te trenutno ignoriše. Promeni to.', color: '#FF6B6B' },
+    
+    // NOVA: Kategorija 11: "Vreme i Akumulacija" (4)
+    { text: 'Najbolje vreme je bilo juče, drugo je SADA', color: '#fff' },
+    { text: 'SEO je maraton koji kreće tvojim sprintom', color: '#A8FF5C' },
+    { text: 'Danas gradiš temelje za profit u 2027', color: '#A8FF5C' },
+    { text: 'Svaki dan čekanja je dan više za konkurenciju', color: '#FF6B6B' },
+  ]
+
+  const generateRandomPositions = (count) => {
+    const positions = [
+      { top: '2%', left: '12%' },
+      { top: '8%', left: '72%' },
+      { top: '32%', left: '8%' },
+      { top: '18%', left: '48%' },
+      { top: '48%', left: '68%' },
+      { top: '55%', left: '22%' },
+      { top: '28%', left: '62%' },
+      { top: '62%', left: '5%' },
+      { top: '12%', left: '35%' },
+      { top: '72%', left: '58%' },
+      { top: '42%', left: '38%' },
+      { top: '22%', left: '78%' },
+      { top: '68%', left: '18%' },
+      { top: '82%', left: '72%' },
+      { top: '58%', left: '42%' },
+    ]
+    return positions.slice(0, count)
+  }
+
+  const refreshStickers = () => {
+    const randomCount = 9 // Tačno 9 kartica
+    const shuffled = [...allStickers].sort(() => Math.random() - 0.5)
+    const selected = shuffled.slice(0, randomCount)
+    const positions = generateRandomPositions(randomCount)
+    
+    const stickerData = selected.map((sticker, idx) => ({
+      ...sticker,
+      rotate: (Math.random() * 6 - 3) + 'deg',
+      radius: Math.random() > 0.5 ? '50px' : '15px',
+      delay: (idx * 0.1) + 's',
+      top: positions[idx].top,
+      left: positions[idx].left,
+      width: Math.random() > 0.5 ? '320px' : '280px',
+      fontSize: '1.15rem',
+      padding: '40px 48px',
+      borderWidth: Math.random() > 0.8 ? '4px' : '3px'
+    }))
+    
+    setVisibleStickers(stickerData)
+    setRefreshKey(prev => prev + 1)
+    setStickerPositions({})
+    setStickerZIndex({})
+  }
+
+  const handleMouseDown = (idx, e) => {
+    if (e.button !== 0) return
+    
+    const stickerElement = document.querySelector(`[data-sticker-idx="${idx}"]`)
+    if (!stickerElement) return
+    
+    // Počni drag
+    setDraggingIdx(idx)
+    
+    // Dobij trenutnu poziciju kartice
+    const rect = stickerElement.getBoundingClientRect()
+    
+    // Ako nije već dragovan (nema pos), konvertuj percentage u piksele
+    const pos = stickerPositions[idx]
+    if (!pos) {
+      const sticker = visibleStickers[idx]
+      const container = document.querySelector('[data-sticker-container]')
+      const containerRect = container?.getBoundingClientRect()
+      
+      if (container && containerRect) {
+        // Konvertuj percentage u piksele
+        const topValue = sticker.top.includes('%') 
+          ? (containerRect.height * parseFloat(sticker.top)) / 100 + containerRect.top
+          : parseFloat(sticker.top) + containerRect.top
+          
+        const leftValue = sticker.left.includes('%')
+          ? (containerRect.width * parseFloat(sticker.left)) / 100 + containerRect.left
+          : parseFloat(sticker.left) + containerRect.left
+        
+        // Postavi inicijalnu poziciju u pikselima
+        setStickerPositions(prev => ({
+          ...prev,
+          [idx]: {
+            x: leftValue - containerRect.left,
+            y: topValue - containerRect.top
+          }
+        }))
+      }
+    }
+    
+    // Kalkuliši offset između kursora i leve gornje ivice kartice
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    })
+    
+    // Postavi visok z-index za clicked sticker
+    setStickerZIndex(prev => ({
+      ...prev,
+      [idx]: 9999 + Object.keys(prev).length
+    }))
+  }
+
+  React.useEffect(() => {
+    if (draggingIdx === null) return
+
+    const handleMouseMove = (e) => {
+      const stickerElement = document.querySelector(`[data-sticker-idx="${draggingIdx}"]`)
+      const container = document.querySelector('[data-sticker-container]')
+      
+      if (!stickerElement || !container) return
+      
+      // Dobij veličinu sticker-a i container-a
+      const stickerRect = stickerElement.getBoundingClientRect()
+      const containerRect = container.getBoundingClientRect()
+      const stickerWidth = stickerRect.width
+      const stickerHeight = stickerRect.height
+      
+      // Kalkuliši poziciju relativno prema container-u
+      // Kursor je u viewport koordinatama, trebam da ga prevedem u container koordinate
+      let x = e.clientX - dragOffset.x - containerRect.left
+      let y = e.clientY - dragOffset.y - containerRect.top
+      
+      // Osiguraj da nisu NaN
+      x = isNaN(x) ? 0 : x
+      y = isNaN(y) ? 0 : y
+      
+      // Bounds - dozvoli da budu VAN container-a, ali ne van stranice
+      const buffer = 10
+      const minX = -stickerWidth - 200 // Može biti van levo, do levog bordera
+      const minY = -stickerHeight - 200 // Može biti van gore, do početka sekcije
+      const maxX = window.innerWidth - containerRect.left - buffer
+      const maxY = document.documentElement.scrollHeight - containerRect.top - buffer
+      
+      // Ograniči na bounds - dozvoli kretanje van container-a
+      x = Math.max(minX, Math.min(x, maxX))
+      y = Math.max(minY, Math.min(y, maxY))
+
+      setStickerPositions(prev => ({
+        ...prev,
+        [draggingIdx]: { x, y }
+      }))
+    }
+
+    const handleMouseUp = () => {
+      setDraggingIdx(null)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [draggingIdx, dragOffset])
+
+  React.useEffect(() => {
+    refreshStickers()
+  }, [])
+
+  // Auto-advance FAQ questions every 8 seconds
+  useEffect(() => {
+    if (!isFaqAutomatic) return
+
+    const interval = setInterval(() => {
+      setExpandedFaq((prev) => (prev + 1) % 6)
+    }, 8000)
+
+    return () => clearInterval(interval)
+  }, [isFaqAutomatic])
+
+  const handleFaqClick = (index) => {
+    setExpandedFaq(index)
+    setIsFaqAutomatic(false)
+    setHoveredFaqIndex(null)
   }
 
   return (
@@ -64,9 +331,6 @@ export default function SEO() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <div style={{ marginBottom: '20px', fontSize: '1.1rem', color: '#FDCA40', fontWeight: '700', letterSpacing: '2px' }}>
-                🎯 DOMINACIJA NA GOOGLE-U
-              </div>
               <h1 style={{
                 fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
                 marginBottom: '25px',
@@ -74,7 +338,7 @@ export default function SEO() {
                 lineHeight: '1.15',
                 color: '#fff'
               }}>
-                SEO Strategija Koja <span style={{ color: '#FDCA40' }}>Konvertuje</span>
+                Pretvorite <span style={{ color: '#4285F4', textShadow: '2px 2px 4px rgba(0,0,0,0.5), 4px 4px 8px rgba(0,0,0,0.3)' }}>G</span><span style={{ color: '#EA4335', textShadow: '2px 2px 4px rgba(0,0,0,0.5), 4px 4px 8px rgba(0,0,0,0.3)' }}>o</span><span style={{ color: '#FDCA40', textShadow: '2px 2px 4px rgba(0,0,0,0.5), 4px 4px 8px rgba(0,0,0,0.3)' }}>o</span><span style={{ color: '#34A853', textShadow: '2px 2px 4px rgba(0,0,0,0.5), 4px 4px 8px rgba(0,0,0,0.3)' }}>g</span><span style={{ color: '#EA4335', textShadow: '2px 2px 4px rgba(0,0,0,0.5), 4px 4px 8px rgba(0,0,0,0.3)' }}>l</span><span style={{ color: '#4285F4', textShadow: '2px 2px 4px rgba(0,0,0,0.5), 4px 4px 8px rgba(0,0,0,0.3)' }}>e</span> pretrage u <span style={{ color: '#FDCA40' }}>stalne klijente</span>.
               </h1>
               <p style={{
                 fontSize: 'clamp(1rem, 2vw, 1.35rem)',
@@ -84,42 +348,8 @@ export default function SEO() {
                 maxWidth: '800px',
                 margin: '0 auto 35px'
               }}>
-                Proverite svoju online prisutnost sa SEO strategijom koja ne samo da vam donosi trafik, već i kvalitetne klijente koji su spremni da se konvertuju. Mi ne činimo obećanja - mi donosimo rezultate.
+                Kvalitet ispred kvantiteta. Strategija koja vaš sajt stavlja ispred konkurencije i zadržava pažnju onih koji su vam zaista bitni.
               </p>
-
-              <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  style={{
-                    padding: '16px 45px',
-                    fontSize: '1.1rem',
-                    background: '#FDCA40',
-                    border: 'none',
-                    borderRadius: '8px',
-                    color: '#000',
-                    cursor: 'pointer',
-                    fontWeight: '700',
-                    boxShadow: '0 8px 24px rgba(253, 202, 64, 0.3)'
-                  }}
-                >
-                  Zatraži SEO Audit
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  style={{
-                    padding: '16px 45px',
-                    fontSize: '1.1rem',
-                    background: 'transparent',
-                    border: '2px solid #FDCA40',
-                    borderRadius: '8px',
-                    color: '#FDCA40',
-                    cursor: 'pointer',
-                    fontWeight: '700'
-                  }}
-                >
-                  Pogledaj Rezultate
-                </motion.button>
-              </div>
             </motion.div>
           </div>
         </section>
@@ -127,7 +357,7 @@ export default function SEO() {
         {/* STATS SECTION - Social Proof */}
         <section style={{
           padding: '60px 24px',
-          background: 'linear-gradient(135deg, #000 0%, #1a1a1a 100%)',
+          background: '#000',
           color: '#fff',
           borderTop: '2px solid #FDCA40'
         }}>
@@ -139,16 +369,13 @@ export default function SEO() {
               textAlign: 'center'
             }}>
               {[
-                { stat: '+85%', label: 'Prosječan rast organskog trafika', icon: '📈' },
-                { stat: '+120%', label: 'Povećanje konverzija', icon: '🎯' },
-                { stat: '47', label: 'Klijenta sa rangom #1', icon: '👑' },
+                { stat: '1/1', label: 'Personalizovan pristup. Svaki klijent dobija jednistvenu strategiju', icon: '📈' },
+                { stat: '21.7%', label: 'Prosecna stopa konverzije za SEO', icon: '🎯' },
+                { stat: '+85%', label: 'Procenat konverzije u SEO-u je duplo veća nego kod PPC oglasa', icon: '👑' },
                 { stat: '+350%', label: 'ROI u prvoj godini', icon: '💰' }
               ].map((item, idx) => (
-                <motion.div
+                <div
                   key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
                   style={{
                     padding: '30px',
                     borderRadius: '12px',
@@ -161,7 +388,7 @@ export default function SEO() {
                     {item.stat}
                   </div>
                   <p style={{ color: '#b0b0b0', fontSize: '1rem' }}>{item.label}</p>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -169,97 +396,142 @@ export default function SEO() {
 
         {/* WHY SEO MATTERS - Authority Building */}
         <section style={{
-          padding: '100px 24px',
-          background: '#000',
+          padding: '60px 24px 120px',
+          background: '#FDCA40',
           color: '#fff'
         }}>
-          <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              style={{ textAlign: 'center', marginBottom: '70px' }}
-            >
+          <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 24px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '60px' }}>
               <h2 style={{
                 fontSize: 'clamp(2rem, 5vw, 3.2rem)',
                 marginBottom: '20px',
                 fontWeight: '900',
-                color: '#fff'
+                color: '#000'
               }}>
-                Zašto SEO? Zašto <span style={{ color: '#FDCA40' }}>Sada</span>?
+                Zašto SEO? Zašto <span style={{ color: '#000' }}>Sada</span>?
               </h2>
-              <p style={{ fontSize: '1.2rem', color: '#b0b0b0', maxWidth: '700px', margin: '0 auto' }}>
-                73% online iskustva započinje pretraživanjem. Ako niste na vrhu, gubite klijente svakog dana.
-              </p>
-            </motion.div>
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '35px' }}>
-              {[
-                {
-                  title: 'Dugoročne Rezultate',
-                  desc: 'Za razliku od plaćene reklame, organsko rangiranje raste tokom vremena i postaje jefter.',
-                  icon: '📊'
-                },
-                {
-                  title: 'Kredibilnost i Povjerenje',
-                  desc: 'Korisnici vjeruju više organskim rezultatima nego plaćenim oglasima.',
-                  icon: '🏆'
-                },
-                {
-                  title: 'Viši ROI',
-                  desc: 'SEO traffic ima 3x veću stopu konverzije od plaćene reklame.',
-                  icon: '💎'
-                },
-                {
-                  title: 'Kompetitivna Prednost',
-                  desc: 'Dok konkurenti razmislјaju, vi ćete dominirati vašom industriji.',
-                  icon: '⚔️'
-                },
-                {
-                  title: '24/7 Marketing',
-                  desc: 'Vaš sajt radi za vas čak i kada ne radite. Bez pauziranja kampanja.',
-                  icon: '🤖'
-                },
-                {
-                  title: 'Skalabilnost',
-                  desc: 'Kada ranking poraste, trafik raste bez dodatnog ulaganja.',
-                  icon: '🚀'
-                }
-              ].map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.08 }}
-                  style={{
-                    padding: '35px',
-                    background: 'linear-gradient(135deg, rgba(253, 202, 64, 0.08) 0%, rgba(253, 202, 64, 0.02) 100%)',
-                    border: '2px solid rgba(253, 202, 64, 0.2)',
-                    borderRadius: '12px',
-                    transition: 'all 0.3s'
-                  }}
-                  whileHover={{ borderColor: '#FDCA40', background: 'rgba(253, 202, 64, 0.12)' }}
-                >
-                  <div style={{ fontSize: '2.5rem', marginBottom: '15px' }}>{item.icon}</div>
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '12px', color: '#fff' }}>{item.title}</h3>
-                  <p style={{ color: '#a0a0a0', lineHeight: '1.6' }}>{item.desc}</p>
-                </motion.div>
-              ))}
+            {/* Sticker Wall Layout */}
+            <div 
+              data-sticker-container
+              style={{ 
+                position: 'relative',
+                minHeight: '600px',
+                width: '120%',
+                marginLeft: '-10%',
+                border: '6px dashed #000',
+                borderRadius: '20px',
+                padding: '50px',
+                boxSizing: 'border-box',
+                userSelect: 'none'
+              }}>
+              {visibleStickers.map((sticker, idx) => {
+                const pos = stickerPositions[idx]
+                const isBeingDragged = draggingIdx === idx
+                
+                return (
+                  <div
+                    key={`${refreshKey}-${idx}`}
+                    data-sticker-idx={idx}
+                    style={{
+                      position: 'absolute',
+                      top: pos ? `${pos.y}px` : sticker.top,
+                      left: pos ? `${pos.x}px` : sticker.left,
+                      background: sticker.color,
+                      color: '#000',
+                      border: `${sticker.borderWidth} solid #000`,
+                      borderRadius: sticker.radius,
+                      padding: sticker.padding,
+                      width: sticker.width,
+                      textAlign: 'center',
+                      fontSize: sticker.fontSize,
+                      fontWeight: '900',
+                      lineHeight: '1.4',
+                      boxShadow: isBeingDragged ? '8px 8px 0px #000' : '6px 6px 0px #000',
+                      transform: `rotate(${sticker.rotate}) ${isBeingDragged ? 'scale(1.05)' : ''}`,
+                      transition: isBeingDragged ? 'none' : 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      cursor: 'grab',
+                      animation: `popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) ${sticker.delay} forwards`,
+                      opacity: 0,
+                      zIndex: stickerZIndex[idx] || 9999
+                    }}
+                    onMouseDown={(e) => handleMouseDown(idx, e)}
+                    onMouseEnter={(e) => {
+                      if (draggingIdx === null) {
+                        e.currentTarget.style.transform = 'rotate(0deg) scale(1.1)';
+                        e.currentTarget.style.boxShadow = '2px 2px 0px #000';
+                        e.currentTarget.style.cursor = 'grab';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (draggingIdx === null) {
+                        e.currentTarget.style.transform = `rotate(${sticker.rotate})`;
+                        e.currentTarget.style.boxShadow = '6px 6px 0px #000';
+                      }
+                    }}
+                  >
+                    {sticker.text}
+                  </div>
+                )
+              })}
+              
+              {/* Refresh Button */}
+              <button
+                onClick={refreshStickers}
+                style={{
+                  position: 'absolute',
+                  bottom: '-90px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: '#FDCA40',
+                  color: '#000',
+                  border: '3px solid #000',
+                  borderRadius: '50px',
+                  padding: '18px 48px',
+                  fontSize: '1.15rem',
+                  fontWeight: '900',
+                  fontFamily: "'Courier New', monospace",
+                  letterSpacing: '0.5px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  boxShadow: '6px 6px 0px 0px #C79F00'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateX(-50%) translate(3px, 3px)';
+                  e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateX(-50%)';
+                  e.currentTarget.style.boxShadow = '6px 6px 0px 0px #C79F00';
+                }}
+              >
+                Novi argumenti
+              </button>
             </div>
           </div>
+          <style>{`
+            @keyframes popIn {
+              from {
+                opacity: 0;
+                transform: scale(0.5);
+              }
+              to {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
+          `}</style>
         </section>
 
         {/* SERVICES OFFERED - SEO Packages */}
         <section style={{
           padding: '100px 24px',
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)',
+          background: '#000',
           color: '#fff'
         }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              style={{ textAlign: 'center', marginBottom: '70px' }}
-            >
+            <div style={{ textAlign: 'center', marginBottom: '70px' }}>
               <h2 style={{
                 fontSize: 'clamp(2rem, 5vw, 3.2rem)',
                 marginBottom: '20px',
@@ -268,81 +540,60 @@ export default function SEO() {
               }}>
                 Naše SEO <span style={{ color: '#FDCA40' }}>Usluge</span>
               </h2>
-            </motion.div>
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', marginBottom: '60px' }}>
+            <div className="cartoon-services-grid">
               {[
                 {
                   title: 'Technical SEO Audit',
                   desc: 'Detaljno skeniranje vašeg sajta za pronalaženje problema koji sprečavaju rangiranje.',
+                  icon: '🔧',
                   items: ['Siteamp analiza', 'Brzina učitavanja', 'Mobile-friendliness', 'SSL sigurnost', 'Structured Data', 'Crawl problemi']
                 },
                 {
                   title: 'Keyword Strategy & Research',
                   desc: 'Pronalaženje visoko-vrijednih ključnih reči sa visokim potencijalom konverzije.',
+                  icon: '🔍',
                   items: ['Konkurentska analiza', 'Search intent mapping', 'Long-tail keywords', 'Local keywords', 'Trend analiza', 'Monetizacijska vrijednost']
                 },
                 {
                   title: 'On-Page Optimization',
                   desc: 'Optimizacija sadržaja, meta tagova i strukture za maksimalan ranking potencijal.',
+                  icon: '✨',
                   items: ['Meta optimizacija', 'Heading struktura', 'Sadržaj optimizacija', 'Internal linking', 'Schema markup', 'Image optimization']
                 },
                 {
                   title: 'Content Strategy & Creation',
                   desc: 'Kreiraj sadržaj koji ranka i konvertuje posjetioce u klijente.',
+                  icon: '📝',
                   items: ['Content calendar', 'Pillar pages', 'Blog posts', 'Topic clustering', 'E-books & guides', 'Case studies']
                 },
                 {
                   title: 'Link Building & Authority',
                   desc: 'Izgradnja autoriteta kroz visoko-kvalitetne backlinks od relevantnih sajtova.',
+                  icon: '🔗',
                   items: ['Prospect research', 'Outreach kampanja', 'Guest posting', 'Digital PR', 'Broken link building', 'Competitor analysis']
                 },
                 {
                   title: 'Local SEO',
                   desc: 'Dominacija lokalnih pretrage - postani #1 u tvojoj regiji.',
+                  icon: '📍',
                   items: ['Google Business Profile', 'Local citations', 'Review management', 'Local content', 'Location pages', 'Map optimization']
                 }
               ].map((service, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  style={{
-                    padding: '40px',
-                    background: '#000',
-                    border: '2px solid rgba(253, 202, 64, 0.15)',
-                    borderRadius: '12px',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}
-                  whileHover={{ borderColor: '#FDCA40', boxShadow: '0 0 30px rgba(253, 202, 64, 0.2)' }}
-                >
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    background: '#FDCA40',
-                    transform: 'scaleX(0)',
-                    transformOrigin: 'left',
-                    transition: 'transform 0.4s'
-                  }} />
-                  <h3 style={{ fontSize: '1.5rem', marginBottom: '12px', color: '#FDCA40', fontWeight: '800' }}>
-                    {service.title}
-                  </h3>
-                  <p style={{ color: '#b0b0b0', marginBottom: '20px', lineHeight: '1.6' }}>
-                    {service.desc}
-                  </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                <div key={idx} className="cartoon-service-card">
+                  <div className="cartoon-icon">{service.icon}</div>
+                  <h3 className="cartoon-title">{service.title}</h3>
+                  <p className="cartoon-desc">{service.desc}</p>
+                  <div className="cartoon-items">
                     {service.items.map((item, i) => (
-                      <div key={i} style={{ fontSize: '0.9rem', color: '#a0a0a0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ color: '#FDCA40', fontWeight: '800' }}>✓</span> {item}
+                      <div key={i} className="cartoon-item">
+                        <span className="cartoon-item-icon">→</span>
+                        {item}
                       </div>
                     ))}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -355,207 +606,101 @@ export default function SEO() {
           color: '#fff'
         }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              style={{ textAlign: 'center', marginBottom: '70px' }}
-            >
+            <div style={{ textAlign: 'center', marginBottom: '70px' }}>
               <h2 style={{
                 fontSize: 'clamp(2rem, 5vw, 3.2rem)',
                 marginBottom: '20px',
                 fontWeight: '900',
                 color: '#fff'
               }}>
-                Naš Proveren <span style={{ color: '#FDCA40' }}>Proces</span>
+                Zašto je <span style={{ color: '#FDCA40' }}>SEO</span> najisplativijija investicija za vaš biznis?
               </h2>
               <p style={{ fontSize: '1.1rem', color: '#b0b0b0' }}>
-                Nije čarolija - to je strateški pristup zasnovan na godinama iskustva
+                Dok plaćeni oglasi (PPC) donose trenutnu vidljivost, dugoročna SEO strategija gradi digitalnu imovinu koja raste s vremenom. Naš cilj je da smanjimo vašu zavisnost od skupih klikova i izgradimo autoritet koji Google nagrađuje visokim pozicijama.
               </p>
-            </motion.div>
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '25px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '50px', maxWidth: '900px', margin: '0 auto' }}>
               {[
                 {
-                  phase: '01',
-                  title: 'Discovery & Audit',
-                  desc: 'Detaljno skeniranje vašeg sajta, konkurencije i industrije'
+                  title: 'Dominacija u organskoj pretrazi',
+                  subtitle: 'SEO vs PPC',
+                  stats: '90%+',
+                  desc: 'Statistike pokazuju da preko 90% korisnika preskače sponzorisane oglase i poverenje poklanja organskim rezultatima. Optimizacijom sajta ne dobijate samo klikove, već i kredibilitet kod vaših idealnih kupaca.'
                 },
                 {
-                  phase: '02',
-                  title: 'Strategy',
-                  desc: 'Kreiramo prilagođenu SEO strategiju bazirano na vašim cilјevima'
+                  title: 'Maksimalan ROI i održiv rast',
+                  subtitle: 'Dugoročna rentabilnost',
+                  stats: '24/7',
+                  desc: 'Za razliku od Google oglasa gde saobraćaj staje onog trenutka kada prestanete sa uplatama, SEO pruža stabilan povraćaj investicije (ROI). Kvalitetan sadržaj i tehnička optimizacija rade za vas 24/7, privlačeći nove klijente bez dodatnih troškova po svakom kliku.'
                 },
                 {
-                  phase: '03',
-                  title: 'Implementation',
-                  desc: 'Počinjemo sa on-page, technical i content optimizacijom'
-                },
-                {
-                  phase: '04',
-                  title: 'Authority Building',
-                  desc: 'Izgradnja linkova i jačanje autoriteta vašeg brenda'
-                },
-                {
-                  phase: '05',
-                  title: 'Monitoring & Reporting',
-                  desc: 'Redovni izvještaji, analytics i transparentnost'
-                },
-                {
-                  phase: '06',
-                  title: 'Optimization',
-                  desc: 'Kontinuirana poboljšanja bazirano na podacima i rezultatima'
+                  title: 'Konverzije zasnovane na nameri korisnika',
+                  subtitle: 'Taraćene audience',
+                  stats: '2x',
+                  desc: 'SEO cilja korisnike u trenutku kada oni aktivno traže rešenje. Fokusiranjem na relevantne ključne reči i nameru pretrage (Search Intent), stopa konverzije na vašem sajtu može biti i do dvostruko veća u odnosu na hladne kanale prodaje.'
                 }
               ].map((item, idx) => (
-                <motion.div
+                <div
                   key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
                   style={{
-                    padding: '30px',
-                    background: 'linear-gradient(135deg, rgba(253, 202, 64, 0.1) 0%, rgba(253, 202, 64, 0.02) 100%)',
-                    border: '2px solid rgba(253, 202, 64, 0.15)',
-                    borderRadius: '12px',
-                    textAlign: 'center',
-                    position: 'relative'
+                    display: 'grid',
+                    gridTemplateColumns: '80px 1fr',
+                    gap: '40px',
+                    alignItems: 'flex-start',
+                    paddingBottom: '40px',
+                    borderBottom: idx < 2 ? '1px solid rgba(253, 202, 64, 0.15)' : 'none'
                   }}
                 >
+                  {/* Statistics Circle */}
                   <div style={{
-                    fontSize: '3.5rem',
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '50%',
+                    background: 'rgba(253, 202, 64, 0.15)',
+                    border: '2px solid rgba(253, 202, 64, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '2rem',
                     fontWeight: '900',
                     color: '#FDCA40',
-                    marginBottom: '15px',
-                    opacity: 0.8
+                    flexShrink: 0
                   }}>
-                    {item.phase}
-                  </div>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', color: '#fff', fontWeight: '800' }}>
-                    {item.title}
-                  </h3>
-                  <p style={{ color: '#a0a0a0', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                    {item.desc}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CASE STUDIES - Real Results */}
-        <section style={{
-          padding: '100px 24px',
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)',
-          color: '#fff'
-        }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              style={{ textAlign: 'center', marginBottom: '70px' }}
-            >
-              <h2 style={{
-                fontSize: 'clamp(2rem, 5vw, 3.2rem)',
-                marginBottom: '20px',
-                fontWeight: '900',
-                color: '#fff'
-              }}>
-                Dokazani <span style={{ color: '#FDCA40' }}>Rezultati</span>
-              </h2>
-              <p style={{ fontSize: '1.1rem', color: '#b0b0b0' }}>
-                Pogledajte kako smo transformisali biznis naših klijenta kroz SEO
-              </p>
-            </motion.div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
-              {[
-                {
-                  client: 'E-Commerce Kompanija',
-                  industry: 'Online Prodaja',
-                  before: '15 monthly conversions',
-                  after: '120+ monthly conversions',
-                  growth: '+800%',
-                  metrics: ['Organic traffic: +320%', 'Keyword rankings: 150+ top 10', 'ROI: 450%']
-                },
-                {
-                  client: 'Local Service Business',
-                  industry: 'Usluge',
-                  before: '2-3 upita po mjesecu',
-                  after: '35+ upita po mjesecu',
-                  growth: '+1,150%',
-                  metrics: ['Local visibility: #1 za 8 ključnih reči', 'Google My Business: +420% views', 'Phone calls: +380%']
-                },
-                {
-                  client: 'B2B SaaS Platform',
-                  industry: 'Software',
-                  before: 'Nevidljivi u pretrazi',
-                  after: 'Lider u industriji',
-                  growth: '+650%',
-                  metrics: ['Organic leads: +250 po mjesecu', 'Domain authority: 18→52', 'Monthly users: +580%']
-                }
-              ].map((caseStudy, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.15 }}
-                  style={{
-                    padding: '40px',
-                    background: '#000',
-                    border: '2px solid rgba(253, 202, 64, 0.2)',
-                    borderRadius: '12px',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}
-                >
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '4px',
-                    background: 'linear-gradient(90deg, #FDCA40, transparent)',
-                  }} />
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '8px', color: '#fff', fontWeight: '800' }}>
-                    {caseStudy.client}
-                  </h3>
-                  <p style={{ color: '#FDCA40', fontSize: '0.9rem', marginBottom: '20px', fontWeight: '600' }}>
-                    {caseStudy.industry}
-                  </p>
-
-                  <div style={{
-                    background: 'rgba(253, 202, 64, 0.08)',
-                    padding: '20px',
-                    borderRadius: '8px',
-                    marginBottom: '20px'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <span style={{ color: '#a0a0a0' }}>Prije:</span>
-                      <span style={{ color: '#b0b0b0', fontWeight: '600' }}>{caseStudy.before}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#a0a0a0' }}>Sada:</span>
-                      <span style={{ color: '#FDCA40', fontWeight: '800' }}>{caseStudy.after}</span>
-                    </div>
+                    {item.stats}
                   </div>
 
-                  <div style={{
-                    fontSize: '2.2rem',
-                    fontWeight: '900',
-                    color: '#FDCA40',
-                    marginBottom: '20px',
-                    textAlign: 'center'
-                  }}>
-                    {caseStudy.growth}
+                  {/* Text Content */}
+                  <div>
+                    <h3 style={{
+                      fontSize: '1.5rem',
+                      fontWeight: '800',
+                      color: '#fff',
+                      marginBottom: '6px',
+                      lineHeight: '1.3'
+                    }}>
+                      {item.title}
+                    </h3>
+                    <p style={{
+                      fontSize: '0.9rem',
+                      color: '#FDCA40',
+                      fontWeight: '600',
+                      marginBottom: '14px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.8px'
+                    }}>
+                      {item.subtitle}
+                    </p>
+                    <p style={{
+                      fontSize: '1.05rem',
+                      color: '#c0c0c0',
+                      lineHeight: '1.7',
+                      marginBottom: 0
+                    }}>
+                      {item.desc}
+                    </p>
                   </div>
-
-                  <div style={{ borderTop: '1px solid rgba(253, 202, 64, 0.2)', paddingTop: '20px' }}>
-                    {caseStudy.metrics.map((metric, i) => (
-                      <div key={i} style={{ fontSize: '0.95rem', color: '#a0a0a0', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ color: '#FDCA40' }}>▸</span> {metric}
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -568,11 +713,7 @@ export default function SEO() {
           color: '#fff'
         }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              style={{ textAlign: 'center', marginBottom: '70px' }}
-            >
+            <div style={{ textAlign: 'center', marginBottom: '70px' }}>
               <h2 style={{
                 fontSize: 'clamp(2rem, 5vw, 3.2rem)',
                 marginBottom: '20px',
@@ -581,7 +722,7 @@ export default function SEO() {
               }}>
                 Šta Kažu <span style={{ color: '#FDCA40' }}>Naši Klijenti</span>
               </h2>
-            </motion.div>
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
               {[
@@ -604,11 +745,8 @@ export default function SEO() {
                   rating: 5
                 }
               ].map((testimonial, idx) => (
-                <motion.div
+                <div
                   key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
                   style={{
                     padding: '35px',
                     background: 'linear-gradient(135deg, rgba(253, 202, 64, 0.08) 0%, rgba(253, 202, 64, 0.02) 100%)',
@@ -633,209 +771,526 @@ export default function SEO() {
                       {testimonial.role}
                     </p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* FAQ SECTION - Detailed Answers */}
+        {/* FAQ SECTION - Styled like FAQSection */}
         <section style={{
+          minHeight: '100vh',
           padding: '100px 24px',
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)',
-          color: '#fff'
+          background: '#1a1a1a',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative'
         }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              style={{ textAlign: 'center', marginBottom: '70px' }}
-            >
+          <div style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            right: '0',
+            height: '300px',
+            background: 'linear-gradient(180deg, #000 0%, #1a1a1a 100%)',
+            pointerEvents: 'none',
+            zIndex: 1
+          }} />
+
+          <div style={{
+            maxWidth: '1400px',
+            width: '100%',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+            gap: '60px',
+            alignItems: 'center',
+            position: 'relative',
+            zIndex: 100
+          }}>
+            {/* LEFT SIDE - QUESTIONS */}
+            <div style={{ position: 'relative', zIndex: 20 }}>
               <h2 style={{
-                fontSize: 'clamp(2rem, 5vw, 3.2rem)',
-                marginBottom: '20px',
-                fontWeight: '900',
-                color: '#fff'
+                fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+                marginBottom: '40px',
+                color: '#fff',
+                fontWeight: 800
               }}>
                 Često Postavljana <span style={{ color: '#FDCA40' }}>Pitanja</span>
               </h2>
-            </motion.div>
 
-            <div style={{ display: 'grid', gap: '20px' }}>
-              {[
-                {
-                  q: 'Koliko vremena traje prije nego što vidim rezultate?',
-                  a: 'SEO je marathon, ne sprint. Obično vidite prve rezultate u 8-12 nedjelja, a značajne rezultate u 4-6 mjeseci. Industrija, konkurencija i starting point su bitni faktori.'
-                },
-                {
-                  q: 'Koliko koštaju vaše SEO usluge?',
-                  a: 'Cijene se razlikuju ovisno o opsegu - lokalni SEO počinje od 500€/mjesečno, dok strategic SEO može biti više. Nude se i one-time audit-i. Sve cijene su transparentne bez skrivenih troškova.'
-                },
-                {
-                  q: 'Možete li garantovati #1 ranking?',
-                  a: 'Ne - i bilo ko ko to garantuje je neiskrena osoba. Međutim, sa pravilnom strategijom, može se dosići #1 za većinu relevantnih ključnih reči. Fokusiramo se na rezultate, ne na prazne obećanje.'
-                },
-                {
-                  q: 'Šta se dešava ako prekinem uslugu?',
-                  a: 'Ranking ne pada preko noći, ali će vremenom početi da pada bez kontinuirane optimizacije. SEO je kontinuirani proces. Mi prenosimo sve znanje tako da možete nastaviti sami ako odete.'
-                },
-                {
-                  q: 'Da li radite samo sa new sajtovima ili i sa uspostavljenim?',
-                  a: 'Radimo sa oba! Zapravo, često imamo bolje rezultate sa existing sajtovima jer već imaju neku auktoritetu i trafik. Nove sajtove gradimo sa SEO u misli od početka.'
-                },
-                {
-                  q: 'Kako ćete mi izvještavati o napretku?',
-                  a: 'Mjesečni detalјni izvještaji sa svim bitnim metrikama - rankings, trafik, konverzije. Pristup live dashboard-u gdje možete pratiti sve u realnom vremenu. Redovne check-in pozive.'
-                }
-              ].map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  style={{
-                    background: '#000',
-                    border: '2px solid rgba(253, 202, 64, 0.15)',
-                    borderRadius: '12px',
-                    overflow: 'hidden'
-                  }}
-                >
-                  <button
-                    onClick={() => toggleFaq(idx)}
-                    style={{
-                      width: '100%',
-                      padding: '25px',
-                      background: expandedFaq === idx ? 'rgba(253, 202, 64, 0.1)' : 'transparent',
-                      border: 'none',
-                      color: '#fff',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      transition: 'background 0.3s'
-                    }}
-                  >
-                    <h4 style={{ fontSize: '1.1rem', color: expandedFaq === idx ? '#FDCA40' : '#fff', fontWeight: '700', margin: 0 }}>
-                      {item.q}
-                    </h4>
-                    <span style={{ fontSize: '1.5rem', color: '#FDCA40', transition: 'transform 0.3s', transform: expandedFaq === idx ? 'rotate(45deg)' : 'rotate(0deg)' }}>
-                      +
-                    </span>
-                  </button>
-                  {expandedFaq === idx && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      transition={{ duration: 0.3 }}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[
+                  {
+                    q: 'Koliko vremena traje prije nego što vidim rezultate?',
+                    a: 'SEO je marathon, ne sprint. Obično vidite prve rezultate u 8-12 nedjelja, a značajne rezultate u 4-6 mjeseci. Industrija, konkurencija i starting point su bitni faktori.'
+                  },
+                  {
+                    q: 'Koliko koštaju vaše SEO usluge?',
+                    a: 'Cijene se razlikuju ovisno o opsegu - lokalni SEO počinje od 500€/mjesečno, dok strategic SEO može biti više. Nude se i one-time audit-i. Sve cijene su transparentne bez skrivenih troškova.'
+                  },
+                  {
+                    q: 'Možete li garantovati #1 ranking?',
+                    a: 'Ne - i bilo ko ko to garantuje je neiskrena osoba. Međutim, sa pravilnom strategijom, može se dosići #1 za većinu relevantnih ključnih reči. Fokusiramo se na rezultate, ne na prazne obećanje.'
+                  },
+                  {
+                    q: 'Šta se dešava ako prekinem uslugu?',
+                    a: 'Ranking ne pada preko noći, ali će vremenom početi da pada bez kontinuirane optimizacije. SEO je kontinuirani proces. Mi prenosimo sve znanje tako da možete nastaviti sami ako odete.'
+                  },
+                  {
+                    q: 'Da li radite samo sa new sajtovima ili i sa uspostavljenim?',
+                    a: 'Radimo sa oba! Zapravo, često imamo bolje rezultate sa existing sajtovima jer već imaju neku auktoritetu i trafik. Nove sajtove gradimo sa SEO u misli od početka.'
+                  },
+                  {
+                    q: 'Kako ćete mi izvještavati o napretku?',
+                    a: 'Mjesečni detaljni izvještaji sa svim bitnim metrikama - rankings, trafik, konverzije. Pristup live dashboard-u gdje možete pratiti sve u realnom vremenu. Redovne check-in pozive.'
+                  }
+                ].map((item, idx) => (
+                  <div key={idx} style={{ position: 'relative' }}>
+                    <motion.button
+                      onClick={() => handleFaqClick(idx)}
+                      type="button"
+                      whileTap={{ scale: 0.98 }}
                       style={{
-                        padding: '0 25px 25px',
-                        borderTop: '1px solid rgba(253, 202, 64, 0.2)',
-                        color: '#b0b0b0',
-                        lineHeight: '1.7'
+                        padding: '18px 24px',
+                        textAlign: 'left',
+                        border: '3px solid #000',
+                        borderRadius: '50px',
+                        backgroundColor: expandedFaq === idx ? '#FDCA40' : (hoveredFaqIndex === idx ? 'rgba(253, 202, 64, 0.15)' : 'transparent'),
+                        color: expandedFaq === idx ? '#000' : '#FDCA40',
+                        cursor: 'pointer',
+                        fontSize: '1.05rem',
+                        fontWeight: expandedFaq === idx ? 700 : 500,
+                        transition: 'all 0.15s ease',
+                        width: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        boxShadow: expandedFaq === idx ? '5px 5px 0px 0px #C79F00' : '5px 5px 0px 0px #333333',
+                        transform: hoveredFaqIndex === idx && expandedFaq !== idx ? 'translate(3px, 3px)' : 'translate(0, 0)'
+                      }}
+                      onMouseEnter={() => {
+                        if (expandedFaq !== idx) {
+                          setHoveredFaqIndex(idx)
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredFaqIndex(null)
                       }}
                     >
-                      {item.a}
+                      {item.q}
+                      
+                      {/* Progress bar inside active button */}
+                      {expandedFaq === idx && isFaqAutomatic && (
+                        <div
+                          key={`progress-${expandedFaq}`}
+                          className="faq-progress-bar"
+                          style={{
+                            position: 'absolute',
+                            bottom: '0',
+                            left: '0',
+                            width: '100%',
+                            height: '3px',
+                            background: '#000',
+                            borderRadius: '0 0 50px 0',
+                            zIndex: 40,
+                            transform: 'scaleX(0)',
+                            transformOrigin: 'left'
+                          }}
+                        />
+                      )}
+                    </motion.button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* RIGHT SIDE - CARTOONY PREMIUM CARD */}
+            <div style={{
+              position: 'relative',
+              minHeight: '500px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <AnimatePresence mode="wait">
+                {expandedFaq !== null && (
+                  <motion.div
+                    key={expandedFaq}
+                    initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, rotate: 2 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    style={{
+                      position: 'relative',
+                      width: '95%',
+                      maxWidth: '520px',
+                      padding: '45px 40px',
+                      background: '#FDCA40',
+                      border: '4px solid #000',
+                      borderRadius: '24px',
+                      boxShadow: '8px 8px 0px 0px #000',
+                      transform: 'rotate(-1deg)'
+                    }}
+                  >
+                    {/* Corner accent */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '-12px',
+                      right: '30px',
+                      background: '#fff',
+                      border: '3px solid #000',
+                      borderRadius: '50px',
+                      padding: '8px 16px',
+                      fontSize: '0.85rem',
+                      fontWeight: '800',
+                      color: '#000',
+                      boxShadow: '3px 3px 0px 0px #000'
+                    }}>
+                      #{expandedFaq + 1}
+                    </div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1, duration: 0.25 }}
+                    >
+                      <h3 style={{
+                        fontSize: '1.4rem',
+                        fontWeight: 800,
+                        marginBottom: '20px',
+                        color: '#000',
+                        lineHeight: '1.3'
+                      }}>
+                        {[
+                          { q: 'Koliko vremena traje prije nego što vidim rezultate?', a: 'SEO je marathon, ne sprint. Obično vidite prve rezultate u 8-12 nedjelja, a značajne rezultate u 4-6 mjeseci. Industrija, konkurencija i starting point su bitni faktori.' },
+                          { q: 'Koliko koštaju vaše SEO usluge?', a: 'Cijene se razlikuju ovisno o opsegu - lokalni SEO počinje od 500€/mjesečno, dok strategic SEO može biti više. Nude se i one-time audit-i. Sve cijene su transparentne bez skrivenih troškova.' },
+                          { q: 'Možete li garantovati #1 ranking?', a: 'Ne - i bilo ko ko to garantuje je neiskrena osoba. Međutim, sa pravilnom strategijom, može se dosići #1 za većinu relevantnih ključnih reči. Fokusiramo se na rezultate, ne na prazne obećanje.' },
+                          { q: 'Šta se dešava ako prekinem uslugu?', a: 'Ranking ne pada preko noći, ali će vremenom početi da pada bez kontinuirane optimizacije. SEO je kontinuirani proces. Mi prenosimo sve znanje tako da možete nastaviti sami ako odete.' },
+                          { q: 'Da li radite samo sa new sajtovima ili i sa uspostavljenim?', a: 'Radimo sa oba! Zapravo, često imamo bolje rezultate sa existing sajtovima jer već imaju neku auktoritetu i trafik. Nove sajtove gradimo sa SEO u misli od početka.' },
+                          { q: 'Kako ćete mi izvještavati o napretku?', a: 'Mjesečni detaljni izvještaji sa svim bitnim metrikama - rankings, trafik, konverzije. Pristup live dashboard-u gdje možete pratiti sve u realnom vremenu. Redovne check-in pozive.' }
+                        ][expandedFaq].q}
+                      </h3>
+                      
+                      {/* Divider */}
+                      <div style={{
+                        width: '60px',
+                        height: '4px',
+                        background: '#000',
+                        borderRadius: '2px',
+                        marginBottom: '20px'
+                      }} />
+                      
+                      <p style={{
+                        fontSize: '1.1rem',
+                        lineHeight: '1.75',
+                        color: '#1a1a1a',
+                        margin: 0,
+                        fontWeight: '500'
+                      }}>
+                        {[
+                          { q: 'Koliko vremena traje prije nego što vidim rezultate?', a: 'SEO je marathon, ne sprint. Obično vidite prve rezultate u 8-12 nedjelja, a značajne rezultate u 4-6 mjeseci. Industrija, konkurencija i starting point su bitni faktori.' },
+                          { q: 'Koliko koštaju vaše SEO usluge?', a: 'Cijene se razlikuju ovisno o opsegu - lokalni SEO počinje od 500€/mjesečno, dok strategic SEO može biti više. Nude se i one-time audit-i. Sve cijene su transparentne bez skrivenih troškova.' },
+                          { q: 'Možete li garantovati #1 ranking?', a: 'Ne - i bilo ko ko to garantuje je neiskrena osoba. Međutim, sa pravilnom strategijom, može se dosići #1 za većinu relevantnih ključnih reči. Fokusiramo se na rezultate, ne na prazne obećanje.' },
+                          { q: 'Šta se dešava ako prekinem uslugu?', a: 'Ranking ne pada preko noći, ali će vremenom početi da pada bez kontinuirane optimizacije. SEO je kontinuirani proces. Mi prenosimo sve znanje tako da možete nastaviti sami ako odete.' },
+                          { q: 'Da li radite samo sa new sajtovima ili i sa uspostavljenim?', a: 'Radimo sa oba! Zapravo, često imamo bolje rezultate sa existing sajtovima jer već imaju neku auktoritetu i trafik. Nove sajtove gradimo sa SEO u misli od početka.' },
+                          { q: 'Kako ćete mi izvještavati o napretku?', a: 'Mjesečni detaljni izvještaji sa svim bitnim metrikama - rankings, trafik, konverzije. Pristup live dashboard-u gdje možete pratiti sve u realnom vremenu. Redovne check-in pozive.' }
+                        ][expandedFaq].a}
+                      </p>
                     </motion.div>
-                  )}
-                </motion.div>
-              ))}
+
+                    {/* Unique decorative elements for each question */}
+                    {expandedFaq === 0 && (
+                      <>
+                        <motion.div style={{ position: 'absolute', width: '50px', height: '50px', background: '#fff', border: '3px solid #000', borderRadius: '50%', bottom: '-15px', left: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '3px 3px 0px 0px #000' }} animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>⏱️</motion.div>
+                        <motion.div style={{ position: 'absolute', width: '40px', height: '40px', background: '#A8FF5C', border: '3px solid #000', borderRadius: '8px', top: '20px', left: '-15px', boxShadow: '3px 3px 0px 0px #000' }} animate={{ rotate: [12, 18, 12] }} transition={{ duration: 3, repeat: Infinity }} />
+                        <motion.div style={{ position: 'absolute', width: '30px', height: '30px', background: '#87CEEB', border: '3px solid #000', borderRadius: '50%', bottom: '60px', right: '-10px', boxShadow: '2px 2px 0px 0px #000' }} animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2, repeat: Infinity }} />
+                      </>
+                    )}
+                    {expandedFaq === 1 && (
+                      <>
+                        <motion.div style={{ position: 'absolute', width: '50px', height: '50px', background: '#fff', border: '3px solid #000', borderRadius: '50%', bottom: '-15px', left: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '3px 3px 0px 0px #000' }} animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>💰</motion.div>
+                        <motion.div style={{ position: 'absolute', width: '35px', height: '35px', background: '#FFD700', border: '3px solid #000', borderRadius: '50%', top: '15px', left: '-12px', boxShadow: '3px 3px 0px 0px #000' }} animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }} />
+                        <motion.div style={{ position: 'absolute', width: '45px', height: '25px', background: '#98FB98', border: '3px solid #000', borderRadius: '6px', bottom: '40px', right: '-15px', boxShadow: '2px 2px 0px 0px #000' }} animate={{ rotate: [-5, 5, -5] }} transition={{ duration: 2.5, repeat: Infinity }} />
+                      </>
+                    )}
+                    {expandedFaq === 2 && (
+                      <>
+                        <motion.div style={{ position: 'absolute', width: '50px', height: '50px', background: '#fff', border: '3px solid #000', borderRadius: '50%', bottom: '-15px', left: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '3px 3px 0px 0px #000' }} animate={{ rotate: [0, 360] }} transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}>🎯</motion.div>
+                        <motion.div style={{ position: 'absolute', width: '0', height: '0', borderLeft: '20px solid transparent', borderRight: '20px solid transparent', borderBottom: '35px solid #FF6B6B', top: '10px', left: '-20px', filter: 'drop-shadow(3px 3px 0px #000)' }} animate={{ rotate: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }} />
+                        <motion.div style={{ position: 'absolute', width: '40px', height: '40px', background: '#DDA0DD', border: '3px solid #000', borderRadius: '12px', bottom: '50px', right: '-12px', boxShadow: '2px 2px 0px 0px #000' }} animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.8, repeat: Infinity }} />
+                      </>
+                    )}
+                    {expandedFaq === 3 && (
+                      <>
+                        <motion.div style={{ position: 'absolute', width: '50px', height: '50px', background: '#fff', border: '3px solid #000', borderRadius: '50%', bottom: '-15px', left: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '3px 3px 0px 0px #000' }} animate={{ y: [0, -8, 0] }} transition={{ duration: 2, repeat: Infinity }}>📊</motion.div>
+                        <motion.div style={{ position: 'absolute', width: '50px', height: '30px', background: '#FFA07A', border: '3px solid #000', borderRadius: '15px', top: '25px', left: '-18px', boxShadow: '3px 3px 0px 0px #000' }} animate={{ scaleX: [1, 1.1, 1] }} transition={{ duration: 2.5, repeat: Infinity }} />
+                        <motion.div style={{ position: 'absolute', width: '25px', height: '25px', background: '#20B2AA', border: '3px solid #000', borderRadius: '4px', bottom: '70px', right: '-8px', boxShadow: '2px 2px 0px 0px #000' }} animate={{ rotate: [0, 90, 0] }} transition={{ duration: 3, repeat: Infinity }} />
+                      </>
+                    )}
+                    {expandedFaq === 4 && (
+                      <>
+                        <motion.div style={{ position: 'absolute', width: '50px', height: '50px', background: '#fff', border: '3px solid #000', borderRadius: '50%', bottom: '-15px', left: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '3px 3px 0px 0px #000' }} animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 2.5, repeat: Infinity }}>🏗️</motion.div>
+                        <motion.div style={{ position: 'absolute', width: '35px', height: '45px', background: '#B0C4DE', border: '3px solid #000', borderRadius: '4px 4px 0 0', top: '15px', left: '-15px', boxShadow: '3px 3px 0px 0px #000' }} animate={{ y: [0, -3, 0] }} transition={{ duration: 1.5, repeat: Infinity }} />
+                        <motion.div style={{ position: 'absolute', width: '40px', height: '40px', background: '#F0E68C', border: '3px solid #000', borderRadius: '50%', bottom: '45px', right: '-15px', boxShadow: '2px 2px 0px 0px #000' }} animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} />
+                      </>
+                    )}
+                    {expandedFaq === 5 && (
+                      <>
+                        <motion.div style={{ position: 'absolute', width: '50px', height: '50px', background: '#fff', border: '3px solid #000', borderRadius: '50%', bottom: '-15px', left: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', boxShadow: '3px 3px 0px 0px #000' }} animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.8, repeat: Infinity }}>📈</motion.div>
+                        <motion.div style={{ position: 'absolute', width: '45px', height: '35px', background: '#E6E6FA', border: '3px solid #000', borderRadius: '8px', top: '20px', left: '-18px', boxShadow: '3px 3px 0px 0px #000' }} animate={{ rotate: [-8, 8, -8] }} transition={{ duration: 3, repeat: Infinity }} />
+                        <motion.div style={{ position: 'absolute', width: '30px', height: '30px', background: '#90EE90', border: '3px solid #000', borderRadius: '50%', bottom: '55px', right: '-10px', boxShadow: '2px 2px 0px 0px #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }} animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }}>✓</motion.div>
+                      </>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </section>
 
-        {/* SEO CHECKLIST - Value Add */}
+        {/* SAMO POSTAJE BOLJE - Growth Chart Section */}
         <section style={{
           padding: '100px 24px',
           background: '#000',
-          color: '#fff'
+          color: '#fff',
+          position: 'relative',
+          overflow: 'hidden'
         }}>
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              style={{ textAlign: 'center', marginBottom: '70px' }}
-            >
-              <h2 style={{
-                fontSize: 'clamp(2rem, 5vw, 3.2rem)',
-                marginBottom: '20px',
-                fontWeight: '900',
-                color: '#fff'
-              }}>
-                SEO <span style={{ color: '#FDCA40' }}>Checklist</span>
-              </h2>
-              <p style={{ fontSize: '1.1rem', color: '#b0b0b0' }}>
-                Besplatnu za preuzimanje - koristite je za sebe ili nam pošaljite vašu stranicu za audit
-              </p>
-            </motion.div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginBottom: '50px' }}>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+            {/* Section Header */}
+            <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                style={{ 
+                  fontSize: '1rem', 
+                  color: '#FDCA40', 
+                  fontWeight: '700', 
+                  letterSpacing: '2px', 
+                  marginBottom: '15px' 
+                }}
               >
-                <h3 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#FDCA40', fontWeight: '800' }}>
-                  Technical SEO
-                </h3>
-                {[
-                  'Site speed < 2 sekunde',
-                  'Mobile responsive design',
-                  'SSL certifikat (HTTPS)',
-                  'XML sitemap',
-                  'Robots.txt optimizovano',
-                  'Structured data (Schema)',
-                  'Core Web Vitals passed',
-                  'No crawl errors'
-                ].map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', padding: '10px 0', borderBottom: '1px solid rgba(253, 202, 64, 0.1)' }}>
-                    <input type="checkbox" style={{ width: '20px', height: '20px', cursor: 'pointer' }} />
-                    <span style={{ color: '#a0a0a0' }}>{item}</span>
-                  </div>
-                ))}
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                REZULTATI
+              </motion.p>
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                style={{
+                  fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                  fontWeight: '900',
+                  marginBottom: '20px',
+                  color: '#fff',
+                  lineHeight: '1.2'
+                }}
               >
-                <h3 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#FDCA40', fontWeight: '800' }}>
-                  On-Page SEO
-                </h3>
-                {[
-                  'Unique title tags (50-60 chars)',
-                  'Meta descriptions',
-                  'H1 sa primary keyword',
-                  'LSI keywords u sadržaju',
-                  'Internal linking strategija',
-                  'Image alt text',
-                  'Content length > 1000 reči',
-                  'Readability score > 60'
-                ].map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', padding: '10px 0', borderBottom: '1px solid rgba(253, 202, 64, 0.1)' }}>
-                    <input type="checkbox" style={{ width: '20px', height: '20px', cursor: 'pointer' }} />
-                    <span style={{ color: '#a0a0a0' }}>{item}</span>
-                  </div>
-                ))}
-              </motion.div>
+                Samo Postaje <span style={{ color: '#FDCA40' }}>Bolje.</span>
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                style={{ 
+                  fontSize: '1.1rem', 
+                  color: '#b0b0b0', 
+                  maxWidth: '600px', 
+                  margin: '0 auto',
+                  lineHeight: '1.6'
+                }}
+              >
+                Pogledaj kako izgleda tipičan rast organskog trafika nakon naše SEO optimizacije
+              </motion.p>
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.05, y: -2 }}
+            {/* Glassmorphism Chart Container */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
               style={{
-                width: '100%',
-                padding: '18px',
-                background: '#FDCA40',
-                color: '#000',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '1.1rem',
-                fontWeight: '800',
-                cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(253, 202, 64, 0.3)'
+                position: 'relative',
+                padding: '40px',
+                borderRadius: '24px',
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(253, 202, 64, 0.15)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
               }}
             >
-              Preuzmi Kompletan SEO Checklist (PDF)
-            </motion.button>
+              {/* Chart Area */}
+              <div style={{ 
+                position: 'relative', 
+                height: '320px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                justifyContent: 'center', 
+                gap: '6px',
+                padding: '0 10px'
+              }}>
+                {/* Zone Tooltips */}
+                {[
+                  { start: 0, end: 10, label: '2-3 meseca nakon početka optimizacije:', sublabel: 'Aktivacija i Start' },
+                  { start: 10, end: 22, label: '4-6 meseca nakon početka optimizacije:', sublabel: 'Ekspanzija Snage' },
+                  { start: 22, end: 37, label: '6+ meseca nakon početka optimizacije:', sublabel: 'Probijanje Granica' }
+                ].map((zone, zoneIdx) => {
+                  const [isHovered, setIsHovered] = useState(false)
+                  return (
+                    <div
+                      key={zoneIdx}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        height: '100%',
+                        left: `${(zone.start / 37) * 100}%`,
+                        width: `${((zone.end - zone.start) / 37) * 100}%`,
+                        cursor: 'pointer',
+                        zIndex: 20
+                      }}
+                    >
+                      {/* Hover overlay */}
+                      <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to top, rgba(253, 202, 64, 0.15), transparent)',
+                        opacity: isHovered ? 1 : 0,
+                        transition: 'opacity 0.3s ease',
+                        borderRadius: '8px'
+                      }} />
+                      
+                      {/* Tooltip */}
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '100%',
+                        left: '50%',
+                        transform: `translateX(-50%) translateY(${isHovered ? '-15px' : '0px'})`,
+                        opacity: isHovered ? 1 : 0,
+                        transition: 'all 0.3s ease',
+                        pointerEvents: 'none',
+                        zIndex: 30,
+                        minWidth: '240px'
+                      }}>
+                        <div style={{
+                          padding: '15px 20px',
+                          borderRadius: '12px',
+                          background: 'rgba(253, 202, 64, 0.95)',
+                          boxShadow: '0 10px 40px rgba(253, 202, 64, 0.3)',
+                          textAlign: 'center'
+                        }}>
+                          <p style={{ fontWeight: '700', color: '#000', fontSize: '0.85rem', marginBottom: '5px' }}>
+                            {zone.label}
+                          </p>
+                          <p style={{ color: 'rgba(0,0,0,0.7)', fontWeight: '600', fontSize: '0.9rem' }}>
+                            {zone.sublabel}
+                          </p>
+                        </div>
+                        {/* Arrow */}
+                        <div style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: 0,
+                          height: 0,
+                          borderLeft: '10px solid transparent',
+                          borderRight: '10px solid transparent',
+                          borderTop: '10px solid rgba(253, 202, 64, 0.95)'
+                        }} />
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {/* Animated Bars - 37 pillars */}
+                {Array.from({ length: 37 }).map((_, idx) => {
+                  const progress = idx / 36
+                  // Bazna visina raste eksponencijalno
+                  const baseLine = 15 + (progress * progress * 70)
+                  // Volatilnost - simulira realan SEO rast
+                  const seed = Math.sin(idx * 12.9898 + 78.233) * 43758.5453
+                  const volatility = ((seed - Math.floor(seed)) - 0.5) * 25
+                  // Dodatni skok za zadnju grupu
+                  const finalBoost = idx > 27 ? (idx - 27) * 2 : 0
+                  const height = Math.max(10, Math.min(98, baseLine + volatility + finalBoost))
+                  
+                  return (
+                    <motion.div
+                      key={idx}
+                      initial={{ scaleY: 0 }}
+                      whileInView={{ scaleY: 1 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{
+                        duration: 0.6,
+                        delay: idx * 0.03,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
+                      style={{
+                        flex: 1,
+                        maxWidth: '16px',
+                        minWidth: '6px',
+                        height: `${height}%`,
+                        background: 'linear-gradient(to top, #C79F00, #FDCA40, #FFE082)',
+                        borderRadius: '100px 100px 0 0',
+                        transformOrigin: 'bottom',
+                        boxShadow: '0 0 15px rgba(253, 202, 64, 0.4)',
+                        position: 'relative'
+                      }}
+                    />
+                  )
+                })}
+              </div>
+
+              {/* X-Axis Labels */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                marginTop: '25px', 
+                paddingTop: '20px', 
+                borderTop: '1px solid rgba(255,255,255,0.1)' 
+              }}>
+                <span style={{ fontSize: '0.85rem', color: '#666' }}>Početak</span>
+                <span style={{ fontSize: '0.85rem', color: '#666' }}>3 meseca</span>
+                <span style={{ fontSize: '0.85rem', color: '#666' }}>6 meseci</span>
+                <span style={{ fontSize: '0.85rem', color: '#FDCA40', fontWeight: '700' }}>12+ meseci</span>
+              </div>
+            </motion.div>
+
+            {/* Bottom Stats */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '30px',
+              marginTop: '60px',
+              textAlign: 'center'
+            }}>
+              {[
+                { value: '320%', label: 'Prosečan rast organskog trafika' },
+                { value: '6-12', label: 'Meseci do vrha Google-a' },
+                { value: '24/7', label: 'Vaš sajt radi za vas non-stop' }
+              ].map((stat, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.5 + idx * 0.1 }}
+                >
+                  <p style={{ color: '#FDCA40', fontSize: '2.5rem', fontWeight: '900', marginBottom: '10px' }}>
+                    {stat.value}
+                  </p>
+                  <p style={{ color: '#b0b0b0', fontSize: '1rem' }}>
+                    {stat.label}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -851,6 +1306,7 @@ export default function SEO() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
+            once={true}
             style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 2 }}
           >
             <h2 style={{
@@ -880,18 +1336,20 @@ export default function SEO() {
                   color: '#FDCA40',
                   padding: '20px 50px',
                   fontSize: '1.3rem',
-                  borderRadius: '6px',
+                  borderRadius: '50px',
+                  border: '3px solid #FDCA40',
                   fontWeight: '700',
-                  transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  transition: 'all 0.1s ease',
                   pointerEvents: 'auto',
                   display: 'inline-block',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  boxShadow: '5px 5px 0px 0px #C79F00'
                 }} onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
-                  e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
+                  e.currentTarget.style.transform = 'translate(3px, 3px)';
+                  e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
                 }} onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.transform = 'translate(0, 0)';
+                  e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
                 }}>
                   Zatraži Besplatnu Konsultaciju
                 </div>
@@ -904,7 +1362,7 @@ export default function SEO() {
           </motion.div>
         </section>
 
-        {/* FOOTER */}
+        
         <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333', position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ display: 'flex', gap: '80px', marginBottom: '60px', position: 'relative', alignItems: 'flex-start' }}>

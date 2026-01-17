@@ -85,17 +85,24 @@ export default function About() {
                 transition={{ duration: 0.6 }}
               >
                 <div style={{
-                  background: 'linear-gradient(135deg, rgba(253, 202, 64, 0.15), rgba(253, 202, 64, 0.05))',
                   width: '100%',
-                  aspectRatio: '1',
+                  aspectRatio: '3/4',
                   borderRadius: '16px',
-                  border: '2px solid rgba(253, 202, 64, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '80px'
+                  border: '4px solid #000',
+                  boxShadow: '8px 8px 0px 0px #FDCA40',
+                  overflow: 'hidden',
+                  position: 'relative'
                 }}>
-                  🐱
+                  <img 
+                    src="/marko-founder.jpeg" 
+                    alt="Marko - Osnivač SEO Mačka" 
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center top'
+                    }}
+                  />
                 </div>
               </motion.div>
 
@@ -532,31 +539,51 @@ export default function About() {
 
             <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1 }}
                 style={{
                   padding: '18px 50px',
                   fontSize: '1.1rem',
                   background: '#000',
-                  border: 'none',
-                  borderRadius: '8px',
+                  border: '3px solid #FDCA40',
+                  borderRadius: '50px',
                   color: '#FDCA40',
                   cursor: 'pointer',
-                  fontWeight: '900'
+                  fontWeight: '900',
+                  boxShadow: '5px 5px 0px 0px #C79F00',
+                  transition: 'all 0.1s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translate(3px, 3px)';
+                  e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translate(0, 0)';
+                  e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
                 }}
               >
                 Zakaži Razgovor
               </motion.button>
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1 }}
                 style={{
                   padding: '18px 50px',
                   fontSize: '1.1rem',
                   background: 'transparent',
-                  border: '2px solid #000',
-                  borderRadius: '8px',
+                  border: '3px solid #000',
+                  borderRadius: '50px',
                   color: '#000',
                   cursor: 'pointer',
-                  fontWeight: '900'
+                  fontWeight: '900',
+                  boxShadow: '5px 5px 0px 0px white',
+                  transition: 'all 0.1s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translate(3px, 3px)';
+                  e.currentTarget.style.boxShadow = '2px 2px 0px 0px white';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translate(0, 0)';
+                  e.currentTarget.style.boxShadow = '5px 5px 0px 0px white';
                 }}
               >
                 Pročitaj Blog
@@ -618,18 +645,20 @@ export default function About() {
                     color: '#000',
                     padding: '20px 50px',
                     fontSize: '1.3rem',
-                    borderRadius: '6px',
+                    borderRadius: '50px',
+                    border: '3px solid #000',
                     fontWeight: '700',
-                    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    transition: 'all 0.1s ease',
                     pointerEvents: 'auto',
                     display: 'inline-block',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    boxShadow: '5px 5px 0px 0px #C79F00'
                   }} onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-8px) scale(1.08)';
-                    e.target.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
+                    e.currentTarget.style.transform = 'translate(3px, 3px)';
+                    e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
                   }} onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0) scale(1)';
-                    e.target.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'translate(0, 0)';
+                    e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
                   }}>
                     Kontakt
                   </div>

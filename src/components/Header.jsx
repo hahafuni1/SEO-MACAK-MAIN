@@ -6,7 +6,11 @@ import logoImg from '../../LOGO MAIN MAIN.png'
 export default function Header() {
   const location = useLocation()
   const isIzradaSajtova = location.pathname === '/izrada-sajtova/'
-  const logoColor = isIzradaSajtova ? '#ffffff' : '#000000'
+  const isSEO = location.pathname === '/seo/'
+  const isBlog = location.pathname === '/blog/'
+  const isAbout = location.pathname === '/about/'
+  const isKontakt = location.pathname === '/kontakt/'
+  const logoColor = (isIzradaSajtova || isSEO || isBlog || isAbout || isKontakt) ? '#ffffff' : '#000000'
 
   return (
     <header className="site-header">

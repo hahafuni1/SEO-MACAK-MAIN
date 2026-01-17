@@ -94,8 +94,8 @@ export default function IzradaSajtova() {
             backgroundImage: 'linear-gradient(45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%), linear-gradient(-45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%)',
             backgroundSize: '60px 60px',
             backgroundPosition: '0px 0px',
-            opacity: 0.08,
-            animation: 'moveDiagonalDots 3s linear infinite',
+            opacity: 0.12,
+            animation: 'moveDiagonalDots 4s linear infinite',
             zIndex: 1,
             pointerEvents: 'none'
           }}
@@ -108,121 +108,94 @@ export default function IzradaSajtova() {
           <div style={{ textAlign: 'center', marginTop: '50px' }}>
             <Link 
               to="/kontakt/" 
-              style={{ textDecoration: 'none' }}
+              style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}
             >
-              <button style={{
+              <div style={{
+                background: '#FDCA40',
+                color: '#000',
                 padding: '28px 90px',
                 fontSize: '1.6rem',
-                fontWeight: '700',
-                fontFamily: 'Playfair Display, serif',
-                backgroundImage: 'linear-gradient(90deg, #FDCA40 0%, #FDCA40 50%, #000 50%, #000 100%)',
-                backgroundSize: '200% 100%',
-                backgroundPosition: '0% center',
-                color: '#000',
-                border: 'none',
                 borderRadius: '50px',
-                cursor: 'pointer',
-                transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                boxShadow: '0 10px 30px rgba(253, 202, 64, 0.3)',
-                letterSpacing: '0.5px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 20px 50px rgba(253, 202, 64, 0.6), 0 0 30px rgba(253, 202, 64, 0.4)';
-                e.currentTarget.style.backgroundPosition = '100% center';
-                e.currentTarget.style.color = '#FDCA40';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(253, 202, 64, 0.3)';
-                e.currentTarget.style.backgroundPosition = '0% center';
-                e.currentTarget.style.color = '#000';
+                fontWeight: '700',
+                transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                pointerEvents: 'auto',
+                display: 'inline-block',
+                whiteSpace: 'nowrap'
+              }} onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
+                e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
+              }} onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = 'none';
               }}>
                 Potražite Besplatnu Ponudu
-              </button>
+              </div>
             </Link>
           </div>
         </div>
       </section>
 
       {/* WHY CHOOSE US - Trust & Authority */}
-      <section style={{ padding: '80px 24px', background: '#000', color: '#fff' }}>
+      <section style={{ padding: '80px 24px', background: '#000', color: '#fff', borderTop: '2px solid #FDCA40' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h2 style={{ 
             textAlign: 'center', 
-            fontSize: '2.8rem', 
+            fontSize: '3rem', 
             marginBottom: '60px', 
             fontWeight: '800',
-            background: 'linear-gradient(135deg, #FFFFFF 0%, #A0A0A0 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            color: '#FDCA40'
+            color: '#FFFFFF'
           }}>Zašto Izabrati Nas?</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px', position: 'relative' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '60px', maxWidth: '900px', margin: '0 auto' }}>
             {[
-              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>', title: 'Brzi Sajtovi', desc: 'Optimizovani za brže učitavanje - veća konverzija i bolja SEO rangiranja', color: '#FFD700' },
-              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L15.09 8.26H22L17.55 12.5L18.91 18.76L12 14.5L5.09 18.76L6.45 12.5L2 8.26H8.91L12 2Z"/></svg>', title: 'Moderni Dizajn', desc: 'Responsive dizajn koji savršeno izgleda na svim uređajima', color: '#00BFFF' },
-              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>', title: 'SEO Optimizacija', desc: 'Ugrađene SEO najbolje prakse od početka - rang na Google-u', color: '#FF6B9D' },
-              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>', title: 'Mobilni First', desc: 'Prilagođeno za mobilne korisnike - većina trafika dolazi sa mobitela', color: '#00FF88' },
-              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', title: 'Sigurnost', desc: 'SSL certifikat, zaštita podataka i redovne sigurnosne nadogradnje', color: '#FF9500' },
-              { svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>', title: 'Podrška & Održavanje', desc: 'Dugoročna podrška, praćenje i redovne nadogradnje', color: '#FF1493' }
-            ].map((item, idx) => {
-              const isMiddleCard = idx === 3; // Srednja kartica (4. kartica - 0 indexed)
-              const bgGradient = 'radial-gradient(135% 135% at 0% 0%, rgba(255,255,255,0.05) 0%, transparent 50%)';
-              
-              return (
-                <div key={idx} style={{ 
-                  background: `linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%), ${bgGradient}`,
-                  padding: isMiddleCard ? '45px' : '40px', 
-                  borderRadius: '12px', 
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  transform: isMiddleCard ? 'scale(1.05)' : 'scale(1)',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.border = `1px solid ${item.color}`;
-                  e.currentTarget.style.boxShadow = `0 0 20px ${item.color}40, inset 0 0 20px ${item.color}10`;
-                  e.currentTarget.style.transform = isMiddleCard ? 'scale(1.08)' : 'scale(1.03)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.transform = isMiddleCard ? 'scale(1.05)' : 'scale(1)';
-                }}>
-                  {/* Icon Container */}
-                  <div style={{ 
-                    width: '60px', 
-                    height: '60px', 
-                    borderRadius: '12px',
-                    background: `${item.color}15`,
-                    border: `2px solid ${item.color}40`,
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    marginBottom: '20px',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = `${item.color}25`;
-                    e.currentTarget.style.boxShadow = `0 0 15px ${item.color}40`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = `${item.color}15`;
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}>
-                    <div style={{ color: item.color, width: '32px', height: '32px' }} dangerouslySetInnerHTML={{ __html: item.svg }} />
-                  </div>
-                  
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '12px', color: '#FFFFFF', fontWeight: '700' }}>{item.title}</h3>
-                  <p style={{ color: '#A0A0A0', lineHeight: '1.8', fontSize: '0.95rem' }}>{item.desc}</p>
-                </div>
-              );
-            })}
+              { title: 'Brzi Sajtovi', desc: 'Optimizovani za brže učitavanje - veća konverzija i bolja SEO rangiranja' },
+              { title: 'Moderni Dizajn', desc: 'Responsive dizajn koji savršeno izgleda na svim uređajima' },
+              { title: 'SEO Optimizacija', desc: 'Ugrađene SEO najbolje prakse od početka - rang na Google-u' },
+              { title: 'Mobilni First', desc: 'Prilagođeno za mobilne korisnike - većina trafika dolazi sa mobitela' },
+              { title: 'Sigurnost', desc: 'SSL certifikat, zaštita podataka i redovne sigurnosne nadogradnje' },
+              { title: 'Podrška & Održavanje', desc: 'Dugoročna podrška, praćenje i redovne nadogradnje' }
+            ].map((item, idx) => (
+              <div key={idx} style={{ 
+                paddingLeft: '24px',
+                paddingBottom: idx !== 5 ? '60px' : '0',
+                borderLeft: '2px solid rgba(253, 202, 64, 0.4)',
+                borderBottom: idx !== 5 ? '1px solid transparent' : 'none',
+                backgroundImage: idx !== 5 ? 'linear-gradient(to bottom, rgba(253, 202, 64, 0.1), transparent)' : 'none',
+                backgroundSize: '1px 100%',
+                backgroundPosition: '0 0',
+                backgroundRepeat: 'repeat-y',
+                transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                cursor: 'pointer',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderLeft = '5px solid #FDCA40';
+                e.currentTarget.style.paddingLeft = '20px';
+                e.currentTarget.style.transform = 'translateX(8px)';
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(253, 202, 64, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderLeft = '2px solid rgba(253, 202, 64, 0.4)';
+                e.currentTarget.style.paddingLeft = '24px';
+                e.currentTarget.style.transform = 'translateX(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.8rem', 
+                  marginBottom: '16px', 
+                  color: '#FDCA40', 
+                  fontWeight: '700',
+                  lineHeight: '1.4',
+                  margin: '0 0 16px 0'
+                }}>{item.title}</h3>
+                <p style={{ 
+                  color: '#888888', 
+                  lineHeight: '1.7', 
+                  fontSize: '1.05rem', 
+                  margin: 0,
+                  fontWeight: '400'
+                }}>{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -254,7 +227,7 @@ export default function IzradaSajtova() {
                 desc: 'Biti na internetu nije isto što i biti vidljiv. Naša strategija vas postavlja ispred konkurencije kroz tehničku optimizaciju i link building. SEO Mačak ne juri samo saobraćaj, već kvalitetne posete koje se direktno transformišu u realan poslovni profit.'
               }
             ].map((service, idx) => (
-              <div key={idx} style={{
+              <div key={idx} data-clickable="true" style={{
                 background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
                 padding: '45px',
                 borderRadius: '16px',
@@ -405,18 +378,20 @@ export default function IzradaSajtova() {
                 color: '#000',
                 padding: '20px 50px',
                 fontSize: '1.3rem',
-                borderRadius: '6px',
+                borderRadius: '50px',
+                border: '3px solid #000',
                 fontWeight: '700',
-                transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                transition: 'all 0.1s ease',
                 pointerEvents: 'auto',
                 display: 'inline-block',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                boxShadow: '5px 5px 0px 0px #C79F00'
               }} onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
-                e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
+                e.currentTarget.style.transform = 'translate(3px, 3px)';
+                e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
               }} onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'translate(0, 0)';
+                e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
               }}>
                 Besplatna Konsultacija
               </div>
@@ -524,7 +499,10 @@ export default function IzradaSajtova() {
                   position: 'relative',
                   overflow: 'hidden',
                   boxShadow: `0 0 30px ${project.color}30`,
-                  flexShrink: 0
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}>
                   <div style={{
                     position: 'absolute',
@@ -535,20 +513,74 @@ export default function IzradaSajtova() {
                     background: project.color,
                     opacity: 0.8
                   }} />
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '100%',
-                    height: '100%',
-                    color: project.color,
-                    opacity: 0.3,
-                    fontSize: '3rem',
-                    fontWeight: '700',
-                    textAlign: 'center'
-                  }}>
-                    {project.title.split(' ')[0]}
-                  </div>
+                  {idx === 0 ? (
+                    <img 
+                      src="/internet-prodavnica.png" 
+                      alt="E-Commerce Platform" 
+                      style={{
+                        width: '120%',
+                        height: '120%',
+                        objectFit: 'cover',
+                        borderRadius: '2px',
+                        marginLeft: '-40px',
+                        marginRight: '-40px'
+                      }}
+                    />
+                  ) : idx === 1 ? (
+                    <img 
+                      src="/saas-aplikacije.png" 
+                      alt="SaaS Aplikacije" 
+                      style={{
+                        width: '120%',
+                        height: '120%',
+                        objectFit: 'cover',
+                        borderRadius: '2px',
+                        marginLeft: '-40px',
+                        marginRight: '-40px'
+                      }}
+                    />
+                  ) : idx === 2 ? (
+                    <img 
+                      src="/seo-optimizacija.png" 
+                      alt="SEO Optimizacija" 
+                      style={{
+                        width: '120%',
+                        height: '120%',
+                        objectFit: 'cover',
+                        borderRadius: '2px',
+                        marginLeft: '-40px',
+                        marginRight: '-40px'
+                      }}
+                    />
+                  ) : idx === 3 ? (
+                    <img 
+                      src="/dizajn-brending.png" 
+                      alt="Dizajn & Branding" 
+                      style={{
+                        width: '120%',
+                        height: '120%',
+                        objectFit: 'cover',
+                        borderRadius: '2px',
+                        marginLeft: '-40px',
+                        marginRight: '-40px'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '100%',
+                      height: '100%',
+                      color: project.color,
+                      opacity: 0.3,
+                      fontSize: '3rem',
+                      fontWeight: '700',
+                      textAlign: 'center'
+                    }}>
+                      {project.title.split(' ')[0]}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -782,13 +814,189 @@ export default function IzradaSajtova() {
       </section>
 
 
+      {/* PRICING PACKAGES SECTION */}
+      <section style={{
+        padding: '100px 24px',
+        background: '#000',
+        color: '#fff',
+        marginTop: '0'
+      }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '70px' }}>
+            <h2 style={{
+              fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+              marginBottom: '20px',
+              fontWeight: '900',
+              color: '#fff'
+            }}>
+              Naši <span style={{ color: '#FDCA40' }}>Paketi</span>
+            </h2>
+            <p style={{ fontSize: '1.2rem', color: '#b0b0b0', maxWidth: '700px', margin: '0 auto' }}>
+              Izaberite paket koji najboji odgovara vašim potrebama. Svi paketi uključuju besplatnu konsultaciju!
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
+            {[
+              {
+                name: 'Mačak Basic',
+                price: '299€',
+                period: 'mesečno',
+                features: [
+                  'Responsive dizajn',
+                  'SEO optimizacija',
+                  '5 stranica',
+                  'Kontakt forma',
+                  '1 mesec podrške',
+                  'SSL certifikat'
+                ],
+                highlighted: false
+              },
+              {
+                name: 'Mačak Napredni',
+                price: '599€',
+                period: 'mesečno',
+                features: [
+                  'Sve iz Basic paketa',
+                  'E-commerce integracija',
+                  'Unlimited stranica',
+                  'Blog sistem',
+                  '3 meseca podrške',
+                  'Analytics integracija',
+                  'Newsletter sistem'
+                ],
+                highlighted: true
+              },
+              {
+                name: 'Mačak Preduzeće',
+                price: '999€',
+                period: 'mesečno',
+                features: [
+                  'Sve iz Naprednog paketa',
+                  'CRM integracija',
+                  'Prilagođeni dizajn',
+                  '6 meseci podrške',
+                  'API integracije',
+                  'Performance optimizacija',
+                  'Dedicated support'
+                ],
+                highlighted: false
+              }
+            ].map((pkg, idx) => (
+              <div
+                key={idx}
+                style={{
+                  padding: '40px',
+                  background: pkg.highlighted ? '#FDCA40' : '#1a1a1a',
+                  color: pkg.highlighted ? '#000' : '#fff',
+                  border: '3px solid #000',
+                  borderRadius: '20px',
+                  position: 'relative',
+                  boxShadow: pkg.highlighted ? '8px 8px 0px 0px #C79F00' : '8px 8px 0px 0px #333333',
+                  transition: 'all 0.3s ease',
+                  transform: pkg.highlighted ? 'scale(1.05)' : 'scale(1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = pkg.highlighted ? 'scale(1.08)' : 'scale(1.02)';
+                  e.currentTarget.style.boxShadow = pkg.highlighted ? '5px 5px 0px 0px #C79F00' : '5px 5px 0px 0px #333333';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = pkg.highlighted ? 'scale(1.05)' : 'scale(1)';
+                  e.currentTarget.style.boxShadow = pkg.highlighted ? '8px 8px 0px 0px #C79F00' : '8px 8px 0px 0px #333333';
+                }}
+              >
+                {pkg.highlighted && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '-15px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#FDCA40',
+                    color: '#000',
+                    padding: '8px 20px',
+                    borderRadius: '20px',
+                    fontSize: '0.9rem',
+                    fontWeight: '900',
+                    border: '2px solid #000'
+                  }}>
+                    NAJPOPULARNIJI
+                  </div>
+                )}
+
+                <h3 style={{
+                  fontSize: '1.8rem',
+                  fontWeight: '900',
+                  marginBottom: '10px',
+                  color: pkg.highlighted ? '#000' : '#FDCA40'
+                }}>
+                  {pkg.name}
+                </h3>
+
+                <div style={{ marginBottom: '30px', paddingBottom: '30px', borderBottom: `2px solid ${pkg.highlighted ? 'rgba(0,0,0,0.2)' : 'rgba(253, 202, 64, 0.3)'}` }}>
+                  <div style={{ fontSize: '3rem', fontWeight: '900', marginBottom: '5px' }}>
+                    {pkg.price}
+                  </div>
+                  <p style={{ fontSize: '0.9rem', opacity: 0.8, margin: 0 }}>
+                    {pkg.period}
+                  </p>
+                </div>
+
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginBottom: '30px' }}>
+                  {pkg.features.map((feature, i) => (
+                    <li key={i} style={{
+                      marginBottom: '15px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      fontSize: '1rem',
+                      color: pkg.highlighted ? '#000' : '#b0b0b0'
+                    }}>
+                      <span style={{
+                        color: pkg.highlighted ? '#000' : '#FDCA40',
+                        fontWeight: '900',
+                        fontSize: '1.3rem'
+                      }}>✓</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <button style={{
+                  width: '100%',
+                  padding: '16px',
+                  background: pkg.highlighted ? '#000' : '#FDCA40',
+                  color: pkg.highlighted ? '#FDCA40' : '#000',
+                  border: `3px solid ${pkg.highlighted ? '#000' : '#000'}`,
+                  borderRadius: '50px',
+                  fontSize: '1rem',
+                  fontWeight: '900',
+                  cursor: 'pointer',
+                  transition: 'all 0.1s ease',
+                  boxShadow: pkg.highlighted ? '5px 5px 0px 0px #000' : '5px 5px 0px 0px #1a1a1a'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translate(3px, 3px)';
+                  e.currentTarget.style.boxShadow = pkg.highlighted ? '2px 2px 0px 0px #000' : '2px 2px 0px 0px #1a1a1a';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translate(0, 0)';
+                  e.currentTarget.style.boxShadow = pkg.highlighted ? '5px 5px 0px 0px #000' : '5px 5px 0px 0px #1a1a1a';
+                }}>
+                  Odaberi Paket
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA SECTION - Final Call To Action */}
       {/* CTA SECTION - Final Call To Action */}
       <section style={{ padding: '100px 24px', background: 'linear-gradient(135deg, #FDCA40 0%, #FDD968 100%)', color: '#000', textAlign: 'center' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '20px', color: '#000' }}>Spreman Za Promenu?</h2>
-          <p style={{ fontSize: '1.2rem', marginBottom: '30px', opacity: '0.95', color: '#000' }}>
-            Hajde da napravimo sajt koji će doneti stvarne rezultate za vaš biznis.
+          <p style={{ fontSize: '1.1rem', marginBottom: '40px', opacity: '0.95', color: '#000' }}>
+            Hajde da napravimo sajt koji donosi rezultate.
           </p>
           <Link 
             to="/kontakt/" 
@@ -804,7 +1012,8 @@ export default function IzradaSajtova() {
               transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
               pointerEvents: 'auto',
               display: 'inline-block',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              marginBottom: '40px'
             }} onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
               e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
@@ -815,6 +1024,9 @@ export default function IzradaSajtova() {
               Zatraži Besplatnu Konsultaciju
             </div>
           </Link>
+          <p style={{ fontSize: '1rem', color: '#000', opacity: '0.85', lineHeight: '1.6' }}>
+            Nema obveza. Nema dugoročnih ugovora. Nema praznih obećanja. Samo platforma koja gradi tvoj brend.
+          </p>
         </div>
       </section>
 
