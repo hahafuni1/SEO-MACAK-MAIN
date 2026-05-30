@@ -53,6 +53,10 @@ export default function SEOHead({ title, robots, ogType, ogImage, children }) {
       <meta property="og:site_name"    content={SITE_NAME} />
       <meta property="og:locale"       content={meta.ogLocale} />
 
+      {/* Search engine ownership verification — uncomment and fill in after verifying in GSC / Bing WMT */}
+      {/* <meta name="google-site-verification" content="TODO-OWNER-FILL-FROM-GSC" /> */}
+      {/* <meta name="msvalidate.01"             content="TODO-OWNER-FILL-FROM-BING" /> */}
+
       {/* Twitter Card */}
       <meta name="twitter:card"        content="summary_large_image" />
       <meta name="twitter:title"       content={meta.title} />

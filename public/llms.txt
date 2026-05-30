@@ -1,0 +1,23 @@
+# SEO Mačak
+
+> Freelance SEO + web development services based in Belgrade, Serbia. Founded 2023.
+
+SEO Mačak offers technical SEO optimization, on-page SEO, local SEO, web development (React/Next.js), and performance optimization for Serbian and EU clients.
+
+## Services
+- [SEO Optimization](https://www.seomacak.com/seo/): Technical audits, keyword strategy, on-page, content, link building, local SEO.
+- [Website Development](https://www.seomacak.com/izrada-sajtova/): Custom websites, performance-first, SEO-friendly architecture.
+
+## Case Studies
+- [Komotraks](https://www.seomacak.com/case-studies/komotraks/): Local insect-screen business — #1 ranking on Top 3 keywords, +60% conversion, +30% load speed, +200% organic traffic.
+
+## About
+- [Founder: Marko](https://www.seomacak.com/about/) — SEO Specialist & Web Developer, 3+ years experience, 50+ projects completed, 30+ #1 keyword rankings achieved.
+- Contact: kontakt@seomacak.com
+
+## Locations served
+- Primary: Beograd, Srbija
+- Secondary: Serbia + EU remote clients
+
+## Pricing
+TODO — owner to add when pricing page is created.

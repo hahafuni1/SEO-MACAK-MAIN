@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import emailjs from '@emailjs/browser'
 import Link from './Link'
@@ -47,6 +47,7 @@ export default function Kontakt() {
   const [formData, setFormData] = useState({ ime: '', email: '', telefon: '', poruka: '' })
   const [status, setStatus] = useState('idle') // 'idle' | 'sending' | 'success' | 'error'
   const [focusedField, setFocusedField] = useState(null)
+  const honeypotRef = useRef(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -56,6 +57,14 @@ export default function Kontakt() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (status === 'sending') return
+
+    // Honeypot check — bots that fill hidden fields get a fake success, humans never see this field
+    if (honeypotRef.current?.value) {
+      setStatus('success')
+      setFormData({ ime: '', email: '', telefon: '', poruka: '' })
+      setTimeout(() => setStatus('idle'), 5000)
+      return
+    }
 
     setStatus('sending')
     try {
@@ -74,10 +83,16 @@ export default function Kontakt() {
       setStatus('success')
       setFormData({ ime: '', email: '', telefon: '', poruka: '' })
       setTimeout(() => setStatus('idle'), 5000)
+      if (typeof window.plausible === 'function') {
+        window.plausible('Contact Form Submit', { props: { status: 'success' } })
+      }
     } catch (err) {
       console.error('EmailJS error:', err)
       setStatus('error')
       setTimeout(() => setStatus('idle'), 5000)
+      if (typeof window.plausible === 'function') {
+        window.plausible('Contact Form Submit', { props: { status: 'error' } })
+      }
     }
   }
 
@@ -263,6 +278,17 @@ export default function Kontakt() {
               required
             />
 
+            {/* Honeypot — hidden from real users, catches bots that fill all fields */}
+            <input
+              ref={honeypotRef}
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+            />
+
             <motion.button
               type="submit"
               disabled={submitted || sending}
@@ -361,6 +387,7 @@ export default function Kontakt() {
           </p>
           <a
             href="mailto:kontakt@seomacak.com"
+            className="plausible-event-name=CTA+Click"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

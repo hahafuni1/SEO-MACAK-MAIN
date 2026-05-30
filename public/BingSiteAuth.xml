@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- TODO OWNER: Replace this entire file with the actual BingSiteAuth.xml
+     downloaded from Bing Webmaster Tools.
+     Steps:
+     1. Go to https://www.bing.com/webmasters
+     2. Add site: https://www.seomacak.com
+     3. Choose "XML file" verification method
+     4. Download BingSiteAuth.xml and replace this placeholder
+     5. Deploy, then click "Verify" in Bing Webmaster Tools
+-->
+<users>
+  <user>TODO-OWNER-REPLACE-WITH-ACTUAL-BING-AUTH-CODE</user>
+</users>

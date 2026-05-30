@@ -162,6 +162,7 @@ export default function HomePage() {
 
             <Link
               to={links.contact}
+              className="plausible-event-name=CTA+Click"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -750,6 +751,7 @@ export default function HomePage() {
           </p>
           <Link
             to={links.contact}
+            className="plausible-event-name=CTA+Click"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
