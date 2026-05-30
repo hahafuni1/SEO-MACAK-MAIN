@@ -4,6 +4,8 @@ import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
 import SEOHead from './SEOHead'
+import { breadcrumbSchema } from '../lib/schema/breadcrumbs'
+import { BASE_URL } from '../lib/routes'
 
 // Premium Minimal — Blog "under construction" page.
 // Real blog grid lives in git history; bringing it back when posts are ready.
@@ -57,23 +59,7 @@ export default function Blog() {
     <>
       {/* noindex until 3+ real posts exist — remove robots prop when blog launches */}
       <SEOHead robots="noindex, follow">
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [{
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Početna",
-              "item": "https://www.seomacak.com/"
-            },{
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Blog",
-              "item": "https://www.seomacak.com/blog/"
-            }]
-          }`}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema([{ name: 'Blog', url: BASE_URL + '/blog/' }]))}</script>
       </SEOHead>
       <ScrollAwareHeader />
 

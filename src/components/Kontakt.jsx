@@ -6,6 +6,9 @@ import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
 import SEOHead from './SEOHead'
+import { localBusinessSchema } from '../lib/schema/localBusiness'
+import { breadcrumbSchema } from '../lib/schema/breadcrumbs'
+import { BASE_URL } from '../lib/routes'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
@@ -85,47 +88,8 @@ export default function Kontakt() {
   return (
     <>
       <SEOHead>
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "SEO Mačak",
-            "image": "https://www.seomacak.com/logo.webp",
-            "@id": "https://www.seomacak.com",
-            "url": "https://www.seomacak.com/kontakt/",
-            "telephone": "+381601234567",
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "TODO-owner-fill",
-              "addressLocality": "Beograd",
-              "postalCode": "TODO-owner-fill",
-              "addressCountry": "RS"
-            },
-            "openingHoursSpecification": {
-              "@type": "OpeningHoursSpecification",
-              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-              "opens": "09:00",
-              "closes": "17:00"
-            }
-          }`}
-        </script>
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [{
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Početna",
-              "item": "https://www.seomacak.com/"
-            },{
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Kontakt",
-              "item": "https://www.seomacak.com/kontakt/"
-            }]
-          }`}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(localBusinessSchema())}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema([{ name: 'Kontakt', url: BASE_URL + '/kontakt/' }]))}</script>
       </SEOHead>
       <ScrollAwareHeader />
 

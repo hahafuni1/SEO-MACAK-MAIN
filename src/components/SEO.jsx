@@ -5,6 +5,10 @@ import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
 import SEOHead from './SEOHead'
+import { seoServiceSchema } from '../lib/schema/service'
+import { faqPageSchema } from '../lib/schema/faqPage'
+import { breadcrumbSchema } from '../lib/schema/breadcrumbs'
+import { BASE_URL } from '../lib/routes'
 
 // Premium Minimal — SEO page (showcase finale).
 // Intentionally the richest page: keeps three showcase elements from the
@@ -304,34 +308,9 @@ export default function SEO() {
   return (
     <>
       <SEOHead>
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": FAQ_ITEMS.map(item => ({
-              "@type": "Question",
-              "name": item.q,
-              "acceptedAnswer": { "@type": "Answer", "text": item.a }
-            }))
-          })}
-        </script>
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [{
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Početna",
-              "item": "https://www.seomacak.com/"
-            },{
-              "@type": "ListItem",
-              "position": 2,
-              "name": "SEO Optimizacija",
-              "item": "https://www.seomacak.com/seo/"
-            }]
-          }`}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(seoServiceSchema())}</script>
+        <script type="application/ld+json">{JSON.stringify(faqPageSchema(FAQ_ITEMS))}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema([{ name: 'SEO Optimizacija', url: BASE_URL + '/seo/' }]))}</script>
       </SEOHead>
       <ScrollAwareHeader />
 

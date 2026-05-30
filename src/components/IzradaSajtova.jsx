@@ -5,6 +5,9 @@ import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
 import SEOHead from './SEOHead'
+import { webDevServiceSchema } from '../lib/schema/service'
+import { breadcrumbSchema } from '../lib/schema/breadcrumbs'
+import { BASE_URL } from '../lib/routes'
 
 // Premium Minimal — Izrada Sajtova page.
 // Same vibe as the homepage: light hero with logo/visual + floating badges,
@@ -144,23 +147,8 @@ export default function IzradaSajtova() {
   return (
     <>
       <SEOHead>
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [{
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Početna",
-              "item": "https://www.seomacak.com/"
-            },{
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Izrada Sajtova",
-              "item": "https://www.seomacak.com/izrada-sajtova/"
-            }]
-          }`}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(webDevServiceSchema())}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema([{ name: 'Izrada Sajtova', url: BASE_URL + '/izrada-sajtova/' }]))}</script>
       </SEOHead>
       <ScrollAwareHeader />
 

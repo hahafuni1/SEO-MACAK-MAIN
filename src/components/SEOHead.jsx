@@ -1,4 +1,5 @@
 // SEOHead — single Helmet wrapper used by every page.
+// Emits all common head tags plus global Organization + WebSite JSON-LD on every page.
 // Pass page-specific JSON-LD as children: <SEOHead><script type="application/ld+json">...</script></SEOHead>
 // Override robots with the robots prop (e.g. robots="noindex, follow" for blog/404).
 
@@ -6,6 +7,10 @@ import { Helmet } from 'react-helmet-async'
 import { useLocation } from 'react-router-dom'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getMetadata, SITE_NAME } from '../lib/seo'
+import { organizationSchema } from '../lib/schema/organization'
+import { websiteSchema } from '../lib/schema/website'
+
+const GLOBAL_SCHEMAS = [organizationSchema(), websiteSchema()]
 
 export default function SEOHead({ title, robots, ogType, ogImage, children }) {
   const { t } = useLanguage()
@@ -54,6 +59,13 @@ export default function SEOHead({ title, robots, ogType, ogImage, children }) {
       <meta name="twitter:description" content={meta.description} />
       <meta name="twitter:image"       content={meta.ogImage} />
       <meta name="twitter:image:alt"   content={meta.ogImageAlt} />
+
+      {/* Global schemas — Organization + WebSite appear on every page */}
+      {GLOBAL_SCHEMAS.map((schema, i) => (
+        <script key={i} type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      ))}
 
       {/* Page-specific JSON-LD and any other head additions */}
       {children}

@@ -4,6 +4,9 @@ import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
 import SEOHead from './SEOHead'
+import { personSchema } from '../lib/schema/person'
+import { breadcrumbSchema } from '../lib/schema/breadcrumbs'
+import { BASE_URL } from '../lib/routes'
 
 // Premium Minimal — About page.
 // Same vibe as homepage and izrada-sajtova: light hero with photo + badges,
@@ -108,23 +111,8 @@ export default function About() {
   return (
     <>
       <SEOHead>
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [{
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Početna",
-              "item": "https://www.seomacak.com/"
-            },{
-              "@type": "ListItem",
-              "position": 2,
-              "name": "O Nama",
-              "item": "https://www.seomacak.com/about/"
-            }]
-          }`}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(personSchema())}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema([{ name: 'O Nama', url: BASE_URL + '/about/' }]))}</script>
       </SEOHead>
       <ScrollAwareHeader />
 

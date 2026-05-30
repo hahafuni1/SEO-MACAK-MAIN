@@ -7,6 +7,8 @@ import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
 import logoImg from '/logo.webp'
 import SEOHead from './SEOHead'
+import { localBusinessSchema } from '../lib/schema/localBusiness'
+import { reviewSchema } from '../lib/schema/review'
 
 // Premium Minimal homepage.
 // Layout philosophy:
@@ -64,20 +66,8 @@ export default function HomePage() {
   return (
     <>
       <SEOHead>
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "SEO Mačak",
-            "url": "https://www.seomacak.com",
-            "logo": "https://www.seomacak.com/logo.webp",
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "telephone": "+381-60-123-4567",
-              "contactType": "customer service"
-            }
-          }`}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(localBusinessSchema())}</script>
+        <script type="application/ld+json">{JSON.stringify(reviewSchema())}</script>
       </SEOHead>
       <ScrollAwareHeader />
 
