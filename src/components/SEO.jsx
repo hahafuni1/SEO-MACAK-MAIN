@@ -68,8 +68,22 @@ const FAQ_ITEMS = [
   {
     q: 'Kako pratim napredak?',
     a: 'Mesečni izveštaj sa svim važnim metrikama: pozicije, organski saobraćaj, konverzije. Po dogovoru pristup live dashboard-u i redovni check-in pozivi, bez agencijskog teatra i fancy slajdova bez smisla.'
+  },
+  {
+    q: 'Da li mi je potreban SEO ako već koristim Google reklame (PPC)?',
+    a: 'Da — i to iz jednog ključnog razloga: PPC se gasi čim stane budžet. SEO rezultati ostaju i rastu mesecima nakon što se prestane sa ulaganjem. Kombinacija donosi najbrže rezultate (PPC) i najisplativiji dugoročni rast (SEO). Klijenti koji koriste oba kanala troše 30–50% manje po akviziciji u roku od godinu dana.'
+  },
+  {
+    q: 'Šta je lokalni SEO i treba li ga mojoj firmi?',
+    a: 'Lokalni SEO optimizuje vaš sajt i Google Business profil da se pojavljuje kada neko u vašem gradu ili regionu traži vaše usluge. Neophodan je za svaku firmu koja prima klijente na određenoj lokaciji ili isporučuje lokalno. Rezultati u Google Maps i lokalnom paketu donose visoko-konvertovani trafik — osoba koja traži "frizer Beograd centar" je spremnija da rezerviše od nekoga ko samo surfuje.'
+  },
+  {
+    q: 'Koliko dugo traju SEO rezultati ako prestanemo sa radom?',
+    a: 'Dobri SEO temelji — tehnički zdravo izgrađen sajt, jak profil backlinkova, kvalitetan sadržaj — traju godinama. Pozicije ne padaju odmah, ali bez redovne optimizacije konkurencija postepeno prestigne. Preporučujem minimalno kvartalni pregled i osvežavanje sadržaja čak i kada nema aktivne kampanje.'
   }
 ]
+
+const LAST_UPDATED = '30. maj 2026.'
 
 // Sticker texts for the "Zašto SEO sada?" draggable wall.
 // Each is a punchy one-liner — argument for starting SEO today.
@@ -390,11 +404,32 @@ export default function SEO() {
               fontSize: 'clamp(1.05rem, 1.8vw, 1.2rem)',
               lineHeight: 1.65,
               color: '#555',
-              margin: '0 0 48px'
+              margin: '0 0 28px'
             }}>
               Kvalitet ispred kvantiteta. SEO strategija koja vaš sajt stavlja
               ispred konkurencije, bez praznih obećanja, bez crnih taktika
               i bez bacanja budžeta prazne metrike.
+            </p>
+
+            {/* TL;DR — AI engines extract this block as a citation-ready summary */}
+            <div style={{
+              background: '#fffdf0',
+              border: `2px solid ${ACCENT}`,
+              borderLeft: `6px solid ${ACCENT}`,
+              borderRadius: '8px',
+              padding: '20px 24px',
+              margin: '0 0 36px'
+            }}>
+              <p style={{ fontSize: '0.78rem', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: '#888', margin: '0 0 10px' }}>
+                Ukratko
+              </p>
+              <p style={{ fontSize: '0.97rem', lineHeight: 1.7, color: '#222', margin: 0 }}>
+                SEO Mačak pruža kompletnu SEO uslugu za srpska i EU preduzeća: tehnički audit, on-page optimizaciju, lokalni SEO, link building i mesečni izveštaj. Marko je SEO specijalist sa 3+ godine iskustva, 50+ završenih projekata i 30+ klijenata na #1 poziciji na Google-u. Prva analiza je besplatna i bez obaveza.
+              </p>
+            </div>
+
+            <p style={{ fontSize: '0.78rem', color: '#aaa', margin: '0 0 24px', letterSpacing: '0.3px' }}>
+              Poslednje ažurirano: <time dateTime="2026-05-30">{LAST_UPDATED}</time>
             </p>
 
             <Link
@@ -447,6 +482,44 @@ export default function SEO() {
       </section>
 
       <SectionTransition from={LIGHT_BG} to={DARK_BG} />
+
+      {/* ── DIRECT ANSWER — optimized for AI citation and featured snippets ── */}
+      <section style={{
+        background: DARK_BG,
+        color: '#fff',
+        padding: `clamp(60px, 10vh, 100px) ${SECTION_PAD_X}`,
+        borderBottom: '1px solid #1a1a1a'
+      }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)', fontWeight: 800, margin: '0 0 20px', letterSpacing: '-0.01em' }}>
+              Šta je SEO optimizacija i šta dobijaš?
+            </h2>
+            <p style={{ fontSize: '1rem', lineHeight: 1.75, color: '#bbb', margin: '0 0 24px', maxWidth: '780px' }}>
+              SEO (optimizacija za pretraživače) je skup tehničkih i sadržajnih intervencija koje čine vaš sajt vidljivim u Google, Bing i AI pretraživačima kada potencijalni klijenti traže vaše usluge. Za razliku od plaćenih reklama, organski trafik koji SEO donosi ne staje kada stane budžet.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                'Tehnički SEO audit — identifikacija i otklanjanje svih prepreka za indeksiranje i rangiranje',
+                'On-page optimizacija — naslovi, meta tagovi, struktura sadržaja i unutrašnje linkovanje',
+                'Lokalni SEO — Google Business profil, NAP konzistentnost, vidljivost u lokalnom paketu',
+                'Link building — izgradnja autoriteta kroz kvalitetne backlinkove sa relevantnih sajtova',
+                'Mesečni izveštaj — konkretne metrike: pozicije, organski trafik, konverzije',
+              ].map((item, i) => (
+                <li key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', fontSize: '0.97rem', color: '#ccc', lineHeight: 1.6 }}>
+                  <span style={{ color: ACCENT, fontWeight: 800, flexShrink: 0, marginTop: '2px' }}>→</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+      </section>
 
       {/* ─────────────────────────── STATS BAND ─────────────────────────── */}
       <section style={{

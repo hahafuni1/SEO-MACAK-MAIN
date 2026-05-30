@@ -27,8 +27,7 @@ export function organizationSchema() {
     areaServed: ['RS', 'EU'],
     contactPoint: {
       '@type': 'ContactPoint',
-      // TODO (owner): replace with real phone in E.164 format
-      telephone: 'TODO-owner-fill',
+      telephone: '+381621058144',
       contactType: 'customer service',
       email: 'kontakt@seomacak.com',
       availableLanguage: ['Serbian', 'English'],

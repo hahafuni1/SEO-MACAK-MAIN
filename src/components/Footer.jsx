@@ -111,9 +111,10 @@ export default function Footer() {
                   kontakt@seomacak.com
                 </a>
               </p>
-              {/* TODO (owner): replace with real phone number */}
-              <p style={{ color: '#555', marginBottom: '10px', fontSize: '0.9rem', fontStyle: 'italic' }}>
-                Telefon — uskoro
+              <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>
+                <a href="tel:+381621058144" style={{ color: '#aaa', textDecoration: 'none' }}>
+                  +381 62 105 8144
+                </a>
               </p>
               <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
             </div>

@@ -9,7 +9,11 @@ const NotFound = () => {
 
   return (
     <>
-      <SEOHead title="404 | SEO Mačak" robots="noindex, follow" />
+      <SEOHead
+        title="404 — Stranica nije pronađena | SEO Mačak"
+        description="Ova stranica ne postoji. Posetite početnu stranicu SEO Mačak za SEO i web development usluge u Beogradu."
+        robots="noindex, follow"
+      />
       <ScrollAwareHeader />
       <div style={{ textAlign: 'center', padding: '100px 20px' }}>
         <h1>404</h1>

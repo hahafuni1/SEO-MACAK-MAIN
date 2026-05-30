@@ -3,9 +3,12 @@
   "name": "seo-macak",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs && node scripts/cleanup-ssr.mjs",
     "preview": "vite preview --port 5000"
   },
   "devDependencies": {

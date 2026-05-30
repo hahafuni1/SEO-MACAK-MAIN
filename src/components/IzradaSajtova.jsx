@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
@@ -6,6 +6,7 @@ import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
 import SEOHead from './SEOHead'
 import { webDevServiceSchema } from '../lib/schema/service'
+import { faqPageSchema } from '../lib/schema/faqPage'
 import { breadcrumbSchema } from '../lib/schema/breadcrumbs'
 import { BASE_URL } from '../lib/routes'
 
@@ -20,6 +21,31 @@ const DARK_GRADIENT = 'linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%)'
 const SECTION_PAD_Y = 'clamp(80px, 14vh, 140px)'
 const SECTION_PAD_X = 'clamp(24px, 5vw, 64px)'
 const CONTAINER_MAX = '1100px'
+
+const LAST_UPDATED = '30. maj 2026.'
+
+const FAQ_ITEMS_WEB = [
+  {
+    q: 'Koliko košta izrada sajta?',
+    a: 'Cena zavisi od obima projekta. Jednostavniji prezentacioni sajt kreće od 300€, dok kompleksna e-commerce platforma može biti 1000€ i više. Sve cene su transparentne i definisane pre početka rada — bez skrivenih troškova.'
+  },
+  {
+    q: 'Koliko traje izrada sajta?',
+    a: 'Tipičan prezentacioni sajt isporučujem za 2–4 nedelje. E-commerce projekti traju 4–8 nedelja, zavisno od broja stranica i integracija. Rok je uvek pismeno potvrđen pre početka — nikad pravim rokove koji ne mogu da se ispune.'
+  },
+  {
+    q: 'Hoću li imati kontrolu nad sadržajem sajta?',
+    a: 'Da. Svaki sajt isporučujem sa jasnom dokumentacijom i, po potrebi, CMS sistemom koji vam omogućava da samostalno menjate slike, tekstove i blog postove bez tehničkog znanja.'
+  },
+  {
+    q: 'Nudite li održavanje sajta nakon lansiranja?',
+    a: 'Da — nudim mesečne pakete za hosting, ažuriranja, sigurnosne zakrpe i monitoring performansi. Nije obavezno, ali je preporučeno: zanemareni sajt gubi brzinu, rangiranje i bezbednost.'
+  },
+  {
+    q: 'Zašto React umesto WordPress?',
+    a: 'React sajtovi su znatno brži (Core Web Vitals), bezbedniji (nema pluginova koji mogu biti hakovani) i skalabilniji za kompleksne funkcionalnosti. WordPress preporučujem samo kada klijent treba autonomno upravljanje sadržajem bez programerske podrške.'
+  }
+]
 
 const Overline = ({ children, dark = false }) => (
   <span style={{
@@ -148,6 +174,7 @@ export default function IzradaSajtova() {
     <>
       <SEOHead>
         <script type="application/ld+json">{JSON.stringify(webDevServiceSchema())}</script>
+        <script type="application/ld+json">{JSON.stringify(faqPageSchema(FAQ_ITEMS_WEB))}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema([{ name: 'Izrada Sajtova', url: BASE_URL + '/izrada-sajtova/' }]))}</script>
       </SEOHead>
       <ScrollAwareHeader />
@@ -231,11 +258,32 @@ export default function IzradaSajtova() {
               fontSize: 'clamp(1.05rem, 1.8vw, 1.2rem)',
               lineHeight: 1.65,
               color: '#555',
-              margin: '0 0 48px'
+              margin: '0 0 28px'
             }}>
               Moderni, brzi i SEO-optimizovani sajtovi koji pretvaraju posetioce u klijente.
               U svetu gde prvi utisak traje samo nekoliko sekundi, gradimo platforme koje
               dominiraju pretragom i rade za vas 24/7.
+            </p>
+
+            {/* TL;DR — citation-ready summary for AI engines */}
+            <div style={{
+              background: '#fffdf0',
+              border: `2px solid ${ACCENT}`,
+              borderLeft: `6px solid ${ACCENT}`,
+              borderRadius: '8px',
+              padding: '20px 24px',
+              margin: '0 0 36px'
+            }}>
+              <p style={{ fontSize: '0.78rem', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: '#888', margin: '0 0 10px' }}>
+                Ukratko
+              </p>
+              <p style={{ fontSize: '0.97rem', lineHeight: 1.7, color: '#222', margin: 0 }}>
+                SEO Mačak izrađuje performansne, SEO-optimizovane sajtove na React tehnologiji za srpska i EU preduzeća. Svaki sajt je prilagođen mobilnim uređajima, prolazi Core Web Vitals standarde i sadrži ugrađene tehničke SEO temelje od prvog dana. Prosečan rok isporuke je 2–4 nedelje, a cene kreću od 300€.
+              </p>
+            </div>
+
+            <p style={{ fontSize: '0.78rem', color: '#aaa', margin: '0 0 24px', letterSpacing: '0.3px' }}>
+              Poslednje ažurirano: <time dateTime="2026-05-30">{LAST_UPDATED}</time>
             </p>
 
             <Link
@@ -494,6 +542,30 @@ export default function IzradaSajtova() {
           }}>
             {packages.map((pkg, i) => (
               <PricingCard key={i} {...pkg} contactUrl={links.contact} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ───────────────────────── FAQ ───────────────────────── */}
+      <section style={{ background: DARK_GRADIENT, color: '#fff', padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}` }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '56px' }}
+          >
+            <Overline dark>FAQ</Overline>
+            <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.4rem)', fontWeight: 900, lineHeight: 1.05, letterSpacing: '-0.02em', margin: 0 }}>
+              Česta pitanja
+            </h2>
+          </motion.div>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {FAQ_ITEMS_WEB.map((item, i) => (
+              <WebFaqItem key={i} index={i} q={item.q} a={item.a} isLast={i === FAQ_ITEMS_WEB.length - 1} />
             ))}
           </div>
         </div>
@@ -1054,6 +1126,27 @@ function BranchSeparator({ label }) {
         height: '2px',
         background: `linear-gradient(to right, transparent, ${ACCENT} 30%, ${ACCENT} 70%, transparent)`
       }} />
+    </div>
+  )
+}
+
+function WebFaqItem({ q, a, isLast }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ borderTop: '1px solid #222', borderBottom: isLast ? '1px solid #222' : 'none' }}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        style={{
+          width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 'clamp(18px, 3vh, 28px) 0',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', textAlign: 'left'
+        }}
+      >
+        <span style={{ fontSize: 'clamp(1rem, 1.8vw, 1.15rem)', fontWeight: 700, color: '#fff', lineHeight: 1.35 }}>{q}</span>
+        <span style={{ color: ACCENT, fontSize: '1.4rem', fontWeight: 700, flexShrink: 0, transition: 'transform 0.25s', transform: open ? 'rotate(45deg)' : 'none' }}>+</span>
+      </button>
+      {open && (
+        <p style={{ fontSize: '0.97rem', lineHeight: 1.75, color: '#aaa', margin: '0 0 clamp(18px, 3vh, 28px)', maxWidth: '780px' }}>{a}</p>
+      )}
     </div>
   )
 }

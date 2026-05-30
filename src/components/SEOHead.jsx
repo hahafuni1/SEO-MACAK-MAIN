@@ -12,7 +12,7 @@ import { websiteSchema } from '../lib/schema/website'
 
 const GLOBAL_SCHEMAS = [organizationSchema(), websiteSchema()]
 
-export default function SEOHead({ title, robots, ogType, ogImage, children }) {
+export default function SEOHead({ title, description, robots, ogType, ogImage, children }) {
   const { t } = useLanguage()
   const { pathname } = useLocation()
 
@@ -26,13 +26,14 @@ export default function SEOHead({ title, robots, ogType, ogImage, children }) {
     },
   })
 
-  // Allow pages to hard-code a title (e.g. 404 page whose pathname is unknown)
-  const resolvedTitle = title ?? meta.title
+  // Allow pages to hard-code title/description (e.g. 404 page whose pathname is *)
+  const resolvedTitle       = title       ?? meta.title
+  const resolvedDescription = description ?? meta.description
 
   return (
     <Helmet>
       <title>{resolvedTitle}</title>
-      <meta name="description" content={meta.description} />
+      <meta name="description" content={resolvedDescription} />
       <link rel="canonical" href={meta.canonical} />
       <meta name="robots" content={meta.robots} />
 
@@ -42,8 +43,8 @@ export default function SEOHead({ title, robots, ogType, ogImage, children }) {
       {meta.hreflang && <link rel="alternate" hreflang="x-default" href={meta.hreflang.xDefault} />}
 
       {/* Open Graph */}
-      <meta property="og:title"        content={meta.title} />
-      <meta property="og:description"  content={meta.description} />
+      <meta property="og:title"        content={resolvedTitle} />
+      <meta property="og:description"  content={resolvedDescription} />
       <meta property="og:image"        content={meta.ogImage} />
       <meta property="og:image:alt"    content={meta.ogImageAlt} />
       <meta property="og:image:width"  content={String(meta.ogImageWidth)} />
@@ -59,8 +60,8 @@ export default function SEOHead({ title, robots, ogType, ogImage, children }) {
 
       {/* Twitter Card */}
       <meta name="twitter:card"        content="summary_large_image" />
-      <meta name="twitter:title"       content={meta.title} />
-      <meta name="twitter:description" content={meta.description} />
+      <meta name="twitter:title"       content={resolvedTitle} />
+      <meta name="twitter:description" content={resolvedDescription} />
       <meta name="twitter:image"       content={meta.ogImage} />
       <meta name="twitter:image:alt"   content={meta.ogImageAlt} />
 

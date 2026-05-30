@@ -14,6 +14,7 @@ const DARK_GRADIENT = 'linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%)'
 const SECTION_PAD_Y = 'clamp(80px, 14vh, 140px)'
 const SECTION_PAD_X = 'clamp(24px, 5vw, 64px)'
 const CONTAINER_MAX = '1100px'
+const LAST_UPDATED = '30. maj 2026.'
 
 const Overline = ({ children, dark = false }) => (
   <span style={{
@@ -113,7 +114,7 @@ export default function CaseStudyKomotraks() {
             </p>
 
             {/* Tags */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '32px' }}>
               {TAGS.map(tag => (
                 <span key={tag} style={{
                   fontSize: '0.8rem',
@@ -127,6 +128,29 @@ export default function CaseStudyKomotraks() {
                 </span>
               ))}
             </div>
+
+            {/* TL;DR — citation-ready summary for AI engines */}
+            <div style={{
+              background: '#fffdf0',
+              border: '2px solid #FDCA40',
+              borderLeft: '6px solid #FDCA40',
+              borderRadius: '8px',
+              padding: '20px 24px',
+              marginBottom: '20px'
+            }}>
+              <p style={{ fontSize: '0.78rem', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: '#888', margin: '0 0 10px' }}>
+                {isEN ? 'Summary' : 'Ukratko'}
+              </p>
+              <p style={{ fontSize: '0.97rem', lineHeight: 1.7, color: '#222', margin: 0 }}>
+                {isEN
+                  ? 'Komotraks is a Belgrade-based specialist for insect screens and folding doors. After a complete SEO and web modernization project, the business reached #1 Google ranking for its top 3 keywords, achieved +200% organic traffic growth, +60% increase in conversions, and +30% faster page load — within 6 months of project launch.'
+                  : 'Komotraks je beogradski specijalist za ugradnju komarnika i harmonika vrata. Posle kompletne SEO i web modernizacije, biznis je dostigao #1 poziciju na Google-u za top 3 ključne reči, ostvario +200% rast organskog trafika, +60% veću konverziju i +30% brže učitavanje — u roku od 6 meseci od lansiranja.'}
+              </p>
+            </div>
+
+            <p style={{ fontSize: '0.78rem', color: '#aaa', margin: 0, letterSpacing: '0.3px' }}>
+              {isEN ? 'Last updated' : 'Poslednje ažurirano'}: <time dateTime="2026-05-30">{LAST_UPDATED}</time>
+            </p>
           </motion.div>
         </div>
       </section>

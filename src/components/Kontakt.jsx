@@ -207,7 +207,7 @@ export default function Kontakt() {
                 Direktno
               </div>
               <ContactRow label="Email" value="kontakt@seomacak.com" href="mailto:kontakt@seomacak.com" />
-              <ContactRow label="Telefon" value="+381 60 123 4567" href="tel:+381601234567" />
+              <ContactRow label="Telefon" value="+381 62 105 8144" href="tel:+381621058144" />
               <ContactRow label="Lokacija" value="Beograd, Srbija · Remote ready" />
             </div>
           </motion.div>
@@ -260,7 +260,7 @@ export default function Kontakt() {
               type="tel"
               value={formData.telefon}
               onChange={handleChange}
-              placeholder="+381 60 123 4567"
+              placeholder="+381 62 105 8144"
               focused={focusedField === 'telefon'}
               onFocus={() => setFocusedField('telefon')}
               onBlur={() => setFocusedField(null)}

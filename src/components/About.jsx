@@ -19,6 +19,7 @@ const DARK_GRADIENT = 'linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%)'
 const SECTION_PAD_Y = 'clamp(80px, 14vh, 140px)'
 const SECTION_PAD_X = 'clamp(24px, 5vw, 64px)'
 const CONTAINER_MAX = '1100px'
+const LAST_UPDATED = '30. maj 2026.'
 
 const Overline = ({ children, dark = false }) => (
   <span style={{
@@ -177,7 +178,7 @@ export default function About() {
               fontWeight: 900,
               lineHeight: 0.98,
               letterSpacing: '-0.03em',
-              margin: '0 0 32px',
+              margin: '0 0 16px',
               color: '#000'
             }}>
               Iza svakog sajta stoji{' '}
@@ -191,13 +192,39 @@ export default function About() {
               </span>
             </h1>
 
+            {/* Job title — explicit for E-E-A-T and Person schema parity */}
+            <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#888', letterSpacing: '1px', margin: '0 0 24px', textTransform: 'uppercase' }}>
+              Marko Devedzic · SEO Specialist &amp; Web Developer · Beograd
+            </p>
+
             <p style={{
               fontSize: 'clamp(1.05rem, 1.8vw, 1.2rem)',
               lineHeight: 1.65,
               color: '#555',
-              margin: '0 0 48px'
+              margin: '0 0 28px'
             }}>
               {heroSubtitle}
+            </p>
+
+            {/* TL;DR — AI citation-ready summary */}
+            <div style={{
+              background: '#fffdf0',
+              border: `2px solid ${ACCENT}`,
+              borderLeft: `6px solid ${ACCENT}`,
+              borderRadius: '8px',
+              padding: '20px 24px',
+              margin: '0 0 36px'
+            }}>
+              <p style={{ fontSize: '0.78rem', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: '#888', margin: '0 0 10px' }}>
+                Ukratko
+              </p>
+              <p style={{ fontSize: '0.97rem', lineHeight: 1.7, color: '#222', margin: 0 }}>
+                Marko je freelance SEO specijalist i web developer iz Beograda sa 3+ godine iskustva, 50+ završenih projekata i 30+ klijenata koji su dostigli #1 poziciju na Google-u. SEO Mačak je osnovan 2023. godine i specijalizovan je za tehnički SEO, lokalni SEO i React web razvoj za srpska i EU preduzeća.
+              </p>
+            </div>
+
+            <p style={{ fontSize: '0.78rem', color: '#aaa', margin: '0 0 24px', letterSpacing: '0.3px' }}>
+              Poslednje ažurirano: <time dateTime="2026-05-30">{LAST_UPDATED}</time>
             </p>
 
             <Link

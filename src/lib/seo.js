@@ -20,10 +20,19 @@ const OG_IMAGES = {
   '/kontakt/':        `${BASE_URL}/og-default.png`,
 }
 
-// Resolve the SR-canonical path from any pathname (strips /en/ prefix).
+// EN slugs that differ from their SR equivalents.
+const EN_TO_SR = {
+  '/web-development/': '/izrada-sajtova/',
+  '/contact/':         '/kontakt/',
+  '/privacy/':         '/privatnost/',
+  '/terms/':           '/uslovi/',
+}
+
+// Resolve the SR-canonical path from any pathname (strips /en/ prefix,
+// then maps EN-only slugs to their SR equivalents).
 function toSrPath(pathname) {
-  const stripped = pathname.replace(/^\/en/, '')
-  return stripped || '/'
+  const stripped = pathname.replace(/^\/en/, '') || '/'
+  return EN_TO_SR[stripped] ?? stripped
 }
 
 // Pull title + description from the translation object for a given SR path.

@@ -268,7 +268,7 @@ export const translationsSR = {
       email: 'Email Adresa',
       emailPlaceholder: 'marko@primer.com',
       phone: 'Telefon (opcionalno)',
-      phonePlaceholder: '+381 60 123 4567',
+      phonePlaceholder: '+381 62 105 8144',
       message: 'Vaša Poruka',
       messagePlaceholder: 'Opišite vaš projekat ili pitanje...',
       submit: 'Pošaljite Poruku',
@@ -281,7 +281,7 @@ export const translationsSR = {
       email: 'Email',
       emailValue: 'kontakt@seomacak.com',
       phone: 'Telefon',
-      phoneValue: '+381 60 123 4567',
+      phoneValue: '+381 62 105 8144',
       location: 'Lokacija',
       locationValue: 'Beograd, Srbija'
     }
@@ -635,8 +635,8 @@ export const translationsEN = {
   // ========== BLOG PAGE ==========
   blog: {
     meta: {
-      title: 'Blog | SEO Mačak',
-      description: 'SEO and web development insights from the team at SEO Mačak. Read articles to improve your online presence.'
+      title: 'SEO Blog | SEO Mačak',
+      description: 'SEO and web development insights from SEO Mačak. Read articles to improve your Google rankings and online presence.'
     },
     hero: {
       overline: '📚 KNOWLEDGE & INSIGHTS',
@@ -672,7 +672,7 @@ export const translationsEN = {
       email: 'Email Address',
       emailPlaceholder: 'john@example.com',
       phone: 'Phone (optional)',
-      phonePlaceholder: '+381 60 123 4567',
+      phonePlaceholder: '+381 62 105 8144',
       message: 'Your Message',
       messagePlaceholder: 'Describe your project or question...',
       submit: 'Send Message',
@@ -685,7 +685,7 @@ export const translationsEN = {
       email: 'Email',
       emailValue: 'kontakt@seomacak.com',
       phone: 'Phone',
-      phoneValue: '+381 60 123 4567',
+      phoneValue: '+381 62 105 8144',
       location: 'Location',
       locationValue: 'Belgrade, Serbia'
     }

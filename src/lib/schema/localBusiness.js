@@ -9,15 +9,14 @@ export function localBusinessSchema() {
     image: `${BASE_URL}/og-default.png`,
     logo: `${BASE_URL}/logo.webp`,
     url: BASE_URL,
-    // TODO (owner): replace telephone with real E.164 number (e.g. "+381601234567")
-    telephone: 'TODO-owner-fill',
+    telephone: '+381621058144',
     email: 'kontakt@seomacak.com',
-    // TODO (owner): fill in real streetAddress and postalCode
+    // Home-based / service-area business — street address intentionally omitted.
+    // Clients are served remotely or at their location; no public office.
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'TODO-owner-fill',
       addressLocality: 'Beograd',
-      postalCode: 'TODO-owner-fill',
+      addressRegion: 'Beograd',
       addressCountry: 'RS',
     },
     geo: {
