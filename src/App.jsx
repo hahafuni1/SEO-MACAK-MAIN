@@ -8,6 +8,11 @@ import SEO from './components/SEO'
 import Blog from './components/Blog'
 import Kontakt from './components/Kontakt'
 import NotFound from './components/NotFound'
+import CaseStudies from './components/CaseStudies'
+import CaseStudyKomotraks from './components/CaseStudyKomotraks'
+import Privacy from './components/Privacy'
+import Terms from './components/Terms'
+import Footer from './components/Footer'
 
 // App renders routes + global decorations.
 // Router context (BrowserRouter / MemoryRouter) is provided by the entry point
@@ -48,9 +53,20 @@ export default function App() {
           <Route path="/en/seo/" element={<SEO />} />
           <Route path="/en/blog/" element={<Blog />} />
           <Route path="/en/contact/" element={<Kontakt />} />
+          <Route path="/en/case-studies/" element={<CaseStudies />} />
+          <Route path="/en/case-studies/komotraks/" element={<CaseStudyKomotraks />} />
+          <Route path="/en/privacy/" element={<Privacy />} />
+          <Route path="/en/terms/" element={<Terms />} />
+
+          {/* Serbian new pages */}
+          <Route path="/case-studies/" element={<CaseStudies />} />
+          <Route path="/case-studies/komotraks/" element={<CaseStudyKomotraks />} />
+          <Route path="/privatnost/" element={<Privacy />} />
+          <Route path="/uslovi/" element={<Terms />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <Footer />
       </PageTransition>
     </>
   )

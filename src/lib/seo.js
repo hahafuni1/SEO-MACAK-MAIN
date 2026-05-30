@@ -29,12 +29,16 @@ function toSrPath(pathname) {
 // Pull title + description from the translation object for a given SR path.
 function getPageMeta(srPath, t) {
   const map = {
-    '/':                t.home?.meta,
-    '/about/':          t.about?.meta,
-    '/seo/':            t.seo?.meta,
-    '/izrada-sajtova/': t.webDevelopment?.meta,
-    '/blog/':           t.blog?.meta,
-    '/kontakt/':        t.contact?.meta,
+    '/':                            t.home?.meta,
+    '/about/':                      t.about?.meta,
+    '/seo/':                        t.seo?.meta,
+    '/izrada-sajtova/':             t.webDevelopment?.meta,
+    '/blog/':                       t.blog?.meta,
+    '/kontakt/':                    t.contact?.meta,
+    '/case-studies/':               t.caseStudies?.meta,
+    '/case-studies/komotraks/':     t.komotraks?.meta,
+    '/privatnost/':                 t.privacy?.meta,
+    '/uslovi/':                     t.terms?.meta,
   }
   return map[srPath] ?? { title: SITE_NAME, description: '' }
 }

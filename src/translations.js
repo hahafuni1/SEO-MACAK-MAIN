@@ -292,6 +292,34 @@ export const translationsSR = {
     title: 'Stranica nije pronađena',
     description: 'Izgleda da stranica koju tražite ne postoji.',
     button: 'Vrati se na početnu'
+  },
+
+  // ========== CASE STUDIES ==========
+  caseStudies: {
+    meta: {
+      title: 'Studije Slučaja | SEO Mačak',
+      description: 'Stvarni rezultati SEO optimizacije i izrade sajtova. Konkretni podaci, merljiv rast, domaći biznisi.'
+    }
+  },
+  komotraks: {
+    meta: {
+      title: 'Komotraks — Studija Slučaja | SEO Mačak',
+      description: 'Kako smo pomogli Komotraksu da dostigne #1 poziciju za ključne reči, +200% organskog trafika i +60% konverzija kroz SEO i web razvoj.'
+    }
+  },
+
+  // ========== LEGAL PAGES ==========
+  privacy: {
+    meta: {
+      title: 'Politika Privatnosti | SEO Mačak',
+      description: 'Politika privatnosti sajta SEO Mačak — kako prikupljamo, koristimo i štitimo vaše podatke.'
+    }
+  },
+  terms: {
+    meta: {
+      title: 'Uslovi Korišćenja | SEO Mačak',
+      description: 'Uslovi korišćenja usluga SEO Mačak — angažman, plaćanje, odgovornost.'
+    }
   }
 }
 
@@ -668,5 +696,33 @@ export const translationsEN = {
     title: 'Page not found',
     description: 'The page you\'re looking for doesn\'t exist.',
     button: 'Back to home'
+  },
+
+  // ========== CASE STUDIES ==========
+  caseStudies: {
+    meta: {
+      title: 'Case Studies | SEO Mačak',
+      description: 'Real results from SEO optimization and web development. Measurable growth, real data, real businesses.'
+    }
+  },
+  komotraks: {
+    meta: {
+      title: 'Komotraks — Case Study | SEO Mačak',
+      description: 'How we helped Komotraks reach #1 rankings, +200% organic traffic, and +60% conversions through SEO and web development.'
+    }
+  },
+
+  // ========== LEGAL PAGES ==========
+  privacy: {
+    meta: {
+      title: 'Privacy Policy | SEO Mačak',
+      description: 'SEO Mačak privacy policy — how we collect, use and protect your data.'
+    }
+  },
+  terms: {
+    meta: {
+      title: 'Terms of Service | SEO Mačak',
+      description: 'SEO Mačak terms of service — engagement, payment, liability.'
+    }
   }
 }

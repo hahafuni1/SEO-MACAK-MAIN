@@ -569,48 +569,30 @@ export default function IzradaSajtova() {
 
       <SectionTransition from={ACCENT} to="#000000" />
 
-      {/* ─────────────────────────── FOOTER ─────────────────────────── */}
-      <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="site-footer-grid">
-            <div className="columns">
-              <div>
-                <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
-                <p style={{ color: '#aaa', lineHeight: '1.8', fontSize: '0.9rem' }}>
-                  Stručna SEO optimizacija, web development i dizajn za vaš biznis.
-                </p>
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
-                <FooterLinks links={[
-                  { to: '/', label: 'Početna' },
-                  { to: '/izrada-sajtova/', label: 'Izrada sajtova' },
-                  { to: '/seo/', label: 'SEO' },
-                  { to: '/blog/', label: 'Blog' }
-                ]} />
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
-                <FooterLinks links={[
-                  { to: '/about/', label: 'O nama' },
-                  { to: '/kontakt/', label: 'Kontakt' },
-                  { href: '#', label: 'Privatnost' },
-                  { href: '#', label: 'Uslovi' }
-                ]} />
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
-                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>email@example.com</p>
-                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 (0) 123 456 789</p>
-                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
-              </div>
-            </div>
+      {/* ─────────────── CROSS-LINK: SEO za novi sajt? ─────────────── */}
+      <section style={{ background: '#000', padding: `clamp(48px, 8vh, 80px) ${SECTION_PAD_X}`, borderTop: '1px solid #111' }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px' }}>
+          <div>
+            <p style={{ color: '#666', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>
+              SEO Optimizacija
+            </p>
+            <h3 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 900, color: '#fff', margin: 0, letterSpacing: '-0.02em' }}>
+              SEO za novi sajt?
+            </h3>
+            <p style={{ color: '#666', fontSize: '0.95rem', margin: '8px 0 0', maxWidth: '480px' }}>
+              Dobar sajt bez SEO-a je kao prodavnica bez table. Krenimo zajedno.
+            </p>
           </div>
-          <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
-            <p style={{ margin: 0 }}>© 2026 SEO Mačak. Sva prava zadržana.</p>
-          </div>
+          <Link
+            to={links.seo}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', color: ACCENT, fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', borderBottom: `2px solid ${ACCENT}`, paddingBottom: '4px', whiteSpace: 'nowrap' }}
+          >
+            <span>SEO Optimizacija</span>
+            <span aria-hidden>→</span>
+          </Link>
         </div>
-      </footer>
+      </section>
+
     </>
   )
 }
@@ -1361,29 +1343,5 @@ function PricingCard({ name, price, period, features, highlighted, contactUrl })
         <span aria-hidden>→</span>
       </Link>
     </motion.div>
-  )
-}
-
-function FooterLinks({ links }) {
-  return (
-    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-      {links.map((l, i) => (
-        <li key={i} style={{ marginBottom: '10px' }}>
-          {l.to ? (
-            <Link to={l.to} style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => e.target.style.color = '#fff'}
-              onMouseLeave={(e) => e.target.style.color = '#aaa'}>
-              {l.label}
-            </Link>
-          ) : (
-            <a href={l.href} style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => e.target.style.color = '#fff'}
-              onMouseLeave={(e) => e.target.style.color = '#aaa'}>
-              {l.label}
-            </a>
-          )}
-        </li>
-      ))}
-    </ul>
   )
 }

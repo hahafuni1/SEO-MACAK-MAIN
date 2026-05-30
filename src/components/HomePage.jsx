@@ -576,7 +576,7 @@ export default function HomePage() {
                 ))}
               </div>
 
-              <Link to={links.contact} style={{
+              <Link to={links.komotraks} style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '12px',
@@ -775,53 +775,6 @@ export default function HomePage() {
       </section>
 
       <SectionTransition from={ACCENT} to="#000000" />
-
-      {/* ───────────────────────── FOOTER ───────────────────────── */}
-      <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div className="site-footer-grid">
-            <div className="columns">
-              <div>
-                <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
-                <p style={{ color: '#aaa', lineHeight: '1.8', fontSize: '0.9rem' }}>
-                  Stručna SEO optimizacija, web development i dizajn za vaš biznis.
-                </p>
-              </div>
-
-              <div>
-                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
-                <FooterLinks links={[
-                  { to: links.home,   label: t.nav.home },
-                  { to: links.webDev, label: t.nav.webDevelopment },
-                  { to: links.seo,    label: t.nav.seo },
-                  { to: links.blog,   label: t.nav.blog }
-                ]} />
-              </div>
-
-              <div>
-                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
-                <FooterLinks links={[
-                  { to: links.about,   label: t.nav.about },
-                  { to: links.contact, label: t.nav.contact },
-                  { href: '#', label: 'Privatnost' },
-                  { href: '#', label: 'Uslovi' }
-                ]} />
-              </div>
-
-              <div>
-                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
-                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>kontakt@seomacak.com</p>
-                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 60 123 4567</p>
-                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
-            <p style={{ margin: 0 }}>© 2026 SEO Mačak. Sva prava zadržana.</p>
-          </div>
-        </div>
-      </footer>
     </>
   )
 }
@@ -987,31 +940,5 @@ function ProcessStep({ index, title, desc }) {
         {desc}
       </p>
     </motion.div>
-  )
-}
-
-function FooterLinks({ links }) {
-  return (
-    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-      {links.map((l, i) => (
-        <li key={i} style={{ marginBottom: '10px' }}>
-          {l.to ? (
-            <Link to={l.to} style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => e.target.style.color = '#fff'}
-              onMouseLeave={(e) => e.target.style.color = '#aaa'}
-            >
-              {l.label}
-            </Link>
-          ) : (
-            <a href={l.href} style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => e.target.style.color = '#fff'}
-              onMouseLeave={(e) => e.target.style.color = '#aaa'}
-            >
-              {l.label}
-            </a>
-          )}
-        </li>
-      ))}
-    </ul>
   )
 }

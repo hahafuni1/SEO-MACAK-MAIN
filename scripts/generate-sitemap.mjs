@@ -18,12 +18,16 @@ const buildDate  = new Date().toISOString().split('T')[0]  // YYYY-MM-DD
 
 // Route pairs: SR canonical path + EN equivalent + SEO priority / changefreq.
 const routePairs = [
-  { sr: '/',                en: '/en/',                priority: '1.0', changefreq: 'weekly'  },
-  { sr: '/seo/',            en: '/en/seo/',            priority: '0.9', changefreq: 'monthly' },
-  { sr: '/izrada-sajtova/', en: '/en/web-development/', priority: '0.9', changefreq: 'monthly' },
-  { sr: '/about/',          en: '/en/about/',          priority: '0.7', changefreq: 'monthly' },
-  { sr: '/kontakt/',        en: '/en/contact/',        priority: '0.6', changefreq: 'yearly'  },
-  { sr: '/blog/',           en: '/en/blog/',           priority: '0.4', changefreq: 'weekly'  },
+  { sr: '/',                            en: '/en/',                            priority: '1.0', changefreq: 'weekly'  },
+  { sr: '/seo/',                        en: '/en/seo/',                        priority: '0.9', changefreq: 'monthly' },
+  { sr: '/izrada-sajtova/',             en: '/en/web-development/',            priority: '0.9', changefreq: 'monthly' },
+  { sr: '/case-studies/komotraks/',     en: '/en/case-studies/komotraks/',     priority: '0.8', changefreq: 'monthly' },
+  { sr: '/about/',                      en: '/en/about/',                      priority: '0.7', changefreq: 'monthly' },
+  { sr: '/case-studies/',               en: '/en/case-studies/',               priority: '0.7', changefreq: 'monthly' },
+  { sr: '/kontakt/',                    en: '/en/contact/',                    priority: '0.6', changefreq: 'yearly'  },
+  { sr: '/privatnost/',                 en: '/en/privacy/',                    priority: '0.3', changefreq: 'yearly'  },
+  { sr: '/uslovi/',                     en: '/en/terms/',                      priority: '0.3', changefreq: 'yearly'  },
+  { sr: '/blog/',                       en: '/en/blog/',                       priority: '0.4', changefreq: 'weekly'  },
 ]
 
 // Build one <url> block per path (SR + EN), each with full hreflang alternates.

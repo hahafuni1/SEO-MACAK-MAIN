@@ -31,6 +31,10 @@ const routes = [
   '/seo/',
   '/blog/',
   '/kontakt/',
+  '/case-studies/',
+  '/case-studies/komotraks/',
+  '/privatnost/',
+  '/uslovi/',
   // English
   '/en/',
   '/en/about/',
@@ -38,6 +42,10 @@ const routes = [
   '/en/seo/',
   '/en/blog/',
   '/en/contact/',
+  '/en/case-studies/',
+  '/en/case-studies/komotraks/',
+  '/en/privacy/',
+  '/en/terms/',
   // 404 — served with HTTP 404 status via netlify.toml
   '/404',
 ]
