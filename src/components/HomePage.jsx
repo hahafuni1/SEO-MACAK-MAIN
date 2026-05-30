@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import FAQSection from './FAQSection'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
+import { getHreflangUrls, BASE_URL } from '../lib/routes'
 import logoImg from '/logo.webp'
 import { Helmet } from 'react-helmet-async'
 
@@ -41,7 +43,10 @@ const Overline = ({ children, dark = false }) => (
 )
 
 export default function HomePage() {
-  const { t } = useLanguage()
+  const { t, links } = useLanguage()
+  const location = useLocation()
+  const canonical = BASE_URL + location.pathname
+  const hreflang = getHreflangUrls(location.pathname)
 
   const services = [
     {
@@ -66,14 +71,17 @@ export default function HomePage() {
       <Helmet>
         <title>{t.home.meta.title}</title>
         <meta name="description" content={t.home.meta.description} />
-        <link rel="canonical" href="https://www.seomacak.com/" />
+        <link rel="canonical" href={canonical} />
+        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
+        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
+        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
         <meta property="og:title" content={t.home.meta.title} />
         <meta property="og:description" content={t.home.meta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/mackic-logo.png" />
-        <meta property="og:url" content="https://www.seomacak.com/" />
+        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
+        <meta property="og:url" content={canonical} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
         <script type="application/ld+json">
           {`
             {
@@ -81,7 +89,7 @@ export default function HomePage() {
               "@type": "Organization",
               "name": "SEO Mačak",
               "url": "https://www.seomacak.com",
-              "logo": "https://www.seomacak.com/mackic-logo.png",
+              "logo": "https://www.seomacak.com/logo.webp",
               "contactPoint": {
                 "@type": "ContactPoint",
                 "telephone": "+381-60-123-4567",
@@ -183,7 +191,7 @@ export default function HomePage() {
             </p>
 
             <Link
-              to="/kontakt/"
+              to={links.contact}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -598,7 +606,7 @@ export default function HomePage() {
                 ))}
               </div>
 
-              <Link to="/kontakt/" style={{
+              <Link to={links.contact} style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '12px',
@@ -703,7 +711,7 @@ export default function HomePage() {
                 Tu mi je kliknulo. Zaronio sam u SEO, čitao, testirao, lomio sajtove pa ih popravljao. Shvatio sam da razlika između sajtova koji zarađuju i onih koji skupljaju prašinu nije magija, to su konkretne stvari koje se mogu naučiti i primeniti.
               </p>
 
-              <Link to="/about/" style={{
+              <Link to={links.about} style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '12px',
@@ -764,7 +772,7 @@ export default function HomePage() {
             Iskrena analiza gde se nalazite i gde možete biti. Bez pritiska, bez obaveza.
           </p>
           <Link
-            to="/kontakt/"
+            to={links.contact}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -813,18 +821,18 @@ export default function HomePage() {
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
                 <FooterLinks links={[
-                  { to: '/', label: 'Početna' },
-                  { to: '/izrada-sajtova/', label: 'Izrada sajtova' },
-                  { to: '/seo/', label: 'SEO' },
-                  { to: '/blog/', label: 'Blog' }
+                  { to: links.home,   label: t.nav.home },
+                  { to: links.webDev, label: t.nav.webDevelopment },
+                  { to: links.seo,    label: t.nav.seo },
+                  { to: links.blog,   label: t.nav.blog }
                 ]} />
               </div>
 
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
                 <FooterLinks links={[
-                  { to: '/about/', label: 'O nama' },
-                  { to: '/kontakt/', label: 'Kontakt' },
+                  { to: links.about,   label: t.nav.about },
+                  { to: links.contact, label: t.nav.contact },
                   { href: '#', label: 'Privatnost' },
                   { href: '#', label: 'Uslovi' }
                 ]} />
@@ -832,8 +840,8 @@ export default function HomePage() {
 
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
-                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>email@example.com</p>
-                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 (0) 123 456 789</p>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>kontakt@seomacak.com</p>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 60 123 4567</p>
                 <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
               </div>
             </div>

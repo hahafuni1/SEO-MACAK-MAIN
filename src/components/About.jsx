@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
+import { getHreflangUrls, BASE_URL } from '../lib/routes'
 import { Helmet } from 'react-helmet-async'
 
 // Premium Minimal — About page.
@@ -35,15 +37,13 @@ const Overline = ({ children, dark = false }) => (
 )
 
 export default function About() {
-  const { t } = useLanguage()
-  // SR translations don't have an `about` block yet, and EN's `about` lacks `meta`.
-  // Read defensively and fall back to sensible Serbian copy so the page doesn't crash.
-  const meta = t?.about?.meta || {
-    title: 'O nama — SEO Mačak',
-    description: 'Upoznajte SEO Mačka — agenciju koja kombinuje SEO, web development i dizajn da bi vaš biznis bio vidljiv i konkurentan online.'
-  }
-  const heroSubtitle = t?.about?.hero?.subtitle
-    || 'Više od agencije. Manja od korporacije. Tačno pravi partner za vaš digitalni rast.'
+  const { t, links } = useLanguage()
+  const location = useLocation()
+  const canonical = BASE_URL + location.pathname
+  const hreflang = getHreflangUrls(location.pathname)
+
+  const meta = t.about.meta
+  const heroSubtitle = t.about.hero.subtitle
 
   const differentiators = [
     {
@@ -116,14 +116,17 @@ export default function About() {
       <Helmet>
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
-        <link rel="canonical" href="https://www.seomacak.com/about/" />
+        <link rel="canonical" href={canonical} />
+        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
+        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
+        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
         <meta property="og:title" content={meta.title} />
         <meta property="og:description" content={meta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/mackic-logo.png" />
-        <meta property="og:url" content="https://www.seomacak.com/about/" />
+        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
+        <meta property="og:url" content={canonical} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
         <script type="application/ld+json">
           {`
             {
@@ -231,7 +234,7 @@ export default function About() {
             </p>
 
             <Link
-              to="/kontakt/"
+              to={links.contact}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -632,7 +635,7 @@ export default function About() {
             i gde možete biti.
           </p>
           <Link
-            to="/kontakt/"
+            to={links.contact}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -678,25 +681,25 @@ export default function About() {
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
                 <FooterLinks links={[
-                  { to: '/', label: 'Početna' },
-                  { to: '/izrada-sajtova/', label: 'Izrada sajtova' },
-                  { to: '/seo/', label: 'SEO' },
-                  { to: '/blog/', label: 'Blog' }
+                  { to: links.home,   label: t.nav.home },
+                  { to: links.webDev, label: t.nav.webDevelopment },
+                  { to: links.seo,    label: t.nav.seo },
+                  { to: links.blog,   label: t.nav.blog }
                 ]} />
               </div>
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
                 <FooterLinks links={[
-                  { to: '/about/', label: 'O nama' },
-                  { to: '/kontakt/', label: 'Kontakt' },
+                  { to: links.about,   label: t.nav.about },
+                  { to: links.contact, label: t.nav.contact },
                   { href: '#', label: 'Privatnost' },
                   { href: '#', label: 'Uslovi' }
                 ]} />
               </div>
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
-                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>email@example.com</p>
-                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 (0) 123 456 789</p>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>kontakt@seomacak.com</p>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 60 123 4567</p>
                 <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
               </div>
             </div>

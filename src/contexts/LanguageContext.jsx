@@ -1,36 +1,34 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useContext } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { translationsSR, translationsEN } from '../translations'
+import { getAlternatePath, getNavLinks } from '../lib/routes'
 
 const LanguageContext = createContext()
 
 export const LanguageProvider = ({ children }) => {
-  // Inicijalno učitavanje iz localStorage ili default 'sr'
-  const [language, setLanguage] = useState(() => {
-    const savedLang = localStorage.getItem('language')
-    return savedLang || 'sr'
-  })
+  const location = useLocation()
+  const navigate = useNavigate()
 
-  // Čuvanje u localStorage svaki put kada se jezik promeni
-  useEffect(() => {
-    localStorage.setItem('language', language)
-  }, [language])
-
-  // Funkcija za promenu jezika
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'sr' ? 'en' : 'sr')
-  }
-
-  // Trenutni translations objekat
+  // Language is derived purely from the URL prefix — no state, no localStorage.
+  // This guarantees SSR and client initial renders are always in sync.
+  const language = location.pathname.startsWith('/en') ? 'en' : 'sr'
   const t = language === 'sr' ? translationsSR : translationsEN
 
+  // Pre-built nav links for the current language (avoids repetition in every component).
+  const links = getNavLinks(language)
+
+  // Navigate to the equivalent page in the other language.
+  const toggleLanguage = () => {
+    navigate(getAlternatePath(location.pathname))
+  }
+
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ language, toggleLanguage, t, links }}>
       {children}
     </LanguageContext.Provider>
   )
 }
 
-// Custom hook za lakše korišćenje
 export const useLanguage = () => {
   const context = useContext(LanguageContext)
   if (!context) {

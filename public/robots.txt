@@ -1,3 +1,48 @@
+# robots.txt for seomacak.com
+# Last updated: 2026-05-30
+
 User-agent: *
 Allow: /
+Disallow: /404
+Disallow: /*?*
+
+# Search engines — explicitly welcomed
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# AI crawlers — explicitly ALLOWED (we want citations)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
 Sitemap: https://www.seomacak.com/sitemap.xml
+Host: https://www.seomacak.com

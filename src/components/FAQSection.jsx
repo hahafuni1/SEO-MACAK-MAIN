@@ -209,22 +209,6 @@ const FAQSection = () => {
         zIndex: 1
       }} />
       
-      <style>{`
-        @keyframes progressBarFill {
-          from {
-            transform: scaleX(0);
-            transform-origin: left;
-          }
-          to {
-            transform: scaleX(1);
-            transform-origin: left;
-          }
-        }
-        .progress-bar {
-          animation: progressBarFill 10s linear forwards !important;
-        }
-      `}</style>
-
       <div style={{
         maxWidth: '1400px',
         width: '100%',

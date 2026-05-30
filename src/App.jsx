@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import PageTransition from './components/PageTransition'
 import HomePage from './components/HomePage'
 import About from './components/About'
@@ -9,48 +9,16 @@ import Blog from './components/Blog'
 import Kontakt from './components/Kontakt'
 import NotFound from './components/NotFound'
 
-export default function App(){
+// App renders routes + global decorations.
+// Router context (BrowserRouter / MemoryRouter) is provided by the entry point
+// so that entry-server.jsx can use MemoryRouter without window dependency.
+// LanguageProvider lives inside the Router (in the entry points) so it can
+// call useLocation() to derive the current language from the URL.
+// Cursor CSS lives in css/styles.css (not here) to avoid SSR hydration mismatch
+// caused by React HTML-encoding apostrophes in url() strings.
+export default function App() {
   return (
-    <Router>
-      <style>{`
-        /* Default static cursor */
-        *, *::before, *::after {
-          cursor: url('/cursors/default.png') 16 16, auto;
-        }
-        /* Interactive elements - pointer cursor on hover */
-        button:hover, a:hover, [role="button"]:hover, 
-        input[type="button"]:hover, input[type="submit"]:hover, input[type="reset"]:hover,
-        .cursor-pointer:hover, .cta:hover, .nav-pill a:hover,
-        .cartoon-service-card:hover, .card:hover,
-        label:hover, summary:hover,
-        [tabindex]:not([tabindex="-1"]):hover {
-          cursor: url('/cursors/pointer.png') 16 16, pointer !important;
-        }
-        /* Form elements - always show pointer */
-        input:not([type="hidden"]), textarea, select,
-        input[type="checkbox"], input[type="radio"] {
-          cursor: url('/cursors/pointer.png') 16 16, pointer !important;
-        }
-        /* Links - always show pointer */
-        a, a:link, a:visited, a:hover, a:active,
-        button, [role="button"] {
-          cursor: url('/cursors/pointer.png') 16 16, pointer !important;
-        }
-        /* Drag and drop - grab cursors */
-        [draggable="true"], .draggable, .drag-handle,
-        [style*="cursor: grab"], [style*="cursor:grab"] {
-          cursor: url('/cursors/pointer.png') 16 16, grab !important;
-        }
-        [draggable="true"]:active, .draggable:active, .drag-handle:active,
-        [style*="cursor: grabbing"], [style*="cursor:grabbing"] {
-          cursor: url('/cursors/pointer.png') 16 16, grabbing !important;
-        }
-        /* Children inherit pointer cursor */
-        button *, a *, [role="button"] *, .cta *,
-        .cartoon-service-card *, .card *, .nav-pill a * {
-          cursor: inherit !important;
-        }
-      `}</style>
+    <>
       <div
         style={{
           position: 'fixed',
@@ -65,15 +33,25 @@ export default function App(){
       />
       <PageTransition>
         <Routes>
+          {/* Serbian routes (default / canonical) */}
           <Route path="/" element={<HomePage />} />
           <Route path="/about/" element={<About />} />
           <Route path="/izrada-sajtova/" element={<IzradaSajtova />} />
           <Route path="/seo/" element={<SEO />} />
           <Route path="/blog/" element={<Blog />} />
           <Route path="/kontakt/" element={<Kontakt />} />
+
+          {/* English routes — same components, language derived from /en/ prefix */}
+          <Route path="/en/" element={<HomePage />} />
+          <Route path="/en/about/" element={<About />} />
+          <Route path="/en/web-development/" element={<IzradaSajtova />} />
+          <Route path="/en/seo/" element={<SEO />} />
+          <Route path="/en/blog/" element={<Blog />} />
+          <Route path="/en/contact/" element={<Kontakt />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </PageTransition>
-    </Router>
+    </>
   )
 }

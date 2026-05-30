@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
+import { getHreflangUrls, BASE_URL } from '../lib/routes'
 
 // Premium Minimal — Izrada Sajtova page.
 // Same vibe as the homepage: light hero with logo/visual + floating badges,
@@ -36,7 +38,10 @@ const Overline = ({ children, dark = false }) => (
 )
 
 export default function IzradaSajtova() {
-  const { t } = useLanguage()
+  const { t, links } = useLanguage()
+  const location = useLocation()
+  const canonical = BASE_URL + location.pathname
+  const hreflang = getHreflangUrls(location.pathname)
   const reasons = [
     { title: 'Brzi Sajtovi', desc: 'Optimizovani za brže učitavanje, veća konverzija i bolja SEO rangiranja.' },
     { title: 'Kreativan Dizajn', desc: 'Jedinstven dizajn po meri brenda, bez šablona i bez kompromisa.' },
@@ -141,24 +146,24 @@ export default function IzradaSajtova() {
     }
   ]
 
-  const webDevMeta = t.webDevelopment?.meta || {
-    title: 'Izrada Sajtova | SEO Mačak',
-    description: 'Nudimo profesionalnu izradu sajtova sa fokusom na brzinu, moderan dizajn i SEO optimizaciju. Kreiramo rešenja koja donose rezultate.'
-  }
+  const webDevMeta = t.webDevelopment.meta
 
   return (
     <>
       <Helmet>
         <title>{webDevMeta.title}</title>
         <meta name="description" content={webDevMeta.description} />
-        <link rel="canonical" href="https://www.seomacak.com/izrada-sajtova/" />
+        <link rel="canonical" href={canonical} />
+        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
+        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
+        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
         <meta property="og:title" content={webDevMeta.title} />
         <meta property="og:description" content={webDevMeta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/mackic-logo.png" />
-        <meta property="og:url" content="https://www.seomacak.com/izrada-sajtova/" />
+        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
+        <meta property="og:url" content={canonical} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
         <script type="application/ld+json">
           {`
             {
@@ -268,7 +273,7 @@ export default function IzradaSajtova() {
             </p>
 
             <Link
-              to="/kontakt/"
+              to={links.contact}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -436,7 +441,7 @@ export default function IzradaSajtova() {
 
           {/* tier layout: SEO is the specialty / featured card on top,
               other 3 services branch out beneath it */}
-          <FeaturedProjectCard {...featuredProject} />
+          <FeaturedProjectCard {...featuredProject} contactUrl={links.contact} />
 
           <BranchSeparator label="I takođe radim" />
 
@@ -522,7 +527,7 @@ export default function IzradaSajtova() {
             alignItems: 'stretch'
           }}>
             {packages.map((pkg, i) => (
-              <PricingCard key={i} {...pkg} />
+              <PricingCard key={i} {...pkg} contactUrl={links.contact} />
             ))}
           </div>
         </div>
@@ -564,7 +569,7 @@ export default function IzradaSajtova() {
             i javljam se u 24 sata.
           </p>
           <Link
-            to="/kontakt/"
+            to={links.contact}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -898,7 +903,7 @@ function ServiceStripe({ index, title, tagline, desc, bullets, isLast }) {
   )
 }
 
-function FeaturedProjectCard({ title, tagline, desc, result, tech }) {
+function FeaturedProjectCard({ title, tagline, desc, result, tech, contactUrl }) {
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
@@ -1030,7 +1035,7 @@ function FeaturedProjectCard({ title, tagline, desc, result, tech }) {
             </div>
           </div>
 
-          <Link to="/kontakt/" style={{
+          <Link to={contactUrl} style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '12px',
@@ -1255,7 +1260,7 @@ function ProcessBlock({ index, title, tagline, desc, bullets }) {
   )
 }
 
-function PricingCard({ name, price, period, features, highlighted }) {
+function PricingCard({ name, price, period, features, highlighted, contactUrl }) {
   // Non-numeric prices ("Po dogovoru", "Custom") need smaller type — the
   // 3.4rem clamp was chosen for short "999€"-style values and overflows on
   // longer phrases.
@@ -1359,7 +1364,7 @@ function PricingCard({ name, price, period, features, highlighted }) {
       </ul>
 
       <Link
-        to="/kontakt/"
+        to={contactUrl}
         style={{
           display: 'inline-flex',
           alignItems: 'center',

@@ -5,6 +5,7 @@ import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../contexts/LanguageContext'
 import logoImg from '/logo.webp'
 
+
 const ACCENT = '#FDCA40'
 
 // Used on pages that start with a light hero and transition to dark sections.
@@ -12,7 +13,7 @@ const ACCENT = '#FDCA40'
 // hero. On mobile (≤900px) the inline nav is hidden and replaced with a
 // full-screen hamburger overlay.
 export default function ScrollAwareHeader() {
-  const { t } = useLanguage()
+  const { t, links } = useLanguage()
   const { scrollY } = useScroll()
   const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -43,19 +44,19 @@ export default function ScrollAwareHeader() {
   const logoColor = useTransform(scrollY, [vh * 0.6, vh * 0.85], ['#000000', '#ffffff'])
 
   const navItems = [
-    { to: '/', label: t.nav.home },
-    { to: '/izrada-sajtova/', label: t.nav.webDevelopment },
-    { to: '/seo/', label: t.nav.seo },
-    { to: '/blog/', label: t.nav.blog },
-    { to: '/about/', label: t.nav.about },
-    { to: '/kontakt/', label: t.nav.contact }
+    { to: links.home,    label: t.nav.home },
+    { to: links.webDev,  label: t.nav.webDevelopment },
+    { to: links.seo,     label: t.nav.seo },
+    { to: links.blog,    label: t.nav.blog },
+    { to: links.about,   label: t.nav.about },
+    { to: links.contact, label: t.nav.contact }
   ]
 
   return (
     <>
       <header className="site-header">
         <div className="container">
-          <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
+          <Link to={links.home} className="logo" onClick={() => setMenuOpen(false)}>
             <img src={logoImg} alt="SEO Mačak" width="60" height="60" style={{ display: 'block', objectFit: 'contain' }} />
             <motion.span className="logo-text" style={{ color: logoColor, textDecoration: 'underline', textDecorationColor: logoColor, textDecorationThickness: '2px' }}>
               SEO<br />
@@ -65,12 +66,12 @@ export default function ScrollAwareHeader() {
 
           {/* desktop nav */}
           <nav className="nav-pill nav-desktop">
-            <Link to="/">{t.nav.home}</Link>
-            <Link to="/izrada-sajtova/">{t.nav.webDevelopment}</Link>
-            <Link to="/seo/">{t.nav.seo}</Link>
-            <Link to="/blog/">{t.nav.blog}</Link>
-            <Link to="/about/">{t.nav.about}</Link>
-            <Link to="/kontakt/" className="btn nav-cta">{t.nav.contact}</Link>
+            <Link to={links.home}>{t.nav.home}</Link>
+            <Link to={links.webDev}>{t.nav.webDevelopment}</Link>
+            <Link to={links.seo}>{t.nav.seo}</Link>
+            <Link to={links.blog}>{t.nav.blog}</Link>
+            <Link to={links.about}>{t.nav.about}</Link>
+            <Link to={links.contact} className="btn nav-cta">{t.nav.contact}</Link>
             <LanguageSwitcher />
           </nav>
 

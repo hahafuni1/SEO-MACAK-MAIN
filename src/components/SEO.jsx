@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
+import { getHreflangUrls, BASE_URL } from '../lib/routes'
 
 // Premium Minimal — SEO page (showcase finale).
 // Intentionally the richest page: keeps three showcase elements from the
@@ -22,17 +24,6 @@ const CONTAINER_MAX = '1100px'
 
 // Inline keyframes — needed for sticker pop-in animation. Everything else
 // uses framer-motion transitions inline.
-const KEYFRAMES = `
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.5); }
-    to   { opacity: 1; transform: scale(1); }
-  }
-  @keyframes faqProgressBarFill {
-    from { transform: scaleX(0); transform-origin: left; }
-    to   { transform: scaleX(1); transform-origin: left; }
-  }
-  .faq-progress-bar { animation: faqProgressBarFill 8s linear forwards !important; }
-`
 
 const Overline = ({ children, dark = false }) => (
   <span style={{
@@ -96,12 +87,11 @@ const STICKER_TEXTS = [
 ]
 
 export default function SEO() {
-  const { t } = useLanguage()
-  // SR translations don't have a top-level `seo` block. Fall back to Serbian defaults.
-  const seoMeta = t?.seo?.meta || {
-    title: 'SEO Optimizacija | SEO Mačak',
-    description: 'Profesionalna SEO optimizacija za stabilan organski rast — tehnički SEO, on-page, content i link building. Više klijenata bez konstantnog plaćanja oglasa.'
-  }
+  const { t, links } = useLanguage()
+  const location = useLocation()
+  const canonical = BASE_URL + location.pathname
+  const hreflang = getHreflangUrls(location.pathname)
+  const seoMeta = t.seo.meta
   // ── FAQ state ──────────────────────────────────────────────────────────
   const [expandedFaq, setExpandedFaq] = useState(0)
   const [isFaqAutomatic, setIsFaqAutomatic] = useState(true)
@@ -322,14 +312,17 @@ export default function SEO() {
       <Helmet>
         <title>{seoMeta.title}</title>
         <meta name="description" content={seoMeta.description} />
-        <link rel="canonical" href="https://www.seomacak.com/seo/" />
+        <link rel="canonical" href={canonical} />
+        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
+        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
+        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
         <meta property="og:title" content={seoMeta.title} />
         <meta property="og:description" content={seoMeta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/mackic-logo.png" />
-        <meta property="og:url" content="https://www.seomacak.com/seo/" />
+        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
+        <meta property="og:url" content={canonical} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
         <script type="application/ld+json">
           {`
             {
@@ -366,7 +359,6 @@ export default function SEO() {
           `}
         </script>
       </Helmet>
-      <style>{KEYFRAMES}</style>
       <ScrollAwareHeader />
 
       {/* ─────────────────────────── HERO (light) ─────────────────────────── */}
@@ -453,7 +445,7 @@ export default function SEO() {
             </p>
 
             <Link
-              to="/kontakt/"
+              to={links.contact}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1047,7 +1039,7 @@ export default function SEO() {
             Hajde da to promenimo: besplatna analiza, bez rizika, bez dugoročnih ugovora.
           </p>
           <Link
-            to="/kontakt/"
+            to={links.contact}
             style={{
               display: 'inline-flex',
               alignItems: 'center',

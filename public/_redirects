@@ -1,1 +1,4 @@
-/*    /index.html   200
+# Redirects are managed in netlify.toml.
+# This file is intentionally empty to prevent overriding netlify.toml rules.
+# Netlify processes _redirects before netlify.toml, so a catch-all here would
+# break the true-404 behaviour configured in netlify.toml [[redirects]].
