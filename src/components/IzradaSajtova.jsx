@@ -1,1072 +1,632 @@
-import React, { useRef, useEffect } from 'react'
-import Header from './Header'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 import Link from './Link'
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { PageTransitionContext } from './PageTransition'
+import ScrollAwareHeader from './ScrollAwareHeader'
+import SectionTransition from './SectionTransition'
+import { Helmet } from 'react-helmet-async'
+import { useLanguage } from '../contexts/LanguageContext'
 
-const keyframes = `
-  @keyframes moveDiagonalDots {
-    from { background-position: 0px 0px; }
-    to { background-position: 60px -60px; }
-  }
-`
+// Premium Minimal — Izrada Sajtova page.
+// Same vibe as the homepage: light hero with logo/visual + floating badges,
+// then alternating dark sections with thin separators and tabular numbering.
+
+const LIGHT_BG = '#FBFAF8'
+const ACCENT = '#FDCA40'
+const DARK_BG = '#000000'
+const DARK_GRADIENT = 'linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%)'
+const SECTION_PAD_Y = 'clamp(80px, 14vh, 140px)'
+const SECTION_PAD_X = 'clamp(24px, 5vw, 64px)'
+const CONTAINER_MAX = '1100px'
+
+const Overline = ({ children, dark = false }) => (
+  <span style={{
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '14px',
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    color: dark ? ACCENT : '#000',
+    letterSpacing: '3px',
+    textTransform: 'uppercase',
+    marginBottom: '32px'
+  }}>
+    <span style={{ display: 'inline-block', width: '40px', height: '1px', background: dark ? ACCENT : '#000' }} />
+    {children}
+  </span>
+)
 
 export default function IzradaSajtova() {
-  const portfolioContainerRef = useRef(null)
-  const [windowWidth, setWindowWidth] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 1200)
+  const { t } = useLanguage()
+  const reasons = [
+    { title: 'Brzi Sajtovi', desc: 'Optimizovani za brže učitavanje, veća konverzija i bolja SEO rangiranja.' },
+    { title: 'Kreativan Dizajn', desc: 'Jedinstven dizajn po meri brenda, bez šablona i bez kompromisa.' },
+    { title: 'SEO Optimizacija', desc: 'Ugrađene SEO najbolje prakse od početka, rang na Google-u.' },
+    { title: 'Mobilni First', desc: 'Prilagođeno za mobilne korisnike, većina trafika dolazi sa mobitela.' },
+    { title: 'Sigurnost', desc: 'SSL certifikat, zaštita podataka i redovne sigurnosne nadogradnje.' },
+    { title: 'Podrška & Održavanje', desc: 'Dugoročna podrška, praćenje i redovne nadogradnje.' }
+  ]
 
-  React.useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  // Responsive carousel values
-  const getCarouselValues = () => {
-    if (windowWidth < 768) {
-      return { paddingLeft: 20, paddingRight: 600, gap: 100, translateX: -2600 }
-    } else if (windowWidth < 1024) {
-      return { paddingLeft: 60, paddingRight: 700, gap: 150, translateX: -3200 }
-    } else if (windowWidth < 1920) {
-      return { paddingLeft: 180, paddingRight: 900, gap: 200, translateX: -3600 }
-    } else {
-      return { paddingLeft: 200, paddingRight: 1100, gap: 220, translateX: -4200 }
+  const services = [
+    {
+      title: 'Custom Razvoj',
+      tagline: 'Bez šablona, bez kompromisa',
+      desc: 'Zaboravite na ograničene šablone. Kreiramo unikatna digitalna rešenja od nule, koristeći React za vrhunske performanse i bezbednost. Svaki red koda pišemo sa fokusom na brzinu i skalabilnost.',
+      bullets: ['React + moderni stack', 'Skalabilna arhitektura', 'Premium performanse']
+    },
+    {
+      title: 'E-Commerce Profit',
+      tagline: 'Optimizacija za prodaju',
+      desc: 'Digitalna prodavnica mora da uliva poverenje i olakšava kupovinu. Naša rešenja optimizujemo za maksimalan ROI, kreirajući intuitivne putanje koje povećavaju konverziju.',
+      bullets: ['Stripe / Plaćanja', 'Upravljanje zalihama', 'Konverzijska analitika']
+    },
+    {
+      title: 'Google Dominacija',
+      tagline: 'SEO od prve linije koda',
+      desc: 'Biti na internetu nije isto što i biti vidljiv. Naša strategija vas postavlja ispred konkurencije kroz tehničku optimizaciju i kvalitetne backlink-ove.',
+      bullets: ['Tehnički SEO', 'Core Web Vitals', 'Sadržajna strategija']
     }
+  ]
+
+  const featuredProject = {
+    title: 'SEO Optimizacija',
+    tagline: 'Ubedljivo najviše ovo radim',
+    desc: 'Najveći deo mojih projekata vrti se oko ovoga: kompletan SEO audit, on-page optimizacija, tehnički SEO, link building i sadržajna strategija. Cilj je jasan: vaš sajt mora da dominira na Google-u, ne samo da postoji.',
+    result: 'Top 5 ranga',
+    tech: ['Tehnički SEO', 'Link Building', 'Content', 'Schema', 'Core Web Vitals']
   }
 
-  const carouselValues = getCarouselValues()
-  
-  const { scrollYProgress } = useScroll({
-    target: portfolioContainerRef,
-    offset: ['start start', 'end start'],
-  })
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 50, damping: 20 })
-
-  // Carousel horizontal scroll animation - all cards move together in a row
-  // Entire carousel track translates left as user scrolls
-  // Progress: 0 = start (cards visible from left), 1 = end (cards off-screen to left)
-  const carouselX = useTransform(smoothProgress, [0, 0.75], [0, carouselValues.translateX])
-
-  const projects = [
+  const otherProjects = [
     {
       title: 'E-Commerce Platforme',
       desc: 'Kreiramo unikatna e-commerce rešenja prilagođena vašem brendu, spajajući vrhunski dizajn sa besprekornim korisničkim iskustvom.',
-      result: '-40% napuštenih korpi',
-      tech: 'React, Node.js, Stripe',
-      color: '#FF6B9D'
+      result: '−40% napuštenih korpi',
+      tech: ['React', 'Node.js', 'Stripe']
     },
     {
       title: 'SaaS Aplikacije',
       desc: 'Custom SaaS rešenja sa složenom backend logikom i intuitivnim frontend interfejsom.',
-      result: 'Real-time obrada podataka',
-      tech: 'React, PostgreSQL, AWS (po potrebi)',
-      color: '#00BFFF'
+      result: 'Real-time obrada',
+      tech: ['React', 'PostgreSQL', 'AWS']
     },
     {
-      title: 'SEO Optimizacija',
-      desc: 'Kompletan SEO audit i optimizacija dovodi do sigurnog uspeha u google pretrazivanju.',
-      result: 'Visoki Google Rankovi',
-      tech: 'Technical SEO, Link Building, Content Strategija',
-      color: '#FFD700'
-    },
-    {
-      title: 'Dizajn & Branding - Rebranding',
-      desc: 'Kompletan rebranding uključujući novi logo, boju, tipografiju i jedan od najunikatnijih web dizajna u Srbiji.',
-      result: '+200% angažmana dizajna',
-      tech: 'Web Dizajn, UX/UI, Brand Strategija',
-      color: '#00FF88'
+      title: 'Dizajn & Rebranding',
+      desc: 'Kompletan rebranding uključujući novi logo, boju, tipografiju i jedinstveni web dizajn.',
+      result: '+200% angažmana',
+      tech: ['Web Dizajn', 'UX/UI', 'Brand']
     }
   ]
+
+  const processSteps = [
+    {
+      title: 'Strategija i Otkrivanje',
+      tagline: 'Vaš biznis zaslužuje plan, ne samo šablon',
+      desc: 'Ne krećemo dok ne razumemo vašeg idealnog kupca, konkurenciju, i šta zaista donosi rezultate u vašoj industriji.',
+      bullets: ['Analiza konkurencije', 'Arhitektura sajta', 'Definisanje ciljeva']
+    },
+    {
+      title: 'Inženjering i Preciznost',
+      tagline: 'Kod koji pretraživači obožavaju',
+      desc: 'Dok drugi samo prave sajt, mi optimizujemo svaki red koda za maksimalnu brzinu i SEO ranking.',
+      bullets: ['Munjevit odziv', 'Cross-device testiranje', 'Clean kod']
+    },
+    {
+      title: 'Lansiranje i Rast',
+      tagline: 'Ne odlazimo nakon "Publish"',
+      desc: 'Lansiranje je samo početak. Pratimo rezultate, vršimo fina podešavanja, i kontinuirano gradimo na onome što radi.',
+      bullets: ['Analiza ponašanja', 'A/B testiranje', 'Stalna podrška']
+    }
+  ]
+
+  const packages = [
+    {
+      name: 'Mačak Basic',
+      price: '200€',
+      period: 'mesečno',
+      features: ['Responsive dizajn', 'SEO optimizacija', '5 stranica', 'Kontakt forma', 'SSL certifikat'],
+      highlighted: false
+    },
+    {
+      name: 'Mačak Napredni',
+      price: '400€',
+      period: 'mesečno',
+      features: ['Sve iz Basic paketa', 'E-commerce integracija', 'Unlimited stranica', 'Blog sistem', 'Analytics integracija', 'Newsletter sistem'],
+      highlighted: true
+    },
+    {
+      name: 'Mačak Preduzeće',
+      price: 'Po dogovoru',
+      period: 'mesečna pretplata',
+      features: ['Sve iz Naprednog paketa', 'CRM integracija', 'Prilagođeni dizajn', 'API integracije', 'Performance optimizacija', 'Dedicated support'],
+      highlighted: false
+    }
+  ]
+
+  const webDevMeta = t.webDevelopment?.meta || {
+    title: 'Izrada Sajtova | SEO Mačak',
+    description: 'Nudimo profesionalnu izradu sajtova sa fokusom na brzinu, moderan dizajn i SEO optimizaciju. Kreiramo rešenja koja donose rezultate.'
+  }
+
   return (
     <>
-    <style>{keyframes}</style>
-    <div>
-      <Header />
+      <Helmet>
+        <title>{webDevMeta.title}</title>
+        <meta name="description" content={webDevMeta.description} />
+        <link rel="canonical" href="https://www.seomacak.com/izrada-sajtova/" />
+        <meta property="og:title" content={webDevMeta.title} />
+        <meta property="og:description" content={webDevMeta.description} />
+        <meta property="og:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <meta property="og:url" content="https://www.seomacak.com/izrada-sajtova/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [{
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Početna",
+                "item": "https://www.seomacak.com/"
+              },{
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Izrada Sajtova",
+                "item": "https://www.seomacak.com/izrada-sajtova/"
+              }]
+            }
+          `}
+        </script>
+      </Helmet>
+      <ScrollAwareHeader />
 
-      {/* HER SECTION - Value Proposition & CTA */}
-      <section style={{ padding: '100px 24px', background: '#000', color: '#fff', textAlign: 'center', minHeight: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-        {/* Animated moving background - diagonal pattern */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: 'linear-gradient(45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%), linear-gradient(-45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%)',
-            backgroundSize: '60px 60px',
-            backgroundPosition: '0px 0px',
-            opacity: 0.12,
-            animation: 'moveDiagonalDots 4s linear infinite',
-            zIndex: 1,
-            pointerEvents: 'none'
-          }}
-        />
-        <div style={{ maxWidth: '900px', position: 'relative', zIndex: 2 }}>
-          <h1 style={{ fontSize: '3.5rem', marginBottom: '20px', fontWeight: '700', color: '#FDCA40' }}>Profesionalna Izrada Sajtova</h1>
-          <p style={{ fontSize: '1.3rem', marginBottom: '30px', color: '#e0e0e0', lineHeight: '1.6' }}>
-            Kreiraj snažnu online prisutnost sa modernim, brzim i SEO-optimizovanim sajtovima koji konvertuju posjetioce u klijente. U svetu gde prvi utisak traje samo nekoliko sekundi, mi gradimo platforme koje odmah ulivaju poverenje, dominiraju pretragom i pretvaraju tvoj digitalni prostor u najefikasniji prodajni alat koji radi za tebe 24/7.
-          </p>
-          <div style={{ textAlign: 'center', marginTop: '50px' }}>
-            <Link 
-              to="/kontakt/" 
-              style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}
-            >
-              <div style={{
-                background: '#FDCA40',
-                color: '#000',
-                padding: '28px 90px',
-                fontSize: '1.6rem',
-                borderRadius: '50px',
-                fontWeight: '700',
-                transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                pointerEvents: 'auto',
-                display: 'inline-block',
-                whiteSpace: 'nowrap'
-              }} onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
-                e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
-              }} onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = 'none';
+      {/* ─────────────────────────── HERO (light) ─────────────────────────── */}
+      <section style={{
+        background: LIGHT_BG,
+        color: '#000',
+        minHeight: '100vh',
+        padding: `clamp(140px, 18vh, 200px) ${SECTION_PAD_X} clamp(60px, 10vh, 100px)`,
+        display: 'flex',
+        alignItems: 'center',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* subtle dot pattern bg */}
+        <div aria-hidden style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'linear-gradient(45deg, transparent 48%, rgba(0,0,0,0.06) 49%, rgba(0,0,0,0.06) 51%, transparent 52%),' +
+            'linear-gradient(-45deg, transparent 48%, rgba(0,0,0,0.06) 49%, rgba(0,0,0,0.06) 51%, transparent 52%)',
+          backgroundSize: '60px 60px',
+          opacity: 0.4,
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
+        {/* yellow glow blob behind the mockup */}
+        <div aria-hidden style={{
+          position: 'absolute',
+          right: '-10%',
+          top: '40%',
+          transform: 'translateY(-50%)',
+          width: 'clamp(380px, 50vw, 720px)',
+          height: 'clamp(380px, 50vw, 720px)',
+          background: 'radial-gradient(circle, rgba(253, 202, 64, 0.32) 0%, rgba(253, 202, 64, 0.08) 45%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
+
+        <div style={{
+          maxWidth: CONTAINER_MAX,
+          margin: '0 auto',
+          width: '100%',
+          position: 'relative',
+          zIndex: 1,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
+          gap: 'clamp(40px, 6vw, 80px)',
+          alignItems: 'center'
+        }}>
+          {/* ─── text column ─── */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+          >
+            <Overline>Izrada Sajtova</Overline>
+
+            <h1 style={{
+              fontSize: 'clamp(2.4rem, 6.5vw, 5rem)',
+              fontWeight: 900,
+              lineHeight: 0.98,
+              letterSpacing: '-0.03em',
+              margin: '0 0 32px',
+              color: '#000'
+            }}>
+              Sajtovi koji{' '}
+              <span style={{
+                textDecoration: 'underline',
+                textDecorationColor: ACCENT,
+                textDecorationThickness: '6px',
+                textUnderlineOffset: '8px'
               }}>
-                Potražite Besplatnu Ponudu
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
+                konvertuju
+              </span>
+            </h1>
 
-      {/* WHY CHOOSE US - Trust & Authority */}
-      <section style={{ padding: '80px 24px', background: '#000', color: '#fff', borderTop: '2px solid #FDCA40' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 style={{ 
-            textAlign: 'center', 
-            fontSize: '3rem', 
-            marginBottom: '60px', 
-            fontWeight: '800',
-            color: '#FFFFFF'
-          }}>Zašto Izabrati Nas?</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '60px', maxWidth: '900px', margin: '0 auto' }}>
-            {[
-              { title: 'Brzi Sajtovi', desc: 'Optimizovani za brže učitavanje - veća konverzija i bolja SEO rangiranja' },
-              { title: 'Moderni Dizajn', desc: 'Responsive dizajn koji savršeno izgleda na svim uređajima' },
-              { title: 'SEO Optimizacija', desc: 'Ugrađene SEO najbolje prakse od početka - rang na Google-u' },
-              { title: 'Mobilni First', desc: 'Prilagođeno za mobilne korisnike - većina trafika dolazi sa mobitela' },
-              { title: 'Sigurnost', desc: 'SSL certifikat, zaštita podataka i redovne sigurnosne nadogradnje' },
-              { title: 'Podrška & Održavanje', desc: 'Dugoročna podrška, praćenje i redovne nadogradnje' }
-            ].map((item, idx) => (
-              <div key={idx} style={{ 
-                paddingLeft: '24px',
-                paddingBottom: idx !== 5 ? '60px' : '0',
-                borderLeft: '2px solid rgba(253, 202, 64, 0.4)',
-                borderBottom: idx !== 5 ? '1px solid transparent' : 'none',
-                backgroundImage: idx !== 5 ? 'linear-gradient(to bottom, rgba(253, 202, 64, 0.1), transparent)' : 'none',
-                backgroundSize: '1px 100%',
-                backgroundPosition: '0 0',
-                backgroundRepeat: 'repeat-y',
-                transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                cursor: 'pointer',
-                position: 'relative'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderLeft = '5px solid #FDCA40';
-                e.currentTarget.style.paddingLeft = '20px';
-                e.currentTarget.style.transform = 'translateX(8px)';
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(253, 202, 64, 0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderLeft = '2px solid rgba(253, 202, 64, 0.4)';
-                e.currentTarget.style.paddingLeft = '24px';
-                e.currentTarget.style.transform = 'translateX(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}>
-                <h3 style={{ 
-                  fontSize: '1.8rem', 
-                  marginBottom: '16px', 
-                  color: '#FDCA40', 
-                  fontWeight: '700',
-                  lineHeight: '1.4',
-                  margin: '0 0 16px 0'
-                }}>{item.title}</h3>
-                <p style={{ 
-                  color: '#888888', 
-                  lineHeight: '1.7', 
-                  fontSize: '1.05rem', 
-                  margin: 0,
-                  fontWeight: '400'
-                }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <p style={{
+              fontSize: 'clamp(1.05rem, 1.8vw, 1.2rem)',
+              lineHeight: 1.65,
+              color: '#555',
+              margin: '0 0 48px'
+            }}>
+              Moderni, brzi i SEO-optimizovani sajtovi koji pretvaraju posetioce u klijente.
+              U svetu gde prvi utisak traje samo nekoliko sekundi, gradimo platforme koje
+              dominiraju pretragom i rade za vas 24/7.
+            </p>
 
-      {/* SERVICES - What We Offer */}
-      <section style={{ padding: '100px 24px', background: '#000', color: '#fff' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          {/* Section Header with Sub-title */}
-          <div style={{ textAlign: 'center', marginBottom: '70px' }}>
-            <h2 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '20px', color: '#FFFFFF' }}>Digitalni Arsenal za Vaš Rast</h2>
-            <p style={{ fontSize: '1.1rem', color: '#A0A0A0', maxWidth: '600px', margin: '0 auto', lineHeight: '1.7' }}>Kompletna rešenja za vašu digitalnu transformaciju - od razvoja do optimizacije i održavanja</p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '40px' }}>
-            {[
-              {
-                svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
-                title: 'Custom Razvoj',
-                desc: 'Zaboravite na ograničene šablone. Kreiramo unikatna digitalna rešenja od nule, koristeći React za vrhunske performanse i bezbednost. Svaki red koda pišemo sa fokusom na brzinu i skalabilnost, osiguravajući da vaš sajt izgleda premium i funkcioniše besprekorno na svim uređajima.'
-              },
-              {
-                svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>',
-                title: 'E-Commerce Profit',
-                desc: 'Digitalna prodavnica mora da uliva poverenje i olakšava kupovinu. Naša rešenja optimizujemo za maksimalan ROI, kreirajući intuitivne putanje koje povećavaju konverziju. Implementiramo napredne sisteme za upravljanje zalihama, pružajući vam stabilnu platformu za rast prodaje.'
-              },
-              {
-                svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',
-                title: 'Google Dominacija',
-                desc: 'Biti na internetu nije isto što i biti vidljiv. Naša strategija vas postavlja ispred konkurencije kroz tehničku optimizaciju i link building. SEO Mačak ne juri samo saobraćaj, već kvalitetne posete koje se direktno transformišu u realan poslovni profit.'
-              }
-            ].map((service, idx) => (
-              <div key={idx} data-clickable="true" style={{
-                background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
-                padding: '45px',
-                borderRadius: '16px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                backdropFilter: 'blur(10px)',
-                transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                position: 'relative',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                minHeight: '400px',
-                display: 'flex',
-                flexDirection: 'column',
+            <Link
+              to="/kontakt/"
+              style={{
+                display: 'inline-flex',
                 alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.border = '1px solid rgba(253, 202, 64, 0.5)';
-                e.currentTarget.style.boxShadow = '0 0 30px rgba(253, 202, 64, 0.2), inset 0 0 30px rgba(253, 202, 64, 0.05)';
-                // Fade out icon & title
-                const iconDiv = e.currentTarget.querySelector('[data-icon-title]');
-                if (iconDiv) {
-                  iconDiv.style.opacity = '0';
-                  iconDiv.style.pointerEvents = 'none';
-                }
-                // Show description
-                const descDiv = e.currentTarget.querySelector('[data-description]');
-                if (descDiv) {
-                  descDiv.style.opacity = '1';
-                  descDiv.style.visibility = 'visible';
-                  descDiv.style.transform = 'translateY(0)';
-                  descDiv.style.pointerEvents = 'auto';
-                }
-                // Show overlay
-                const overlay = e.currentTarget.querySelector('[data-overlay]');
-                if (overlay) {
-                  overlay.style.opacity = '1';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.08)';
-                e.currentTarget.style.boxShadow = 'none';
-                // Fade in icon & title
-                const iconDiv = e.currentTarget.querySelector('[data-icon-title]');
-                if (iconDiv) {
-                  iconDiv.style.opacity = '1';
-                  iconDiv.style.pointerEvents = 'auto';
-                }
-                // Hide description
-                const descDiv = e.currentTarget.querySelector('[data-description]');
-                if (descDiv) {
-                  descDiv.style.opacity = '0';
-                  descDiv.style.visibility = 'hidden';
-                  descDiv.style.transform = 'translateY(20px)';
-                  descDiv.style.pointerEvents = 'none';
-                }
-                // Hide overlay
-                const overlay = e.currentTarget.querySelector('[data-overlay]');
-                if (overlay) {
-                  overlay.style.opacity = '0';
-                }
-              }}>
-                
-                {/* Icon & Title - Always visible, fades out on hover */}
-                <div data-icon-title style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  textAlign: 'center',
-                  transition: 'opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  zIndex: 10,
-                  opacity: 1
-                }}>
-                  {/* Icon Container */}
-                  <div style={{
-                    width: '70px',
-                    height: '70px',
-                    borderRadius: '14px',
-                    background: 'rgba(253, 202, 64, 0.1)',
-                    border: '2px solid rgba(253, 202, 64, 0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '15px',
-                    transition: 'all 0.3s ease',
-                    margin: '0 auto 15px auto'
-                  }}>
-                    <div style={{ color: '#FDCA40', width: '40px', height: '40px' }} dangerouslySetInnerHTML={{ __html: service.svg }} />
-                  </div>
-
-                  {/* Title */}
-                  <h3 style={{
-                    fontSize: '1.6rem',
-                    fontWeight: '700',
-                    color: '#FFFFFF',
-                    margin: 0,
-                    transition: 'font-size 0.4s ease'
-                  }}>{service.title}</h3>
-                </div>
-
-                {/* Description - Hidden by default, revealed on hover */}
-                <div data-description style={{
-                  position: 'absolute',
-                  inset: '45px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  opacity: 0,
-                  transform: 'translateY(20px)',
-                  transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  pointerEvents: 'none',
-                  zIndex: 10
-                }}>
-                  <p style={{
-                    color: '#FFFFFF',
-                    lineHeight: '1.6',
-                    fontSize: '1.05rem',
-                    margin: 0,
-                    textAlign: 'center',
-                    fontWeight: '500',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-                  }}>{service.desc}</p>
-                </div>
-
-                {/* Overlay background that appears on hover */}
-                <div data-overlay style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(135deg, rgba(15, 15, 15, 0.7) 0%, rgba(20, 20, 20, 0.7) 100%)',
-                  opacity: 0,
-                  transition: 'opacity 0.4s ease',
-                  pointerEvents: 'none',
-                  zIndex: 1,
-                  borderRadius: '16px'
-                }} />
-              </div>
-            ))}
-          </div>
-
-          {/* Main CTA Button */}
-          <div style={{ textAlign: 'center', marginTop: '60px' }}>
-            <Link 
-              to="/kontakt/" 
-              style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}
-            >
-              <div style={{
-                background: '#FDCA40',
-                color: '#000',
-                padding: '20px 50px',
-                fontSize: '1.3rem',
+                gap: '12px',
+                padding: '18px 36px',
+                background: '#000',
+                color: ACCENT,
                 borderRadius: '50px',
                 border: '3px solid #000',
-                fontWeight: '700',
-                transition: 'all 0.1s ease',
-                pointerEvents: 'auto',
-                display: 'inline-block',
-                whiteSpace: 'nowrap',
-                boxShadow: '5px 5px 0px 0px #C79F00'
-              }} onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translate(3px, 3px)';
-                e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
-              }} onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translate(0, 0)';
-                e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
-              }}>
-                Besplatna Konsultacija
-              </div>
+                textDecoration: 'none',
+                fontSize: '1.05rem',
+                fontWeight: 900,
+                letterSpacing: '0.5px',
+                boxShadow: '5px 5px 0px 0px #1a1a1a',
+                transition: 'all 0.1s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translate(3px, 3px)'
+                e.currentTarget.style.boxShadow = '2px 2px 0px 0px #1a1a1a'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translate(0, 0)'
+                e.currentTarget.style.boxShadow = '5px 5px 0px 0px #1a1a1a'
+              }}
+            >
+              <span>Potraži besplatnu analizu</span>
+              <span aria-hidden style={{ fontSize: '1.3rem' }}>→</span>
             </Link>
-          </div>
-        </div>
-      </section>
+          </motion.div>
 
-      {/* CAROUSEL PORTFOLIO SECTION - Horizontal Scrolling Track */}
-      <div ref={portfolioContainerRef} style={{ position: 'relative', height: '350vh' }}>
-        <div style={{ 
-          position: 'sticky', 
-          top: 0, 
-          height: '100vh', 
-          width: '100%',
-          background: '#000', 
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          overflow: 'hidden',
-          zIndex: 100
-        }}>
-          {/* Static Section Title - Fixed at top, no animation */}
-          <div 
-            style={{
-              position: 'absolute',
-              top: '40px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              textAlign: 'center',
-              zIndex: 20,
-              pointerEvents: 'none'
-            }}
-          >
-            <h2 style={{ fontSize: '2.8rem', fontWeight: '800', color: '#FFFFFF', margin: 0 }}>Naše Usluge</h2>
-          </div>
-
-          {/* Horizontal Carousel Track - All cards in one row */}
+          {/* ─── browser mockup visual ─── */}
           <motion.div
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: 'easeOut' }}
             style={{
-              x: carouselX,
+              position: 'relative',
               display: 'flex',
-              gap: `${carouselValues.gap}px`,
-              paddingLeft: `${carouselValues.paddingLeft}px`,
-              paddingRight: `${carouselValues.paddingRight}px`,
-              paddingTop: '120px',
-              paddingBottom: '60px',
-              minWidth: 'fit-content',
-              height: 'auto'
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: 'clamp(280px, 45vh, 480px)'
             }}
           >
-            {projects.map((project, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '60px',
-                flexShrink: 0,
-                flexWrap: 'wrap',
-                width: 'min(1200px, 90vw)'
-              }}>
-                {/* Card Content - Text */}
-                <div style={{ flex: '1 1 420px', paddingTop: '40px', minWidth: '280px', maxWidth: '500px' }}>
-                  <h3 style={{ fontSize: '2.5rem', fontWeight: '700', color: '#FFFFFF', marginBottom: '20px', lineHeight: '1.3' }}>
-                    {project.title}
-                  </h3>
-                  <p style={{ fontSize: '1.1rem', color: '#A0A0A0', marginBottom: '30px', lineHeight: '1.8', maxWidth: '550px' }}>
-                    {project.desc}
-                  </p>
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '15px',
-                    maxWidth: '550px'
-                  }}>
-                    <div style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '12px 16px',
-                      background: `${project.color}15`,
-                      border: `1px solid ${project.color}40`,
-                      borderRadius: '8px',
-                      width: 'fit-content'
-                    }}>
-                      <span style={{ color: project.color, fontWeight: '700' }}>✓</span>
-                      <span style={{ color: project.color, fontSize: '1rem', fontWeight: '600' }}>{project.result}</span>
-                    </div>
-                    <div style={{ color: '#808080', fontSize: '0.95rem' }}>
-                      <span style={{ fontWeight: '600', color: '#A0A0A0' }}>Tehnologije:</span> {project.tech}
-                    </div>
-                  </div>
-                </div>
+            <BrowserMockup />
 
-                {/* Card Visual - Image/Placeholder */}
-                <div style={{
-                  flex: '1 1 420px',
-                  minWidth: '280px',
-                  height: '450px',
-                  background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
-                  padding: '40px',
-                  borderRadius: '16px',
-                  border: `1px solid ${project.color}40`,
-                  backdropFilter: 'blur(10px)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: `0 0 30px ${project.color}30`,
-                  flexShrink: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    background: project.color,
-                    opacity: 0.8
-                  }} />
-                  {idx === 0 ? (
-                    <img 
-                      src="/internet-prodavnica.png" 
-                      alt="E-Commerce Platform" 
-                      style={{
-                        width: '120%',
-                        height: '120%',
-                        objectFit: 'cover',
-                        borderRadius: '2px',
-                        marginLeft: '-40px',
-                        marginRight: '-40px'
-                      }}
-                    />
-                  ) : idx === 1 ? (
-                    <img 
-                      src="/saas-aplikacije.png" 
-                      alt="SaaS Aplikacije" 
-                      style={{
-                        width: '120%',
-                        height: '120%',
-                        objectFit: 'cover',
-                        borderRadius: '2px',
-                        marginLeft: '-40px',
-                        marginRight: '-40px'
-                      }}
-                    />
-                  ) : idx === 2 ? (
-                    <img 
-                      src="/seo-optimizacija.png" 
-                      alt="SEO Optimizacija" 
-                      style={{
-                        width: '120%',
-                        height: '120%',
-                        objectFit: 'cover',
-                        borderRadius: '2px',
-                        marginLeft: '-40px',
-                        marginRight: '-40px'
-                      }}
-                    />
-                  ) : idx === 3 ? (
-                    <img 
-                      src="/dizajn-brending.png" 
-                      alt="Dizajn & Branding" 
-                      style={{
-                        width: '120%',
-                        height: '120%',
-                        objectFit: 'cover',
-                        borderRadius: '2px',
-                        marginLeft: '-40px',
-                        marginRight: '-40px'
-                      }}
-                    />
-                  ) : (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '100%',
-                      height: '100%',
-                      color: project.color,
-                      opacity: 0.3,
-                      fontSize: '3rem',
-                      fontWeight: '700',
-                      textAlign: 'center'
-                    }}>
-                      {project.title.split(' ')[0]}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+            <HeroBadge
+              text="Kreativan Dizajn"
+              sub="Jedinstven svaki put"
+              style={{ top: '6%', right: '-6%' }}
+              delay={0.5}
+              float={{ duration: 4, y: [0, -6, 0] }}
+            />
+            <HeroBadge
+              text="Mobile First"
+              sub="Svaki uređaj"
+              style={{ bottom: '10%', left: '-4%' }}
+              delay={0.7}
+              float={{ duration: 5, y: [0, 8, 0] }}
+              variant="dark"
+            />
+            <HeroBadge
+              text="SSL ✓"
+              sub="Bezbedan"
+              style={{ top: '40%', right: '-12%' }}
+              delay={0.9}
+              float={{ duration: 6, y: [0, -6, 0] }}
+              variant="yellow"
+            />
           </motion.div>
         </div>
-      </div>
-
-      {/* PROCESS - How We Work - New Design */}
-      <section style={{ padding: '120px 24px', background: '#000', color: '#fff', position: 'relative', overflow: 'hidden' }}>
-        {/* Animated moving background - diagonal pattern */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: 'linear-gradient(45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%), linear-gradient(-45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%)',
-            backgroundSize: '60px 60px',
-            backgroundPosition: '0px 0px',
-            opacity: 0.04,
-            animation: 'moveDiagonalDots 3s linear infinite',
-            zIndex: 0,
-            pointerEvents: 'none'
-          }}
-        />
-        <div style={{ maxWidth: '1300px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          {/* First Block - Strategija i Otkrivanje (01+02) */}
-          <div style={{ marginBottom: '120px', position: 'relative' }}>
-            <div style={{
-              position: 'absolute',
-              top: '-40px',
-              left: '0',
-              fontSize: '180px',
-              fontWeight: '900',
-              color: '#FDCA40',
-              opacity: '0.15',
-              zIndex: 0,
-              pointerEvents: 'none',
-              lineHeight: '1'
-            }}>01</div>
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <h3 style={{ fontSize: '3.5rem', fontWeight: '800', color: '#FFFFFF', marginBottom: '30px', lineHeight: '1.2' }}>
-                Strategija i Otkrivanje
-              </h3>
-              <p style={{ fontSize: '1.3rem', color: '#FDCA40', fontWeight: '700', marginBottom: '25px', maxWidth: '800px' }}>
-                Vaš biznis zaslužuje plan, a ne samo šablon
-              </p>
-              <p style={{ fontSize: '1.1rem', color: '#A0A0A0', lineHeight: '1.8', maxWidth: '850px', marginBottom: '35px' }}>
-                Ne krećemo u rad dok ne upoznamo vašeg idealnog kupca. Fokusiramo se na:
-              </p>
-              
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, maxWidth: '850px' }}>
-                <li style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '18px',
-                  marginBottom: '20px',
-                  fontSize: '1.1rem',
-                  color: '#FFFFFF'
-                }}>
-                  <span style={{
-                    flexShrink: 0,
-                    marginTop: '2px',
-                    color: '#FDCA40',
-                    fontSize: '1.3rem'
-                  }}>🔍</span>
-                  <span><strong>Analizu konkurencije</strong> – da biste uvek bili korak ispred.</span>
-                </li>
-                <li style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '18px',
-                  marginBottom: '20px',
-                  fontSize: '1.1rem',
-                  color: '#FFFFFF'
-                }}>
-                  <span style={{
-                    flexShrink: 0,
-                    marginTop: '2px',
-                    color: '#FDCA40',
-                    fontSize: '1.3rem'
-                  }}>🏗️</span>
-                  <span><strong>Arhitekturu sajta</strong> – logičnu za ljude, jasnu za Google.</span>
-                </li>
-              </ul>
-
-              <p style={{ fontSize: '1rem', color: '#A0A0A0', lineHeight: '1.8', maxWidth: '850px', marginTop: '30px' }}>
-                Istraživanje je temelj svega. Analiziramo šta radi najbolje za vašu konkurenciju, koje ključne reči stvarno donose traffic, i kako se vaši potencijalni klijenti ponašaju online. Planiramo logičnu strukturu sajta koja olakšava korisnicima da pronađu ono što trebaju, a istovremeno signalizira Google-u da je vašaj sadržaj relevantan i vredan rangiranja.
-              </p>
-            </div>
-          </div>
-
-          {/* Second Block - Inženjering i Preciznost (03+04) */}
-          <div style={{ marginBottom: '120px', position: 'relative' }}>
-            <div style={{
-              position: 'absolute',
-              top: '-40px',
-              right: '0',
-              fontSize: '180px',
-              fontWeight: '900',
-              color: '#FDCA40',
-              opacity: '0.15',
-              zIndex: 0,
-              pointerEvents: 'none',
-              lineHeight: '1'
-            }}>02</div>
-            <div style={{ position: 'relative', zIndex: 1, textAlign: 'right' }}>
-              <h3 style={{ fontSize: '3.5rem', fontWeight: '800', color: '#FFFFFF', marginBottom: '30px', lineHeight: '1.2' }}>
-                Inženjering i Preciznost
-              </h3>
-              <p style={{ fontSize: '1.3rem', color: '#FDCA40', fontWeight: '700', marginBottom: '25px' }}>
-                Kod koji pretraživači obožavaju
-              </p>
-              <p style={{ fontSize: '1.1rem', color: '#A0A0A0', lineHeight: '1.8', maxWidth: '100%', marginBottom: '35px' }}>
-                Dok drugi samo 'prave sajt', mi optimizujemo svaki red koda za maksimalnu brzinu.
-              </p>
-              
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '20px' }}>
-                <li style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '18px',
-                  marginBottom: '0px',
-                  fontSize: '1.1rem',
-                  color: '#FFFFFF',
-                  textAlign: 'right',
-                  flexDirection: 'row-reverse'
-                }}>
-                  <span style={{
-                    flexShrink: 0,
-                    marginTop: '2px',
-                    color: '#FDCA40',
-                    fontSize: '1.3rem'
-                  }}>⚡</span>
-                  <span><strong>Munjevit odziv</strong> – jer niko ne voli da čeka.</span>
-                </li>
-                <li style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '18px',
-                  marginBottom: '0px',
-                  fontSize: '1.1rem',
-                  color: '#FFFFFF',
-                  textAlign: 'right',
-                  flexDirection: 'row-reverse'
-                }}>
-                  <span style={{
-                    flexShrink: 0,
-                    marginTop: '2px',
-                    color: '#FDCA40',
-                    fontSize: '1.3rem'
-                  }}>✓</span>
-                  <span><strong>Rigorozno testiranje</strong> – vaš sajt će raditi savršeno na svakom uređaju.</span>
-                </li>
-              </ul>
-
-              <p style={{ fontSize: '1rem', color: '#A0A0A0', lineHeight: '1.8', maxWidth: '100%', marginTop: '30px', textAlign: 'right' }}>
-                Tehnička kompleksnost je skrivena iza jednostavnog interfejsa. Koristimo najnovije alate i najbolje prakse za web razvoj - React za dinamičnost, optimizovane slike, minifikovani CSS i JavaScript, te sve što pravi sajt bržim. Svaki piksel, svaki JavaScript event je testiram, debugovan i optimizovan. Rezultat svega toga je vaš sajt koji se učitava u milisekundama, što donosi veću konverziju i bolje SEO rangiranje.
-              </p>
-            </div>
-          </div>
-
-          {/* Third Block - Lansiranje i Kontinuirani Rast (05+06) */}
-          <div style={{ textAlign: 'center', position: 'relative' }}>
-            <div style={{
-              position: 'absolute',
-              top: '-40px',
-              left: '0',
-              fontSize: '180px',
-              fontWeight: '900',
-              color: '#FDCA40',
-              opacity: '0.15',
-              zIndex: 0,
-              pointerEvents: 'none',
-              lineHeight: '1'
-            }}>03</div>
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <h3 style={{ fontSize: '3.5rem', fontWeight: '800', color: '#FFFFFF', marginBottom: '30px', lineHeight: '1.2' }}>
-                Lansiranje i Kontinuirani Rast
-              </h3>
-              <p style={{ fontSize: '1.3rem', color: '#FDCA40', fontWeight: '700', marginBottom: '25px' }}>
-                Mi ne odlazimo nakon klika na <span style={{ fontWeight: '900' }}>"Publish"</span>
-              </p>
-              <p style={{ fontSize: '1.1rem', color: '#A0A0A0', lineHeight: '1.8', maxWidth: '900px', margin: '0 auto 35px auto' }}>
-                Lansiranje je samo početak. Pratimo rezultate i vršimo fina podešavanja kako bi vaš profit nastavio da raste.
-              </p>
-              
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 auto', maxWidth: '900px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-                <li style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '18px',
-                  marginBottom: '0px',
-                  fontSize: '1.1rem',
-                  color: '#FFFFFF',
-                  justifyContent: 'center',
-                  textAlign: 'center'
-                }}>
-                  <span style={{
-                    flexShrink: 0,
-                    marginTop: '2px',
-                    color: '#FDCA40',
-                    fontSize: '1.3rem'
-                  }}>📊</span>
-                  <span><strong>Analiza ponašanja</strong> – saznajte šta vaši klijenti zapravo žele.</span>
-                </li>
-                <li style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '18px',
-                  marginBottom: '0px',
-                  fontSize: '1.1rem',
-                  color: '#FFFFFF',
-                  justifyContent: 'center',
-                  textAlign: 'center'
-                }}>
-                  <span style={{
-                    flexShrink: 0,
-                    marginTop: '2px',
-                    color: '#FDCA40',
-                    fontSize: '1.3rem'
-                  }}>🛡️</span>
-                  <span><strong>Stalna podrška</strong> – vaš sajt ostaje siguran, moderan i uvek optimizovan.</span>
-                </li>
-              </ul>
-
-              <p style={{ fontSize: '1rem', color: '#A0A0A0', lineHeight: '1.8', maxWidth: '900px', margin: '30px auto 0 auto', textAlign: 'center' }}>
-                Koristeći Google Analytics, heatmape i A/B testiranja, vidimo tačno kako korisnici stupaju u interakciju sa vašim sajtom. Gde ostaju duže, gde odustaju, koje stranice konvertuju? Radimo redovne izveštaje da imate na uvid sta se desava u pozadini. Dodajemo nove stranice, optimizujemo postojeće, i kontinuirano poboljsavamo SEO strategiju na osnovu stvarnih podataka, ne nagađanja. Vaš sajt se nikada ne „završava" – on se stalno evoluira da bi donosio što bolje rezultate.
-              </p>
-            </div>
-          </div>
-        </div>
       </section>
 
+      <SectionTransition from={LIGHT_BG} to={DARK_BG} />
 
-      {/* PRICING PACKAGES SECTION */}
-      <section style={{
-        padding: '100px 24px',
-        background: '#000',
-        color: '#fff',
-        marginTop: '0'
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '70px' }}>
+      {/* ───────────────── ZAŠTO IZABRATI NAS — numbered list ──────────────── */}
+      <section style={{ background: DARK_BG, color: '#fff', padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}` }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '80px' }}
+          >
+            <Overline dark>Zašto Mi</Overline>
             <h2 style={{
-              fontSize: 'clamp(2rem, 5vw, 3.2rem)',
-              marginBottom: '20px',
-              fontWeight: '900',
-              color: '#fff'
+              fontSize: 'clamp(2rem, 5vw, 3.4rem)',
+              fontWeight: 900,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              maxWidth: '700px'
             }}>
-              Naši <span style={{ color: '#FDCA40' }}>Paketi</span>
+              Šta nas razlikuje od ostalih?
             </h2>
-            <p style={{ fontSize: '1.2rem', color: '#b0b0b0', maxWidth: '700px', margin: '0 auto' }}>
-              Izaberite paket koji najboji odgovara vašim potrebama. Svi paketi uključuju besplatnu konsultaciju!
-            </p>
-          </div>
+          </motion.div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
-            {[
-              {
-                name: 'Mačak Basic',
-                price: '299€',
-                period: 'mesečno',
-                features: [
-                  'Responsive dizajn',
-                  'SEO optimizacija',
-                  '5 stranica',
-                  'Kontakt forma',
-                  '1 mesec podrške',
-                  'SSL certifikat'
-                ],
-                highlighted: false
-              },
-              {
-                name: 'Mačak Napredni',
-                price: '599€',
-                period: 'mesečno',
-                features: [
-                  'Sve iz Basic paketa',
-                  'E-commerce integracija',
-                  'Unlimited stranica',
-                  'Blog sistem',
-                  '3 meseca podrške',
-                  'Analytics integracija',
-                  'Newsletter sistem'
-                ],
-                highlighted: true
-              },
-              {
-                name: 'Mačak Preduzeće',
-                price: '999€',
-                period: 'mesečno',
-                features: [
-                  'Sve iz Naprednog paketa',
-                  'CRM integracija',
-                  'Prilagođeni dizajn',
-                  '6 meseci podrške',
-                  'API integracije',
-                  'Performance optimizacija',
-                  'Dedicated support'
-                ],
-                highlighted: false
-              }
-            ].map((pkg, idx) => (
-              <div
-                key={idx}
-                style={{
-                  padding: '40px',
-                  background: pkg.highlighted ? '#FDCA40' : '#1a1a1a',
-                  color: pkg.highlighted ? '#000' : '#fff',
-                  border: '3px solid #000',
-                  borderRadius: '20px',
-                  position: 'relative',
-                  boxShadow: pkg.highlighted ? '8px 8px 0px 0px #C79F00' : '8px 8px 0px 0px #333333',
-                  transition: 'all 0.3s ease',
-                  transform: pkg.highlighted ? 'scale(1.05)' : 'scale(1)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = pkg.highlighted ? 'scale(1.08)' : 'scale(1.02)';
-                  e.currentTarget.style.boxShadow = pkg.highlighted ? '5px 5px 0px 0px #C79F00' : '5px 5px 0px 0px #333333';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = pkg.highlighted ? 'scale(1.05)' : 'scale(1)';
-                  e.currentTarget.style.boxShadow = pkg.highlighted ? '8px 8px 0px 0px #C79F00' : '8px 8px 0px 0px #333333';
-                }}
-              >
-                {pkg.highlighted && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '-15px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: '#FDCA40',
-                    color: '#000',
-                    padding: '8px 20px',
-                    borderRadius: '20px',
-                    fontSize: '0.9rem',
-                    fontWeight: '900',
-                    border: '2px solid #000'
-                  }}>
-                    NAJPOPULARNIJI
-                  </div>
-                )}
-
-                <h3 style={{
-                  fontSize: '1.8rem',
-                  fontWeight: '900',
-                  marginBottom: '10px',
-                  color: pkg.highlighted ? '#000' : '#FDCA40'
-                }}>
-                  {pkg.name}
-                </h3>
-
-                <div style={{ marginBottom: '30px', paddingBottom: '30px', borderBottom: `2px solid ${pkg.highlighted ? 'rgba(0,0,0,0.2)' : 'rgba(253, 202, 64, 0.3)'}` }}>
-                  <div style={{ fontSize: '3rem', fontWeight: '900', marginBottom: '5px' }}>
-                    {pkg.price}
-                  </div>
-                  <p style={{ fontSize: '0.9rem', opacity: 0.8, margin: 0 }}>
-                    {pkg.period}
-                  </p>
-                </div>
-
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginBottom: '30px' }}>
-                  {pkg.features.map((feature, i) => (
-                    <li key={i} style={{
-                      marginBottom: '15px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      fontSize: '1rem',
-                      color: pkg.highlighted ? '#000' : '#b0b0b0'
-                    }}>
-                      <span style={{
-                        color: pkg.highlighted ? '#000' : '#FDCA40',
-                        fontWeight: '900',
-                        fontSize: '1.3rem'
-                      }}>✓</span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <button style={{
-                  width: '100%',
-                  padding: '16px',
-                  background: pkg.highlighted ? '#000' : '#FDCA40',
-                  color: pkg.highlighted ? '#FDCA40' : '#000',
-                  border: `3px solid ${pkg.highlighted ? '#000' : '#000'}`,
-                  borderRadius: '50px',
-                  fontSize: '1rem',
-                  fontWeight: '900',
-                  cursor: 'pointer',
-                  transition: 'all 0.1s ease',
-                  boxShadow: pkg.highlighted ? '5px 5px 0px 0px #000' : '5px 5px 0px 0px #1a1a1a'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translate(3px, 3px)';
-                  e.currentTarget.style.boxShadow = pkg.highlighted ? '2px 2px 0px 0px #000' : '2px 2px 0px 0px #1a1a1a';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translate(0, 0)';
-                  e.currentTarget.style.boxShadow = pkg.highlighted ? '5px 5px 0px 0px #000' : '5px 5px 0px 0px #1a1a1a';
-                }}>
-                  Odaberi Paket
-                </button>
-              </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+            gap: 'clamp(28px, 4vw, 48px)',
+            rowGap: 'clamp(36px, 5vw, 56px)'
+          }}>
+            {reasons.map((r, i) => (
+              <ReasonItem key={i} index={i + 1} {...r} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA SECTION - Final Call To Action */}
-      {/* CTA SECTION - Final Call To Action */}
-      <section style={{ padding: '100px 24px', background: 'linear-gradient(135deg, #FDCA40 0%, #FDD968 100%)', color: '#000', textAlign: 'center' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '20px', color: '#000' }}>Spreman Za Promenu?</h2>
-          <p style={{ fontSize: '1.1rem', marginBottom: '40px', opacity: '0.95', color: '#000' }}>
-            Hajde da napravimo sajt koji donosi rezultate.
-          </p>
-          <Link 
-            to="/kontakt/" 
-            style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}
+      {/* ───────────────────────── ŠTA NUDIMO ───────────────────────── */}
+      <section style={{ background: DARK_GRADIENT, color: '#fff', padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}` }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '72px' }}
           >
-            <div style={{
-              background: '#000',
-              color: '#FDCA40',
-              padding: '20px 50px',
-              fontSize: '1.3rem',
-              borderRadius: '6px',
-              fontWeight: '700',
-              transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              pointerEvents: 'auto',
-              display: 'inline-block',
-              whiteSpace: 'nowrap',
-              marginBottom: '40px'
-            }} onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
-              e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
-            }} onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1)';
-              e.currentTarget.style.boxShadow = 'none';
+            <Overline dark>Usluge</Overline>
+            <h2 style={{
+              fontSize: 'clamp(2rem, 5vw, 3.4rem)',
+              fontWeight: 900,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              margin: 0
             }}>
-              Zatraži Besplatnu Konsultaciju
-            </div>
-          </Link>
-          <p style={{ fontSize: '1rem', color: '#000', opacity: '0.85', lineHeight: '1.6' }}>
-            Nema obveza. Nema dugoročnih ugovora. Nema praznih obećanja. Samo platforma koja gradi tvoj brend.
-          </p>
+              Digitalni Arsenal za Vaš Rast
+            </h2>
+          </motion.div>
+
+          <div>
+            {services.map((s, idx) => (
+              <ServiceStripe key={idx} index={idx + 1} {...s} isLast={idx === services.length - 1} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333', position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
+      <SectionTransition from="#0d0d0d" to={LIGHT_BG} />
+
+      {/* ────────────────────── NAŠI PROJEKTI (light) ────────────────────── */}
+      <section style={{ background: LIGHT_BG, color: '#000', padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}` }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '64px' }}
+          >
+            <Overline>Naši Projekti</Overline>
+            <h2 style={{
+              fontSize: 'clamp(2rem, 5vw, 3.4rem)',
+              fontWeight: 900,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              color: '#000'
+            }}>
+              Šta smo gradili
+            </h2>
+          </motion.div>
+
+          {/* tier layout: SEO is the specialty / featured card on top,
+              other 3 services branch out beneath it */}
+          <FeaturedProjectCard {...featuredProject} />
+
+          <BranchSeparator label="I takođe radim" />
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))',
+            gap: 'clamp(20px, 3vw, 32px)'
+          }}>
+            {otherProjects.map((p, i) => (
+              <ProjectCard key={i} {...p} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SectionTransition from={LIGHT_BG} to={DARK_BG} />
+
+      {/* ───────────────────────── PROCES ───────────────────────── */}
+      <section style={{ background: DARK_BG, color: '#fff', padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}` }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '72px' }}
+          >
+            <Overline dark>Kako Radimo</Overline>
+            <h2 style={{
+              fontSize: 'clamp(2rem, 5vw, 3.4rem)',
+              fontWeight: 900,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              margin: 0
+            }}>
+              Od ideje do lansiranja
+            </h2>
+          </motion.div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+            gap: 'clamp(28px, 4vw, 48px)'
+          }}>
+            {processSteps.map((step, i) => (
+              <ProcessBlock key={i} index={i + 1} {...step} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ───────────────────────── PRICING ───────────────────────── */}
+      <section style={{ background: DARK_GRADIENT, color: '#fff', padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}` }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '64px', textAlign: 'center' }}
+          >
+            <div style={{ display: 'inline-block' }}>
+              <Overline dark>Paketi</Overline>
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(2rem, 5vw, 3.4rem)',
+              fontWeight: 900,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              margin: '0 0 20px'
+            }}>
+              Izaberite paket
+            </h2>
+            <p style={{ fontSize: '1.05rem', color: '#888', maxWidth: '600px', margin: '0 auto' }}>
+              Svi paketi uključuju besplatnu konsultaciju i opciju doplate dodatnih funkcionalnosti.
+            </p>
+          </motion.div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+            gap: 'clamp(24px, 3vw, 36px)',
+            alignItems: 'stretch'
+          }}>
+            {packages.map((pkg, i) => (
+              <PricingCard key={i} {...pkg} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SectionTransition from="#0d0d0d" to={ACCENT} />
+
+      {/* ───────────────────────── FINAL CTA ───────────────────────── */}
+      <section style={{
+        background: ACCENT,
+        color: '#000',
+        padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}`,
+        textAlign: 'center'
+      }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6 }}
+          style={{ maxWidth: '800px', margin: '0 auto' }}
+        >
+          <h2 style={{
+            fontSize: 'clamp(2.2rem, 6vw, 4rem)',
+            fontWeight: 900,
+            lineHeight: 1.05,
+            letterSpacing: '-0.02em',
+            margin: '0 0 24px'
+          }}>
+            Spremni da gradimo?
+          </h2>
+          <p style={{
+            fontSize: '1.15rem',
+            color: '#000',
+            opacity: 0.75,
+            margin: '0 0 44px',
+            lineHeight: 1.6
+          }}>
+            Besplatna konsultacija, jasna ponuda, bez obaveza. Pošaljite kratak opis projekta
+            i javljam se u 24 sata.
+          </p>
+          <Link
+            to="/kontakt/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '14px',
+              padding: '20px 44px',
+              background: '#000',
+              color: ACCENT,
+              borderRadius: '50px',
+              border: '3px solid #000',
+              textDecoration: 'none',
+              fontSize: '1.1rem',
+              fontWeight: 900,
+              letterSpacing: '0.5px',
+              boxShadow: '5px 5px 0px 0px #1a1a1a',
+              transition: 'all 0.1s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translate(3px, 3px)'
+              e.currentTarget.style.boxShadow = '2px 2px 0px 0px #1a1a1a'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translate(0, 0)'
+              e.currentTarget.style.boxShadow = '5px 5px 0px 0px #1a1a1a'
+            }}
+          >
+            <span>Pošalji upit</span>
+            <span aria-hidden>→</span>
+          </Link>
+        </motion.div>
+      </section>
+
+      <SectionTransition from={ACCENT} to="#000000" />
+
+      {/* ─────────────────────────── FOOTER ─────────────────────────── */}
+      <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', gap: '80px', marginBottom: '60px', position: 'relative', alignItems: 'flex-start' }}>
-            {/* LEFT SIDE - COLUMNS */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(150px, auto))', gap: '40px', flex: '0 0 auto' }}>
-              {/* FOOTER COLUMN 1 - BRAND */}
+          <div className="site-footer-grid">
+            <div className="columns">
               <div>
                 <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
                 <p style={{ color: '#aaa', lineHeight: '1.8', fontSize: '0.9rem' }}>
                   Stručna SEO optimizacija, web development i dizajn za vaš biznis.
                 </p>
               </div>
-
-              {/* FOOTER COLUMN 2 - LINKS */}
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  <li style={{ marginBottom: '10px' }}><Link to="/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Početna</Link></li>
-                  <li style={{ marginBottom: '10px' }}><Link to="/izrada-sajtova/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Izrada sajtova</Link></li>
-                  <li style={{ marginBottom: '10px' }}><Link to="/seo/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>SEO</Link></li>
-                  <li style={{ marginBottom: '10px' }}><Link to="/blog/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Blog</Link></li>
-                </ul>
+                <FooterLinks links={[
+                  { to: '/', label: 'Početna' },
+                  { to: '/izrada-sajtova/', label: 'Izrada sajtova' },
+                  { to: '/seo/', label: 'SEO' },
+                  { to: '/blog/', label: 'Blog' }
+                ]} />
               </div>
-
-              {/* FOOTER COLUMN 3 - MORE LINKS */}
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  <li style={{ marginBottom: '10px' }}><Link to="/about/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>O nama</Link></li>
-                  <li style={{ marginBottom: '10px' }}><Link to="/kontakt/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Kontakt</Link></li>
-                  <li style={{ marginBottom: '10px' }}><a href="#" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Privatnost</a></li>
-                  <li style={{ marginBottom: '10px' }}><a href="#" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Uslovi</a></li>
-                </ul>
+                <FooterLinks links={[
+                  { to: '/about/', label: 'O nama' },
+                  { to: '/kontakt/', label: 'Kontakt' },
+                  { href: '#', label: 'Privatnost' },
+                  { href: '#', label: 'Uslovi' }
+                ]} />
               </div>
-
-              {/* FOOTER COLUMN 4 - CONTACT */}
               <div>
                 <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
                 <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>email@example.com</p>
@@ -1074,16 +634,785 @@ export default function IzradaSajtova() {
                 <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
               </div>
             </div>
-
           </div>
+          <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
+            <p style={{ margin: 0 }}>© 2026 SEO Mačak. Sva prava zadržana.</p>
+          </div>
+        </div>
+      </footer>
+    </>
+  )
+}
 
-        {/* FOOTER BOTTOM */}
-        <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
-          <p style={{ margin: 0 }}>© 2024 SEO Mačak. Sva prava zadržana.</p>
+// ─────────────────── helpers ───────────────────
+
+// Browser-window mockup used as the hero visual — pure CSS, no images.
+// Slight rotation gives it depth without being cartoonish.
+function BrowserMockup() {
+  return (
+    <motion.div
+      animate={{ y: [0, -10, 0] }}
+      transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+      style={{
+        width: '100%',
+        maxWidth: '460px',
+        aspectRatio: '4/3',
+        background: '#fff',
+        borderRadius: '12px',
+        border: '1px solid #e5e5e5',
+        boxShadow: '0 30px 60px rgba(0,0,0,0.14), 0 12px 24px rgba(0,0,0,0.07)',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        transform: 'rotate(-1.5deg)',
+        position: 'relative',
+        zIndex: 2
+      }}
+    >
+      {/* title bar */}
+      <div style={{
+        padding: '12px 16px',
+        borderBottom: '1px solid #eee',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        background: '#fafafa'
+      }}>
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FF5F57' }} />
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FFBD2E' }} />
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#28C840' }} />
+        <span style={{
+          marginLeft: '14px',
+          fontSize: '0.7rem',
+          color: '#aaa',
+          letterSpacing: '0.5px',
+          fontFamily: 'monospace'
+        }}>
+          seomacak.com
+        </span>
+      </div>
+
+      {/* fake content */}
+      <div style={{
+        flex: 1,
+        padding: '20px 22px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '11px'
+      }}>
+        <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: ACCENT }} />
+        <div style={{ height: '14px', borderRadius: '4px', background: '#1a1a1a', width: '82%', marginTop: '4px' }} />
+        <div style={{ height: '8px', borderRadius: '3px', background: '#ddd', width: '95%' }} />
+        <div style={{ height: '8px', borderRadius: '3px', background: '#ddd', width: '70%' }} />
+        <div style={{
+          marginTop: '8px',
+          alignSelf: 'flex-start',
+          padding: '7px 16px',
+          borderRadius: '999px',
+          background: '#000',
+          color: ACCENT,
+          fontSize: '0.65rem',
+          fontWeight: 800,
+          letterSpacing: '0.5px'
+        }}>
+          Saznaj više
+        </div>
+        <div style={{
+          marginTop: 'auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '7px'
+        }}>
+          <div style={{ aspectRatio: '1', borderRadius: '5px', background: '#f0f0f0' }} />
+          <div style={{ aspectRatio: '1', borderRadius: '5px', background: '#f0f0f0' }} />
+          <div style={{ aspectRatio: '1', borderRadius: '5px', background: '#f0f0f0' }} />
         </div>
       </div>
-      </footer>
+    </motion.div>
+  )
+}
+
+function HeroBadge({ text, sub, style, delay = 0, float, variant = 'light' }) {
+  const palette = {
+    light: { bg: '#fff', border: '#000', text: '#000', sub: '#666' },
+    dark: { bg: '#000', border: '#000', text: '#fff', sub: '#aaa' },
+    yellow: { bg: ACCENT, border: '#000', text: '#000', sub: '#000' }
+  }[variant]
+
+  return (
+    <motion.div
+      className="hero-badge"
+      initial={{ opacity: 0, scale: 0.7 }}
+      animate={{ opacity: 1, scale: 1, ...(float ? { y: float.y } : {}) }}
+      transition={{
+        opacity: { duration: 0.5, delay },
+        scale: { duration: 0.5, delay, type: 'spring', stiffness: 200 },
+        ...(float ? { y: { duration: float.duration, repeat: Infinity, ease: 'easeInOut', delay } } : {})
+      }}
+      style={{
+        position: 'absolute',
+        background: palette.bg,
+        color: palette.text,
+        border: `2px solid ${palette.border}`,
+        borderRadius: '999px',
+        padding: '10px 18px',
+        boxShadow: '4px 4px 0 0 #1a1a1a',
+        fontFamily: 'Poppins, Inter, sans-serif',
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: '8px',
+        whiteSpace: 'nowrap',
+        zIndex: 3,
+        ...style
+      }}
+    >
+      <span style={{ fontWeight: 800, fontSize: '0.95rem', letterSpacing: '-0.01em' }}>{text}</span>
+      {sub && (
+        <span style={{ fontSize: '0.7rem', color: palette.sub, fontWeight: 500, letterSpacing: '0.3px' }}>
+          {sub}
+        </span>
+      )}
+    </motion.div>
+  )
+}
+
+function ReasonItem({ index, title, desc }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5, delay: (index - 1) * 0.06 }}
+      style={{
+        borderTop: '1px solid #2a2a2a',
+        paddingTop: '24px'
+      }}
+    >
+      <span style={{
+        fontSize: '0.85rem',
+        fontWeight: 800,
+        color: ACCENT,
+        letterSpacing: '2px',
+        fontVariantNumeric: 'tabular-nums'
+      }}>
+        {String(index).padStart(2, '0')}
+      </span>
+      <h3 style={{
+        fontSize: '1.25rem',
+        fontWeight: 800,
+        margin: '12px 0',
+        color: '#fff',
+        letterSpacing: '-0.01em'
+      }}>
+        {title}
+      </h3>
+      <p style={{
+        fontSize: '0.95rem',
+        lineHeight: 1.7,
+        color: '#888',
+        margin: 0
+      }}>
+        {desc}
+      </p>
+    </motion.div>
+  )
+}
+
+function ServiceStripe({ index, title, tagline, desc, bullets, isLast }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.5, delay: (index - 1) * 0.08 }}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr',
+        gap: 'clamp(20px, 4vw, 56px)',
+        padding: 'clamp(32px, 5vh, 56px) 0',
+        borderTop: '1px solid #2a2a2a',
+        borderBottom: isLast ? '1px solid #2a2a2a' : 'none',
+        alignItems: 'baseline'
+      }}
+    >
+      <span style={{
+        fontSize: 'clamp(1.4rem, 3vw, 1.8rem)',
+        fontWeight: 800,
+        color: '#666',
+        fontVariantNumeric: 'tabular-nums'
+      }}>
+        {String(index).padStart(2, '0')}
+      </span>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+        gap: 'clamp(24px, 4vw, 60px)'
+      }}>
+        <div>
+          <h3 style={{
+            fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)',
+            fontWeight: 800,
+            margin: '0 0 8px',
+            color: '#fff',
+            letterSpacing: '-0.02em'
+          }}>
+            {title}
+          </h3>
+          <p style={{
+            color: ACCENT,
+            fontSize: '0.95rem',
+            fontWeight: 700,
+            margin: 0
+          }}>
+            {tagline}
+          </p>
+        </div>
+        <div>
+          <p style={{
+            fontSize: '1rem',
+            lineHeight: 1.7,
+            color: '#aaa',
+            margin: '0 0 20px'
+          }}>
+            {desc}
+          </p>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {bullets.map((b, i) => (
+              <li key={i} style={{
+                fontSize: '0.9rem',
+                color: '#bbb',
+                marginBottom: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <span style={{ color: ACCENT, fontWeight: 900 }}>—</span>
+                {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function FeaturedProjectCard({ title, tagline, desc, result, tech }) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.6 }}
+      style={{
+        padding: 'clamp(36px, 5vw, 64px)',
+        background: '#fff',
+        border: `2px solid ${ACCENT}`,
+        borderRadius: '4px',
+        position: 'relative',
+        // soft yellow glow behind the card to lift it visually
+        boxShadow: '0 30px 60px rgba(253, 202, 64, 0.15), 0 10px 20px rgba(0, 0, 0, 0.05)'
+      }}
+    >
+      {/* specialty badge */}
+      <div style={{
+        position: 'absolute',
+        top: '-14px',
+        left: 'clamp(24px, 4vw, 48px)',
+        background: '#000',
+        color: ACCENT,
+        padding: '6px 16px',
+        borderRadius: '999px',
+        fontSize: '0.7rem',
+        fontWeight: 800,
+        letterSpacing: '1.5px',
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap'
+      }}>
+        ★ Specialty
+      </div>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+        gap: 'clamp(28px, 4vw, 56px)',
+        alignItems: 'start'
+      }}>
+        {/* left: title + tagline + desc */}
+        <div>
+          <h3 style={{
+            fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+            fontWeight: 900,
+            margin: '0 0 12px',
+            color: '#000',
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1
+          }}>
+            {title}
+          </h3>
+          <p style={{
+            color: '#000',
+            fontSize: 'clamp(0.95rem, 1.5vw, 1.1rem)',
+            fontWeight: 700,
+            margin: '0 0 20px',
+            display: 'inline-block',
+            paddingBottom: '4px',
+            borderBottom: `3px solid ${ACCENT}`
+          }}>
+            {tagline}
+          </p>
+          <p style={{
+            fontSize: '1rem',
+            lineHeight: 1.75,
+            color: '#555',
+            margin: 0
+          }}>
+            {desc}
+          </p>
+        </div>
+
+        {/* right: result stat + tech tags */}
+        <div>
+          <div style={{
+            padding: '24px',
+            background: ACCENT,
+            borderRadius: '4px',
+            marginBottom: '24px',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              fontSize: 'clamp(1.6rem, 3vw, 2rem)',
+              fontWeight: 900,
+              color: '#000',
+              letterSpacing: '-0.02em',
+              lineHeight: 1
+            }}>
+              {result}
+            </div>
+            <div style={{
+              fontSize: '0.75rem',
+              color: '#000',
+              opacity: 0.7,
+              marginTop: '6px',
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+              fontWeight: 700
+            }}>
+              Prosečan rezultat
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{
+              fontSize: '0.7rem',
+              color: '#999',
+              letterSpacing: '2px',
+              textTransform: 'uppercase',
+              fontWeight: 700,
+              marginBottom: '12px'
+            }}>
+              Šta uključuje
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              {tech.map((t, i) => (
+                <span key={i} style={{
+                  fontSize: '0.78rem',
+                  padding: '5px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '999px',
+                  color: '#333',
+                  fontWeight: 600
+                }}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <Link to="/kontakt/" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px 32px',
+            background: '#000',
+            color: ACCENT,
+            borderRadius: '50px',
+            border: '3px solid #000',
+            textDecoration: 'none',
+            fontSize: '0.95rem',
+            fontWeight: 900,
+            letterSpacing: '0.5px',
+            boxShadow: '5px 5px 0px 0px #1a1a1a',
+            transition: 'all 0.1s ease'
+          }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translate(3px, 3px)'
+              e.currentTarget.style.boxShadow = '2px 2px 0px 0px #1a1a1a'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translate(0, 0)'
+              e.currentTarget.style.boxShadow = '5px 5px 0px 0px #1a1a1a'
+            }}>
+            <span>Pričajmo o SEO-u</span>
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
+      </div>
+    </motion.article>
+  )
+}
+
+// Visual separator between the featured card and the smaller cards.
+// Thin vertical line drops down from the featured card, branches into a small
+// horizontal line, with a label in the center — implies tier hierarchy.
+function BranchSeparator({ label }) {
+  return (
+    <div
+      aria-hidden
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0',
+        margin: 'clamp(48px, 7vh, 72px) 0 clamp(32px, 5vh, 56px)'
+      }}
+    >
+      {/* vertical drop */}
+      <span style={{ width: '2px', height: '40px', background: ACCENT }} />
+      {/* center label pill */}
+      <span style={{
+        background: '#000',
+        color: ACCENT,
+        fontSize: '0.7rem',
+        fontWeight: 800,
+        letterSpacing: '2px',
+        textTransform: 'uppercase',
+        padding: '8px 18px',
+        borderRadius: '999px',
+        marginTop: '-1px',
+        marginBottom: '-1px'
+      }}>
+        {label}
+      </span>
+      {/* horizontal split — fades out to suggest 3 branches */}
+      <span style={{
+        width: 'min(420px, 80%)',
+        height: '2px',
+        background: `linear-gradient(to right, transparent, ${ACCENT} 30%, ${ACCENT} 70%, transparent)`
+      }} />
     </div>
-    </>
+  )
+}
+
+function ProjectCard({ title, desc, result, tech }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        padding: '32px',
+        background: hovered ? '#fff' : 'transparent',
+        border: `1px solid ${hovered ? '#000' : '#ddd'}`,
+        borderRadius: '4px',
+        transition: 'background 0.3s ease, border-color 0.3s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%'
+      }}
+    >
+      <div style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        gap: '16px',
+        marginBottom: '16px'
+      }}>
+        <h3 style={{
+          fontSize: '1.25rem',
+          fontWeight: 800,
+          margin: 0,
+          color: '#000',
+          letterSpacing: '-0.01em'
+        }}>
+          {title}
+        </h3>
+        <span style={{
+          fontSize: '0.78rem',
+          color: '#000',
+          background: ACCENT,
+          padding: '4px 10px',
+          borderRadius: '999px',
+          fontWeight: 700,
+          whiteSpace: 'nowrap'
+        }}>
+          {result}
+        </span>
+      </div>
+      <p style={{
+        fontSize: '0.95rem',
+        lineHeight: 1.65,
+        color: '#555',
+        margin: '0 0 20px',
+        flex: 1
+      }}>
+        {desc}
+      </p>
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '6px',
+        paddingTop: '16px',
+        borderTop: '1px solid #eee'
+      }}>
+        {tech.map((t, i) => (
+          <span key={i} style={{
+            fontSize: '0.72rem',
+            color: '#777',
+            letterSpacing: '0.3px',
+            textTransform: 'uppercase',
+            fontWeight: 600
+          }}>
+            {t}{i < tech.length - 1 ? ' ·' : ''}
+          </span>
+        ))}
+      </div>
+    </motion.article>
+  )
+}
+
+function ProcessBlock({ index, title, tagline, desc, bullets }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5, delay: (index - 1) * 0.08 }}
+      style={{
+        borderTop: `2px solid ${ACCENT}`,
+        paddingTop: '28px'
+      }}
+    >
+      <div style={{
+        fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+        fontWeight: 800,
+        color: ACCENT,
+        letterSpacing: '-0.02em',
+        lineHeight: 1,
+        marginBottom: '20px',
+        fontVariantNumeric: 'tabular-nums'
+      }}>
+        {String(index).padStart(2, '0')}
+      </div>
+      <h3 style={{
+        fontSize: '1.35rem',
+        fontWeight: 800,
+        margin: '0 0 10px',
+        color: '#fff',
+        letterSpacing: '-0.01em',
+        lineHeight: 1.2
+      }}>
+        {title}
+      </h3>
+      <p style={{
+        fontSize: '0.9rem',
+        color: ACCENT,
+        fontWeight: 700,
+        margin: '0 0 16px',
+        fontStyle: 'italic'
+      }}>
+        {tagline}
+      </p>
+      <p style={{
+        fontSize: '0.95rem',
+        lineHeight: 1.7,
+        color: '#888',
+        margin: '0 0 18px'
+      }}>
+        {desc}
+      </p>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        {bullets.map((b, i) => (
+          <li key={i} style={{
+            fontSize: '0.85rem',
+            color: '#bbb',
+            marginBottom: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            <span style={{ color: ACCENT, fontWeight: 900 }}>→</span>
+            {b}
+          </li>
+        ))}
+      </ul>
+    </motion.div>
+  )
+}
+
+function PricingCard({ name, price, period, features, highlighted }) {
+  // Non-numeric prices ("Po dogovoru", "Custom") need smaller type — the
+  // 3.4rem clamp was chosen for short "999€"-style values and overflows on
+  // longer phrases.
+  const isNumericPrice = /\d/.test(price)
+  const priceFontSize = isNumericPrice
+    ? 'clamp(2.6rem, 5vw, 3.4rem)'
+    : 'clamp(1.7rem, 3.5vw, 2.2rem)'
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5 }}
+      style={{
+        padding: 'clamp(28px, 4vw, 40px)',
+        background: highlighted ? ACCENT : '#0f0f0f',
+        color: highlighted ? '#000' : '#fff',
+        border: `2px solid ${highlighted ? '#000' : '#2a2a2a'}`,
+        borderRadius: '8px',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative'
+      }}
+    >
+      {highlighted && (
+        <div style={{
+          position: 'absolute',
+          top: '-14px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: '#000',
+          color: ACCENT,
+          padding: '6px 16px',
+          borderRadius: '999px',
+          fontSize: '0.7rem',
+          fontWeight: 800,
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          whiteSpace: 'nowrap'
+        }}>
+          ★ Najpopularniji
+        </div>
+      )}
+
+      <h3 style={{
+        fontSize: '1.1rem',
+        fontWeight: 800,
+        margin: '0 0 20px',
+        letterSpacing: '1px',
+        textTransform: 'uppercase',
+        color: highlighted ? '#000' : ACCENT
+      }}>
+        {name}
+      </h3>
+
+      <div style={{
+        marginBottom: '28px',
+        paddingBottom: '28px',
+        borderBottom: `1px solid ${highlighted ? 'rgba(0,0,0,0.2)' : '#2a2a2a'}`
+      }}>
+        <div style={{
+          fontSize: priceFontSize,
+          fontWeight: 900,
+          letterSpacing: '-0.03em',
+          lineHeight: 1
+        }}>
+          {price}
+        </div>
+        <div style={{
+          fontSize: '0.85rem',
+          color: highlighted ? '#000' : '#888',
+          opacity: highlighted ? 0.7 : 1,
+          marginTop: '6px'
+        }}>
+          {period}
+        </div>
+      </div>
+
+      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', flex: 1 }}>
+        {features.map((f, i) => (
+          <li key={i} style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            marginBottom: '12px',
+            fontSize: '0.92rem',
+            color: highlighted ? '#000' : '#bbb',
+            lineHeight: 1.5
+          }}>
+            <span style={{
+              color: highlighted ? '#000' : ACCENT,
+              fontWeight: 900,
+              flexShrink: 0,
+              marginTop: '2px'
+            }}>
+              ✓
+            </span>
+            {f}
+          </li>
+        ))}
+      </ul>
+
+      <Link
+        to="/kontakt/"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+          padding: '16px 28px',
+          background: highlighted ? '#000' : ACCENT,
+          color: highlighted ? ACCENT : '#000',
+          borderRadius: '50px',
+          border: '3px solid #000',
+          textDecoration: 'none',
+          fontSize: '0.95rem',
+          fontWeight: 900,
+          letterSpacing: '0.5px',
+          boxShadow: '5px 5px 0px 0px #1a1a1a',
+          transition: 'all 0.1s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translate(3px, 3px)'
+          e.currentTarget.style.boxShadow = '2px 2px 0px 0px #1a1a1a'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translate(0, 0)'
+          e.currentTarget.style.boxShadow = '5px 5px 0px 0px #1a1a1a'
+        }}
+      >
+        <span>Odaberi paket</span>
+        <span aria-hidden>→</span>
+      </Link>
+    </motion.div>
+  )
+}
+
+function FooterLinks({ links }) {
+  return (
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      {links.map((l, i) => (
+        <li key={i} style={{ marginBottom: '10px' }}>
+          {l.to ? (
+            <Link to={l.to} style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
+              onMouseEnter={(e) => e.target.style.color = '#fff'}
+              onMouseLeave={(e) => e.target.style.color = '#aaa'}>
+              {l.label}
+            </Link>
+          ) : (
+            <a href={l.href} style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
+              onMouseEnter={(e) => e.target.style.color = '#fff'}
+              onMouseLeave={(e) => e.target.style.color = '#aaa'}>
+              {l.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
   )
 }

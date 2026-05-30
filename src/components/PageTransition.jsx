@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import logoImg from '../../LOGO MAIN MAIN.png'
+import logoImg from '/logo.webp'
 
 export const PageTransitionContext = createContext()
 

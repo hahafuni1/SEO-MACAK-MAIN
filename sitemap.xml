@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://seo-macak.rs/</loc>
-    <priority>1.00</priority>
+    <loc>https://www.seomacak.com/</loc>
+    <lastmod>2026-05-27</lastmod>
   </url>
   <url>
-    <loc>https://seo-macak.rs/izrada-sajtova/</loc>
-    <priority>0.80</priority>
+    <loc>https://www.seomacak.com/izrada-sajtova/</loc>
+    <lastmod>2026-05-27</lastmod>
   </url>
   <url>
-    <loc>https://seo-macak.rs/seo/</loc>
-    <priority>0.80</priority>
+    <loc>https://www.seomacak.com/seo/</loc>
+    <lastmod>2026-05-27</lastmod>
   </url>
   <url>
-    <loc>https://seo-macak.rs/blog/</loc>
-    <priority>0.64</priority>
+    <loc>https://www.seomacak.com/about/</loc>
+    <lastmod>2026-05-27</lastmod>
   </url>
   <url>
-    <loc>https://seo-macak.rs/kontakt/</loc>
-    <priority>0.64</priority>
+    <loc>https://www.seomacak.com/kontakt/</loc>
+    <lastmod>2026-05-27</lastmod>
+  </url>
+  <url>
+    <loc>https://www.seomacak.com/blog/</loc>
+    <lastmod>2026-05-27</lastmod>
   </url>
 </urlset>

@@ -1,681 +1,667 @@
-import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from './Link'
-import Header from './Header'
+import ScrollAwareHeader from './ScrollAwareHeader'
+import SectionTransition from './SectionTransition'
+import { Helmet } from 'react-helmet-async'
+import { useLanguage } from '../contexts/LanguageContext'
 
-const keyframes = `
-  @keyframes moveDiagonalDots {
-    from { background-position: 0px 0px; }
-    to { background-position: 60px -60px; }
-  }
-`
+// Premium Minimal — Blog "under construction" page.
+// Real blog grid lives in git history; bringing it back when posts are ready.
+
+const LIGHT_BG = '#FBFAF8'
+const ACCENT = '#FDCA40'
+const SECTION_PAD_Y = 'clamp(80px, 14vh, 140px)'
+const SECTION_PAD_X = 'clamp(24px, 5vw, 64px)'
+const CONTAINER_MAX = '1100px'
+
+const Overline = ({ children, dark = false }) => (
+  <span style={{
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '14px',
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    color: dark ? ACCENT : '#000',
+    letterSpacing: '3px',
+    textTransform: 'uppercase',
+    marginBottom: '32px'
+  }}>
+    <span style={{ display: 'inline-block', width: '40px', height: '1px', background: dark ? ACCENT : '#000' }} />
+    {children}
+  </span>
+)
 
 export default function Blog() {
-  const [selectedCategory, setSelectedCategory] = useState('all')
-
-  const articles = [
+  const { t } = useLanguage()
+  // Sneak peek of what categories the real blog will cover — builds anticipation
+  // and tells visitors "this is intentional, not abandoned."
+  const upcomingTopics = [
     {
-      category: 'seo',
-      title: '10 Razloga Zašto Vaš SEO Nije Funkcionisao (i Kako To Ispraviti)',
-      excerpt: 'Analizirali smo 500+ failed SEO kampanja. Evo šta se ispostavilo kao najveće greške koje klijenti prave...',
-      date: 'Dec 28, 2025',
-      readTime: '8 min',
-      tags: ['SEO', 'Strategy', 'Mistakes'],
-      image: '🎯'
+      label: 'SEO',
+      title: 'Stvarni SEO casovi',
+      desc: 'Šta sam naučio iz preko 500 audita, bez recikliranih tutorijala.'
     },
     {
-      category: 'seo',
-      title: 'Kako Google Koristi AI Za Rangiranje - 2025 Vodiči',
-      excerpt: 'Google se komplatno promijenio sa AI integracijama. Evo kako to utiče na vašu SEO strategiju...',
-      date: 'Dec 25, 2025',
-      readTime: '12 min',
-      tags: ['AI', 'Google', 'Future of SEO'],
-      image: '🤖'
+      label: 'Tehnički',
+      title: 'Brzina & Core Web Vitals',
+      desc: 'Konkretne tehnike za optimizaciju koje vide rezultate u GSC-u.'
     },
     {
-      category: 'technical',
-      title: 'Core Web Vitals Mastery: Kompletan Vodič za Brze Sajtove',
-      excerpt: 'Učite kako optimizovati CLS, LCP i FID za brutalne mejnine performansi i bolji ranking...',
-      date: 'Dec 22, 2025',
-      readTime: '10 min',
-      tags: ['Technical SEO', 'Performance', 'Core Web Vitals'],
-      image: '⚡'
-    },
-    {
-      category: 'content',
-      title: 'Content Strategy Koja Rangira: Framework Od A Do Ž',
-      excerpt: 'Radi li pisanje sadržaja bez strategije? Evo kako strukturirati content koji Google voli...',
-      date: 'Dec 18, 2025',
-      readTime: '15 min',
-      tags: ['Content', 'Strategy', 'Writing'],
-      image: '📝'
-    },
-    {
-      category: 'seo',
-      title: 'Lokalni SEO Za Male Biznise: Praktični Recept',
-      excerpt: 'Ako ste mali lokal biznis, evo kako dominirati lokalnim pretraživanjem sa minimalnim budžetom...',
-      date: 'Dec 15, 2025',
-      readTime: '7 min',
-      tags: ['Local SEO', 'GMB', 'Small Business'],
-      image: '📍'
-    },
-    {
-      category: 'technical',
-      title: 'Linkovi: Kako Zaista Funkcionisuje Link Building 2025',
-      excerpt: 'Link building se komplatno promijenio. Evo novog pristupa koji radnički zaista donosi rezultate...',
-      date: 'Dec 12, 2025',
-      readTime: '11 min',
-      tags: ['Link Building', 'Authority', 'Backlinks'],
-      image: '🔗'
-    },
-    {
-      category: 'content',
-      title: 'E-A-T & YMYL: Kako Zadobiti Povjerenje Google-a',
-      excerpt: 'YMYL sajtovi trebaju E-A-T. Evo kako pokazati Google-u da ste ekspert, autoriteta i validan...',
-      date: 'Dec 10, 2025',
-      readTime: '9 min',
-      tags: ['E-A-T', 'Authority', 'Trust'],
-      image: '👑'
-    },
-    {
-      category: 'seo',
-      title: 'Competitive Analysis Za SEO: Šta Rade Pobjednici',
-      excerpt: 'Analiziramo konkurente kako bi razumjeli šta i kako rade. Evo step-by-step procesa...',
-      date: 'Dec 8, 2025',
-      readTime: '10 min',
-      tags: ['Competitor Analysis', 'Strategy', 'Research'],
-      image: '🔍'
-    },
-    {
-      category: 'technical',
-      title: 'Page Speed Optimizacija: Moj Kompletna Toolkit',
-      excerpt: 'Učite sve tehnike za ubrzanje sajta - od image optimization do caching strategije...',
-      date: 'Dec 5, 2025',
-      readTime: '13 min',
-      tags: ['Page Speed', 'Performance', 'Technical'],
-      image: '🚀'
-    },
-    {
-      category: 'content',
-      title: 'SEO Copywriting: Kako Pisati Za Google I Ljude',
-      excerpt: 'Trik je pisati sadržaj koji Google rangira ILI čitaoci vole. Evo kako biti oba...',
-      date: 'Dec 2, 2025',
-      readTime: '8 min',
-      tags: ['Copywriting', 'Content', 'Writing'],
-      image: '✍️'
+      label: 'Sadržaj',
+      title: 'Pisanje koje rangira',
+      desc: 'Kako napraviti tekst koji i Google voli i čitaoci pročitaju do kraja.'
     }
-  ]
-
-  const filteredArticles = selectedCategory === 'all' 
-    ? articles 
-    : articles.filter(a => a.category === selectedCategory)
-
-  const categories = [
-    { id: 'all', label: 'Sve Članke' },
-    { id: 'seo', label: 'SEO Strategija' },
-    { id: 'technical', label: 'Tehnički SEO' },
-    { id: 'content', label: 'Sadržaj' }
   ]
 
   return (
     <>
-      <style>{keyframes}</style>
-      <div>
-        <Header />
+      <Helmet>
+        <title>{t.blog.meta.title}</title>
+        <meta name="description" content={t.blog.meta.description} />
+        <link rel="canonical" href="https://www.seomacak.com/blog/" />
+        <meta property="og:title" content={t.blog.meta.title} />
+        <meta property="og:description" content={t.blog.meta.description} />
+        <meta property="og:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <meta property="og:url" content="https://www.seomacak.com/blog/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [{
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Početna",
+                "item": "https://www.seomacak.com/"
+              },{
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://www.seomacak.com/blog/"
+              }]
+            }
+          `}
+        </script>
+      </Helmet>
+      <ScrollAwareHeader />
 
-        {/* HERO SECTION */}
-        <section style={{
-          padding: '120px 24px 100px',
-          background: '#000',
-          color: '#fff',
-          minHeight: '600px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+      {/* ─────────────────────────── HERO (light) ─────────────────────────── */}
+      <section style={{
+        background: LIGHT_BG,
+        color: '#000',
+        minHeight: '100vh',
+        padding: `clamp(140px, 18vh, 200px) ${SECTION_PAD_X} clamp(60px, 10vh, 100px)`,
+        display: 'flex',
+        alignItems: 'center',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* subtle diagonal pattern bg */}
+        <div aria-hidden style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'linear-gradient(45deg, transparent 48%, rgba(0,0,0,0.06) 49%, rgba(0,0,0,0.06) 51%, transparent 52%),' +
+            'linear-gradient(-45deg, transparent 48%, rgba(0,0,0,0.06) 49%, rgba(0,0,0,0.06) 51%, transparent 52%)',
+          backgroundSize: '60px 60px',
+          opacity: 0.4,
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
+        {/* yellow glow blob */}
+        <div aria-hidden style={{
+          position: 'absolute',
+          right: '-10%',
+          top: '40%',
+          transform: 'translateY(-50%)',
+          width: 'clamp(380px, 50vw, 720px)',
+          height: 'clamp(380px, 50vw, 720px)',
+          background: 'radial-gradient(circle, rgba(253, 202, 64, 0.32) 0%, rgba(253, 202, 64, 0.08) 45%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
+
+        <div style={{
+          maxWidth: CONTAINER_MAX,
+          margin: '0 auto',
+          width: '100%',
           position: 'relative',
-          overflow: 'hidden'
+          zIndex: 1,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
+          gap: 'clamp(40px, 6vw, 80px)',
+          alignItems: 'center'
         }}>
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: 'linear-gradient(45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%), linear-gradient(-45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%)',
-            backgroundSize: '60px 60px',
-            opacity: 0.1,
-            animation: 'moveDiagonalDots 4s linear infinite',
-            zIndex: 1,
-            pointerEvents: 'none'
-          }} />
-
+          {/* ─── text column ─── */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            style={{ maxWidth: '900px', position: 'relative', zIndex: 2, textAlign: 'center' }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
           >
-            <div style={{ marginBottom: '20px', fontSize: '1.1rem', color: '#FDCA40', fontWeight: '700', letterSpacing: '2px' }}>
-              📚 ZNANJE & INSIGHTS
-            </div>
-            <h1 style={{
-              fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
-              marginBottom: '25px',
-              fontWeight: '900',
-              lineHeight: '1.15',
-              color: '#fff'
-            }}>
-              SEO Blog: Pravi Savjeti, <span style={{ color: '#FDCA40' }}>Bez Bullshita</span>
-            </h1>
-            <p style={{
-              fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-              marginBottom: '35px',
-              color: '#d0d0d0',
-              lineHeight: '1.7',
-              maxWidth: '750px',
-              margin: '0 auto 35px'
-            }}>
-              Artikli o SEO, razvoju, i strategiji pisani od osobe koja je zaista radila (i neuspjela) tisuće puta.
-            </p>
-          </motion.div>
-        </section>
+            <Overline>Blog</Overline>
 
-        {/* CATEGORY FILTER */}
-        <section style={{
-          padding: '60px 24px 40px',
-          background: '#000',
-          color: '#fff',
-          borderBottom: '2px solid rgba(253, 202, 64, 0.2)'
-        }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{
-              display: 'flex',
-              gap: '15px',
-              justifyContent: 'center',
-              flexWrap: 'wrap'
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '6px 14px',
+              background: '#000',
+              color: ACCENT,
+              borderRadius: '999px',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+              marginBottom: '24px'
             }}>
-              {categories.map((cat) => (
-                <motion.button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  whileHover={{ scale: 1 }}
-                  style={{
-                    padding: '12px 28px',
-                    background: selectedCategory === cat.id ? '#FDCA40' : 'transparent',
-                    color: selectedCategory === cat.id ? '#000' : '#FDCA40',
-                    border: `3px solid #000`,
-                    borderRadius: '50px',
-                    fontSize: '1rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'all 0.1s ease',
-                    boxShadow: selectedCategory === cat.id ? '5px 5px 0px 0px #C79F00' : '5px 5px 0px 0px white'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translate(3px, 3px)';
-                    e.currentTarget.style.boxShadow = selectedCategory === cat.id ? '2px 2px 0px 0px #C79F00' : '2px 2px 0px 0px white';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translate(0, 0)';
-                    e.currentTarget.style.boxShadow = selectedCategory === cat.id ? '5px 5px 0px 0px #C79F00' : '5px 5px 0px 0px white';
-                  }}
-                >
-                  {cat.label}
-                </motion.button>
-              ))}
+              <PulsingDot />
+              U izradi
             </div>
-          </div>
-        </section>
 
-        {/* ARTICLES GRID */}
-        <section style={{
-          padding: '80px 24px',
-          background: '#000',
-          color: '#fff'
-        }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <motion.div
-              layout
+            <h1 style={{
+              fontSize: 'clamp(2.4rem, 6.5vw, 5rem)',
+              fontWeight: 900,
+              lineHeight: 0.98,
+              letterSpacing: '-0.03em',
+              margin: '0 0 32px',
+              color: '#000'
+            }}>
+              Pišem{' '}
+              <span style={{
+                textDecoration: 'underline',
+                textDecorationColor: ACCENT,
+                textDecorationThickness: '6px',
+                textUnderlineOffset: '8px'
+              }}>
+                prvi članak
+              </span>
+            </h1>
+
+            <p style={{
+              fontSize: 'clamp(1.05rem, 1.8vw, 1.2rem)',
+              lineHeight: 1.65,
+              color: '#555',
+              margin: '0 0 32px'
+            }}>
+              Blog je trenutno u radu. Ne želim da bacam nasumične AI-generisane
+              tekstove samo da bi nešto stajalo ovde. Radije sačekajte par
+              nedelja i čitajte ono što ima smisla.
+            </p>
+
+            <p style={{
+              fontSize: '1rem',
+              lineHeight: 1.65,
+              color: '#777',
+              margin: '0 0 48px',
+              fontStyle: 'italic',
+              borderLeft: `3px solid ${ACCENT}`,
+              paddingLeft: '16px'
+            }}>
+              U međuvremenu, ako vam treba konkretan savet za vaš sajt,
+              javite se direktno.
+            </p>
+
+            <Link
+              to="/kontakt/"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                gap: '35px'
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '18px 36px',
+                background: '#000',
+                color: ACCENT,
+                borderRadius: '50px',
+                border: '3px solid #000',
+                textDecoration: 'none',
+                fontSize: '1.05rem',
+                fontWeight: 900,
+                letterSpacing: '0.5px',
+                boxShadow: '5px 5px 0px 0px #1a1a1a',
+                transition: 'all 0.1s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translate(3px, 3px)'
+                e.currentTarget.style.boxShadow = '2px 2px 0px 0px #1a1a1a'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translate(0, 0)'
+                e.currentTarget.style.boxShadow = '5px 5px 0px 0px #1a1a1a'
               }}
             >
-              {filteredArticles.map((article, idx) => (
-                <motion.article
-                  key={idx}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ delay: idx * 0.05 }}
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(253, 202, 64, 0.08) 0%, rgba(253, 202, 64, 0.02) 100%)',
-                    border: '2px solid rgba(253, 202, 64, 0.15)',
-                    borderRadius: '12px',
-                    padding: '0',
-                    overflow: 'hidden',
-                    transition: 'all 0.3s',
-                    cursor: 'pointer',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }}
-                  whileHover={{
-                    borderColor: '#FDCA40',
-                    boxShadow: '0 0 30px rgba(253, 202, 64, 0.2)',
-                    y: -5
-                  }}
-                >
-                  {/* Image/Icon */}
-                  <div style={{
-                    height: '180px',
-                    background: 'linear-gradient(135deg, rgba(253, 202, 64, 0.1) 0%, rgba(253, 202, 64, 0.05) 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '60px',
-                    borderBottom: '1px solid rgba(253, 202, 64, 0.1)'
-                  }}>
-                    {article.image}
-                  </div>
+              <span>Pošalji upit</span>
+              <span aria-hidden style={{ fontSize: '1.3rem' }}>→</span>
+            </Link>
+          </motion.div>
 
-                  {/* Content */}
-                  <div style={{ padding: '25px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ marginBottom: '12px' }}>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        color: '#FDCA40',
-                        fontWeight: '700',
-                        letterSpacing: '1px',
-                        textTransform: 'uppercase'
-                      }}>
-                        {article.category.toUpperCase()}
-                      </span>
-                    </div>
-
-                    <h3 style={{
-                      fontSize: '1.3rem',
-                      fontWeight: '800',
-                      marginBottom: '12px',
-                      color: '#fff',
-                      lineHeight: '1.4',
-                      flex: 1
-                    }}>
-                      {article.title}
-                    </h3>
-
-                    <p style={{
-                      fontSize: '0.95rem',
-                      color: '#a0a0a0',
-                      marginBottom: '20px',
-                      lineHeight: '1.5'
-                    }}>
-                      {article.excerpt}
-                    </p>
-
-                    {/* Tags */}
-                    <div style={{
-                      display: 'flex',
-                      gap: '8px',
-                      marginBottom: '18px',
-                      flexWrap: 'wrap'
-                    }}>
-                      {article.tags.map((tag, i) => (
-                        <span
-                          key={i}
-                          style={{
-                            fontSize: '0.75rem',
-                            background: 'rgba(253, 202, 64, 0.15)',
-                            color: '#FDCA40',
-                            padding: '5px 12px',
-                            borderRadius: '4px',
-                            fontWeight: '600'
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Meta */}
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      paddingTop: '15px',
-                      borderTop: '1px solid rgba(253, 202, 64, 0.1)',
-                      fontSize: '0.85rem',
-                      color: '#888'
-                    }}>
-                      <span>{article.date}</span>
-                      <span>{article.readTime} read</span>
-                    </div>
-                  </div>
-                </motion.article>
-              ))}
-            </motion.div>
-
-            {filteredArticles.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '60px 24px' }}>
-                <p style={{ fontSize: '1.2rem', color: '#888' }}>
-                  Nema članaka u ovoj kategoriji. Uskoro dolaze...
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* NEWSLETTER SIGNUP */}
-        <section style={{
-          padding: '100px 24px',
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)',
-          color: '#fff'
-        }}>
+          {/* ─── article mockup visual (being written) ─── */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: 'easeOut' }}
             style={{
-              maxWidth: '700px',
-              margin: '0 auto',
-              textAlign: 'center',
-              padding: '50px 35px',
-              background: '#000',
-              border: '2px solid rgba(253, 202, 64, 0.2)',
-              borderRadius: '12px'
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: 'clamp(280px, 45vh, 480px)'
             }}
           >
-            <h2 style={{
-              fontSize: '2rem',
-              fontWeight: '900',
-              marginBottom: '15px',
-              color: '#fff'
-            }}>
-              Primi Svoje <span style={{ color: '#FDCA40' }}>Sabjete</span>
-            </h2>
-            <p style={{
-              color: '#b0b0b0',
-              marginBottom: '30px',
-              fontSize: '1.05rem',
-              lineHeight: '1.6'
-            }}>
-              Najbolje SEO artikli direktno u vašu inbox svaki petak. Bez spam-a, samo pravi savjeti.
-            </p>
-
-            <div style={{ display: 'flex', gap: '12px', flexDirection: 'column' }}>
-              <input
-                type="email"
-                placeholder="Unesite vašu email..."
-                style={{
-                  padding: '14px 18px',
-                  background: 'rgba(253, 202, 64, 0.1)',
-                  border: '2px solid rgba(253, 202, 64, 0.3)',
-                  borderRadius: '8px',
-                  color: '#fff',
-                  fontSize: '1rem',
-                  outline: 'none',
-                  transition: 'all 0.3s'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#FDCA40'
-                  e.target.style.background = 'rgba(253, 202, 64, 0.15)'
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(253, 202, 64, 0.3)'
-                  e.target.style.background = 'rgba(253, 202, 64, 0.1)'
-                }}
-              />
-              <motion.button
-                whileHover={{ scale: 1 }}
-                style={{
-                  padding: '14px 30px',
-                  background: '#FDCA40',
-                  border: '3px solid #000',
-                  borderRadius: '50px',
-                  color: '#000',
-                  fontWeight: '800',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  boxShadow: '5px 5px 0px 0px #C79F00',
-                  transition: 'all 0.1s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translate(3px, 3px)';
-                  e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translate(0, 0)';
-                  e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
-                }}
-              >
-                Pretplati Se
-              </motion.button>
-            </div>
-            <p style={{ marginTop: '15px', fontSize: '0.85rem', color: '#888' }}>
-              Bez spam-a • Odjava u bilo kojem trenutku
-            </p>
+            <ArticleMockup />
           </motion.div>
-        </section>
+        </div>
+      </section>
 
-        {/* FEATURED ARTICLES SECTION */}
-        <section style={{
-          padding: '100px 24px',
-          background: '#000',
-          color: '#fff'
-        }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              style={{ textAlign: 'center', marginBottom: '70px' }}
-            >
-              <h2 style={{
-                fontSize: 'clamp(2rem, 5vw, 3.2rem)',
-                marginBottom: '20px',
-                fontWeight: '900',
-                color: '#fff'
-              }}>
-                Najčitaniji <span style={{ color: '#FDCA40' }}>Članci</span>
-              </h2>
-            </motion.div>
+      <SectionTransition from={LIGHT_BG} to="#000000" />
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-              gap: '35px'
-            }}>
-              {[
-                {
-                  title: '10 SEO Greške Koje Koštaju Vam $100,000',
-                  views: '12,450',
-                  shares: '340',
-                  rating: '4.9'
-                },
-                {
-                  title: 'Kako Iz 0 Doći Do $10K/Mjesečnog Trafika Sa SEO',
-                  views: '8,920',
-                  shares: '250',
-                  rating: '4.8'
-                },
-                {
-                  title: 'Novi Google Algorithm 2025: Što Se Promijenjeno',
-                  views: '7,680',
-                  shares: '180',
-                  rating: '4.7'
-                }
-              ].map((article, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  style={{
-                    padding: '35px',
-                    background: 'linear-gradient(135deg, rgba(253, 202, 64, 0.1) 0%, rgba(253, 202, 64, 0.02) 100%)',
-                    border: '2px solid rgba(253, 202, 64, 0.15)',
-                    borderRadius: '12px',
-                    cursor: 'pointer'
-                  }}
-                  whileHover={{ borderColor: '#FDCA40', y: -5 }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-                    <span style={{ fontSize: '1.5rem' }}>⭐</span>
-                    <span style={{ color: '#FDCA40', fontWeight: '800' }}>{article.rating}</span>
-                    <span style={{ color: '#888', fontSize: '0.9rem' }}>({article.views} views)</span>
-                  </div>
-                  <h3 style={{ fontSize: '1.3rem', marginBottom: '15px', color: '#fff', fontWeight: '800', lineHeight: '1.4' }}>
-                    {article.title}
-                  </h3>
-                  <div style={{ display: 'flex', gap: '20px', fontSize: '0.9rem', color: '#888' }}>
-                    <span>👁️ {article.views} views</span>
-                    <span>📤 {article.shares} shares</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA SECTION */}
-        <section style={{
-          padding: '120px 24px',
-          background: 'linear-gradient(135deg, #FDCA40 0%, #FDD968 100%)',
-          color: '#000',
-          textAlign: 'center',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
+      {/* ───────────────── ŠTA STIŽE — preview of upcoming topics ───────────────── */}
+      <section style={{ background: '#000', color: '#fff', padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}` }}>
+        <div style={{ maxWidth: CONTAINER_MAX, margin: '0 auto' }}>
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 2 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '64px' }}
           >
+            <Overline dark>Šta stiže</Overline>
             <h2 style={{
-              fontSize: 'clamp(2rem, 6vw, 3.5rem)',
-              marginBottom: '25px',
-              fontWeight: '900',
-              lineHeight: '1.2'
+              fontSize: 'clamp(2rem, 5vw, 3.4rem)',
+              fontWeight: 900,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              maxWidth: '720px'
             }}>
-              Trebate Praktičan Savjet?
+              O čemu ćete moći da čitate
             </h2>
-            <p style={{
-              fontSize: '1.2rem',
-              marginBottom: '40px',
-              opacity: '0.95',
-              lineHeight: '1.6'
-            }}>
-              Blog je odličan, ali ništa ne pomaže kao personalizirani SEO audit i strategija. Hajde da razgovaramo o vašem specifičnom slučaju.
-            </p>
-
-            <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link 
-                to="/kontakt/" 
-                style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}
-              >
-                <div style={{
-                  background: '#000',
-                  color: '#FDCA40',
-                  padding: '20px 50px',
-                  fontSize: '1.3rem',
-                  borderRadius: '6px',
-                  fontWeight: '700',
-                  transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  pointerEvents: 'auto',
-                  display: 'inline-block',
-                  whiteSpace: 'nowrap'
-                }} onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px) scale(1.08)';
-                  e.currentTarget.style.boxShadow = '0 0 50px rgba(253, 202, 64, 0.8), 0 0 80px rgba(253, 202, 64, 0.4), 0 15px 40px rgba(0, 0, 0, 0.3)';
-                }} onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}>
-                  Zatraži Besplatnu Konsultaciju
-                </div>
-              </Link>
-            </div>
           </motion.div>
-        </section>
 
-        {/* FOOTER */}
-        <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333', position: 'relative', zIndex: 1000, pointerEvents: 'auto' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', gap: '80px', marginBottom: '60px', position: 'relative', alignItems: 'flex-start' }}>
-              {/* LEFT SIDE - COLUMNS */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(150px, auto))', gap: '40px', flex: '0 0 auto' }}>
-                {/* FOOTER COLUMN 1 - BRAND */}
-                <div>
-                  <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
-                  <p style={{ color: '#aaa', lineHeight: '1.8', fontSize: '0.9rem' }}>
-                    Stručna SEO optimizacija, web development i dizajn za vaš biznis.
-                  </p>
-                </div>
-
-                {/* FOOTER COLUMN 2 - LINKS */}
-                <div>
-                  <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    <li style={{ marginBottom: '10px' }}><Link to="/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Početna</Link></li>
-                    <li style={{ marginBottom: '10px' }}><Link to="/izrada-sajtova/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Izrada sajtova</Link></li>
-                    <li style={{ marginBottom: '10px' }}><Link to="/seo/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>SEO</Link></li>
-                    <li style={{ marginBottom: '10px' }}><Link to="/blog/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Blog</Link></li>
-                  </ul>
-                </div>
-
-                {/* FOOTER COLUMN 3 - MORE LINKS */}
-                <div>
-                  <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    <li style={{ marginBottom: '10px' }}><Link to="/about/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>O nama</Link></li>
-                    <li style={{ marginBottom: '10px' }}><Link to="/kontakt/" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Kontakt</Link></li>
-                    <li style={{ marginBottom: '10px' }}><a href="#" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Privatnost</a></li>
-                    <li style={{ marginBottom: '10px' }}><a href="#" style={{ color: '#aaa', textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#aaa'}>Uslovi</a></li>
-                  </ul>
-                </div>
-
-                {/* FOOTER COLUMN 4 - CONTACT */}
-                <div>
-                  <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
-                  <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>email@example.com</p>
-                  <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 (0) 123 456 789</p>
-                  <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
-                </div>
-              </div>
-
-              {/* RIGHT SIDE - BUTTON */}
-              <div style={{ marginLeft: 'auto', marginRight: '-210npx', paddingRight: '24px', display: 'flex', alignItems: 'flex-start', marginTop: '40px' }}>
-                <Link to="/kontakt/" style={{ textDecoration: 'none', pointerEvents: 'auto', cursor: 'pointer' }}>
-                  <div style={{
-                    background: '#FDCA40',
-                    color: '#000',
-                    padding: '20px 50px',
-                    fontSize: '1.3rem',
-                    borderRadius: '50px',
-                    border: '3px solid #000',
-                    fontWeight: '700',
-                    transition: 'all 0.1s ease',
-                    pointerEvents: 'auto',
-                    display: 'inline-block',
-                    whiteSpace: 'nowrap',
-                    boxShadow: '5px 5px 0px 0px #C79F00'
-                  }} onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translate(3px, 3px)';
-                    e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
-                  }} onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translate(0, 0)';
-                    e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
-                  }}>
-                    Kontakt
-                  </div>
-                </Link>
-              </div>
-            </div>
-
-          {/* FOOTER BOTTOM */}
-          <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
-            <p style={{ margin: 0 }}>© 2024 SEO Mačak. Sva prava zadržana.</p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+            gap: 'clamp(24px, 3vw, 36px)'
+          }}>
+            {upcomingTopics.map((topic, i) => (
+              <UpcomingTopicCard key={i} index={i + 1} {...topic} />
+            ))}
           </div>
         </div>
-        </footer>
-      </div>
+      </section>
+
+      <SectionTransition from="#000000" to={ACCENT} />
+
+      {/* ───────────────────────── FINAL CTA ───────────────────────── */}
+      <section style={{
+        background: ACCENT,
+        color: '#000',
+        padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}`,
+        textAlign: 'center'
+      }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6 }}
+          style={{ maxWidth: '800px', margin: '0 auto' }}
+        >
+          <h2 style={{
+            fontSize: 'clamp(2.2rem, 6vw, 4rem)',
+            fontWeight: 900,
+            lineHeight: 1.05,
+            letterSpacing: '-0.02em',
+            margin: '0 0 24px'
+          }}>
+            Ne čekajte blog
+          </h2>
+          <p style={{
+            fontSize: '1.15rem',
+            color: '#000',
+            opacity: 0.75,
+            margin: '0 0 44px',
+            lineHeight: 1.6
+          }}>
+            Sve što bih napisao na blogu, već radim za klijente. Besplatna
+            konsultacija i konkretan savet za vaš slučaj.
+          </p>
+          <Link
+            to="/kontakt/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '14px',
+              padding: '20px 44px',
+              background: '#000',
+              color: ACCENT,
+              borderRadius: '50px',
+              border: '3px solid #000',
+              textDecoration: 'none',
+              fontSize: '1.1rem',
+              fontWeight: 900,
+              letterSpacing: '0.5px',
+              boxShadow: '5px 5px 0px 0px #1a1a1a',
+              transition: 'all 0.1s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translate(3px, 3px)'
+              e.currentTarget.style.boxShadow = '2px 2px 0px 0px #1a1a1a'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translate(0, 0)'
+              e.currentTarget.style.boxShadow = '5px 5px 0px 0px #1a1a1a'
+            }}
+          >
+            <span>Zakaži razgovor</span>
+            <span aria-hidden>→</span>
+          </Link>
+        </motion.div>
+      </section>
+
+      <SectionTransition from={ACCENT} to="#000000" />
+
+      {/* ─────────────────────────── FOOTER ─────────────────────────── */}
+      <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div className="site-footer-grid">
+            <div className="columns">
+              <div>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
+                <p style={{ color: '#aaa', lineHeight: '1.8', fontSize: '0.9rem' }}>
+                  Stručna SEO optimizacija, web development i dizajn za vaš biznis.
+                </p>
+              </div>
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
+                <FooterLinks links={[
+                  { to: '/', label: 'Početna' },
+                  { to: '/izrada-sajtova/', label: 'Izrada sajtova' },
+                  { to: '/seo/', label: 'SEO' },
+                  { to: '/blog/', label: 'Blog' }
+                ]} />
+              </div>
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
+                <FooterLinks links={[
+                  { to: '/about/', label: 'O nama' },
+                  { to: '/kontakt/', label: 'Kontakt' },
+                  { href: '#', label: 'Privatnost' },
+                  { href: '#', label: 'Uslovi' }
+                ]} />
+              </div>
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>email@example.com</p>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 (0) 123 456 789</p>
+                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
+              </div>
+            </div>
+          </div>
+          <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
+            <p style={{ margin: 0 }}>© 2026 SEO Mačak. Sva prava zadržana.</p>
+          </div>
+        </div>
+      </footer>
     </>
+  )
+}
+
+// ─────────────────── helpers ───────────────────
+
+// Pulsing yellow dot for the "u izradi" status badge.
+function PulsingDot() {
+  return (
+    <motion.span
+      animate={{ opacity: [1, 0.3, 1] }}
+      transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+      style={{
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        background: ACCENT,
+        display: 'inline-block'
+      }}
+    />
+  )
+}
+
+// Article-in-progress mockup — looks like a draft being typed in real time.
+// Animated blinking cursor at the end suggests "actively being written."
+function ArticleMockup() {
+  return (
+    <motion.div
+      animate={{ y: [0, -10, 0] }}
+      transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+      style={{
+        width: '100%',
+        maxWidth: '460px',
+        aspectRatio: '4/3',
+        background: '#fff',
+        borderRadius: '12px',
+        border: '1px solid #e5e5e5',
+        boxShadow: '0 30px 60px rgba(0,0,0,0.14), 0 12px 24px rgba(0,0,0,0.07)',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        transform: 'rotate(-1.5deg)',
+        position: 'relative',
+        zIndex: 2
+      }}
+    >
+      {/* title bar — like a doc editor */}
+      <div style={{
+        padding: '12px 16px',
+        borderBottom: '1px solid #eee',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        background: '#fafafa'
+      }}>
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FF5F57' }} />
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#FFBD2E' }} />
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#28C840' }} />
+        <span style={{
+          marginLeft: '14px',
+          fontSize: '0.7rem',
+          color: '#aaa',
+          letterSpacing: '0.5px',
+          fontFamily: 'monospace'
+        }}>
+          draft.md
+        </span>
+        <span style={{
+          marginLeft: 'auto',
+          fontSize: '0.6rem',
+          color: '#999',
+          padding: '2px 8px',
+          background: '#f0f0f0',
+          borderRadius: '999px',
+          fontWeight: 700,
+          letterSpacing: '0.5px',
+          textTransform: 'uppercase'
+        }}>
+          Draft
+        </span>
+      </div>
+
+      {/* fake article content */}
+      <div style={{
+        flex: 1,
+        padding: '24px 26px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '11px'
+      }}>
+        <div style={{
+          fontSize: '0.6rem',
+          color: ACCENT,
+          letterSpacing: '2px',
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          fontFamily: 'monospace'
+        }}>
+          SEO · 8 min čitanja
+        </div>
+        <div style={{ height: '16px', borderRadius: '4px', background: '#1a1a1a', width: '85%', marginTop: '4px' }} />
+        <div style={{ height: '10px', borderRadius: '3px', background: '#1a1a1a', width: '55%' }} />
+
+        <div style={{ height: '6px', borderRadius: '2px', background: '#ddd', width: '95%', marginTop: '10px' }} />
+        <div style={{ height: '6px', borderRadius: '2px', background: '#ddd', width: '88%' }} />
+        <div style={{ height: '6px', borderRadius: '2px', background: '#ddd', width: '92%' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ height: '6px', borderRadius: '2px', background: '#ddd', width: '60%' }} />
+          {/* blinking cursor — implies "actively being written" */}
+          <motion.div
+            animate={{ opacity: [1, 0, 1] }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            style={{
+              width: '2px',
+              height: '14px',
+              background: '#1a1a1a',
+              marginLeft: '4px'
+            }}
+          />
+        </div>
+
+        <div style={{
+          marginTop: 'auto',
+          display: 'flex',
+          gap: '6px'
+        }}>
+          <span style={{
+            fontSize: '0.55rem',
+            padding: '4px 10px',
+            background: '#f5f5f5',
+            color: '#666',
+            borderRadius: '999px',
+            fontWeight: 600,
+            letterSpacing: '0.3px'
+          }}>
+            SEO
+          </span>
+          <span style={{
+            fontSize: '0.55rem',
+            padding: '4px 10px',
+            background: '#f5f5f5',
+            color: '#666',
+            borderRadius: '999px',
+            fontWeight: 600,
+            letterSpacing: '0.3px'
+          }}>
+            Strategija
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function UpcomingTopicCard({ index, label, title, desc }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5, delay: (index - 1) * 0.08 }}
+      style={{
+        background: '#0f0f0f',
+        border: '1px solid #2a2a2a',
+        borderRadius: '6px',
+        padding: 'clamp(28px, 3.5vw, 36px)',
+        position: 'relative'
+      }}
+    >
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'baseline',
+        marginBottom: '20px',
+        paddingBottom: '16px',
+        borderBottom: '1px solid #2a2a2a'
+      }}>
+        <span style={{
+          fontSize: '0.8rem',
+          fontWeight: 800,
+          color: ACCENT,
+          letterSpacing: '2px',
+          fontVariantNumeric: 'tabular-nums'
+        }}>
+          {String(index).padStart(2, '0')}
+        </span>
+        <span style={{
+          fontSize: '0.7rem',
+          fontWeight: 700,
+          color: '#888',
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase'
+        }}>
+          {label}
+        </span>
+      </div>
+
+      <h3 style={{
+        fontSize: '1.25rem',
+        fontWeight: 800,
+        margin: '0 0 14px',
+        color: '#fff',
+        letterSpacing: '-0.01em',
+        lineHeight: 1.3
+      }}>
+        {title}
+      </h3>
+
+      <p style={{
+        fontSize: '0.93rem',
+        lineHeight: 1.65,
+        color: '#888',
+        margin: 0
+      }}>
+        {desc}
+      </p>
+
+      {/* coming soon ribbon */}
+      <div style={{
+        marginTop: '24px',
+        paddingTop: '16px',
+        borderTop: '1px solid #2a2a2a',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '0.75rem',
+        color: '#666',
+        fontWeight: 700,
+        letterSpacing: '1px',
+        textTransform: 'uppercase'
+      }}>
+        <PulsingDot />
+        <span>Uskoro</span>
+      </div>
+    </motion.div>
+  )
+}
+
+function FooterLinks({ links }) {
+  return (
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      {links.map((l, i) => (
+        <li key={i} style={{ marginBottom: '10px' }}>
+          {l.to ? (
+            <Link to={l.to} style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
+              onMouseEnter={(e) => e.target.style.color = '#fff'}
+              onMouseLeave={(e) => e.target.style.color = '#aaa'}>
+              {l.label}
+            </Link>
+          ) : (
+            <a href={l.href} style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
+              onMouseEnter={(e) => e.target.style.color = '#fff'}
+              onMouseLeave={(e) => e.target.style.color = '#aaa'}>
+              {l.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
   )
 }

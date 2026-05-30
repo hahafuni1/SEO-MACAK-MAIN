@@ -1,38 +1,46 @@
 import React, { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import Link from './Link'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../contexts/LanguageContext'
 import logoImg from '/logo.webp'
 
-// Static-logo header — used on pages whose entire viewport starts dark
-// (no scroll-based color shift). Includes the same full-screen hamburger
-// menu as ScrollAwareHeader so mobile UX is consistent across the site.
-export default function Header() {
-  const location = useLocation()
+const ACCENT = '#FDCA40'
+
+// Used on pages that start with a light hero and transition to dark sections.
+// The desktop logo color smoothly fades black → white as you scroll past the
+// hero. On mobile (≤900px) the inline nav is hidden and replaced with a
+// full-screen hamburger overlay.
+export default function ScrollAwareHeader() {
   const { t } = useLanguage()
+  const { scrollY } = useScroll()
+  const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const isIzradaSajtova = location.pathname === '/izrada-sajtova/'
-  const isSEO = location.pathname === '/seo/'
-  const isBlog = location.pathname === '/blog/'
-  const isAbout = location.pathname === '/about/'
-  const isKontakt = location.pathname === '/kontakt/'
-  const logoColor = (isIzradaSajtova || isSEO || isBlog || isAbout || isKontakt) ? '#ffffff' : '#000000'
-
-  // Body scroll lock + Escape close while menu is open
   useEffect(() => {
-    if (!menuOpen) return
-    const original = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    const onKey = (e) => { if (e.key === 'Escape') setMenuOpen(false) }
-    window.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = original
-      window.removeEventListener('keydown', onKey)
+    const onResize = () => setVh(window.innerHeight)
+    window.addEventListener('resize', onResize, { passive: true })
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  // Body scroll lock while the mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      const original = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = original }
     }
   }, [menuOpen])
+
+  // ESC closes the menu
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e) => { if (e.key === 'Escape') setMenuOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [menuOpen])
+
+  const logoColor = useTransform(scrollY, [vh * 0.6, vh * 0.85], ['#000000', '#ffffff'])
 
   const navItems = [
     { to: '/', label: t.nav.home },
@@ -49,14 +57,13 @@ export default function Header() {
         <div className="container">
           <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
             <img src={logoImg} alt="SEO Mačak" width="60" height="60" style={{ display: 'block', objectFit: 'contain' }} />
-            <span className="logo-text" style={{ color: logoColor, textDecoration: 'underline', textDecorationColor: logoColor, textDecorationThickness: '2px' }}>
-              SEO<br/>
-              <span className="logo-sub" style={{ color: logoColor }}>
-                Mačak.
-              </span>
-            </span>
+            <motion.span className="logo-text" style={{ color: logoColor, textDecoration: 'underline', textDecorationColor: logoColor, textDecorationThickness: '2px' }}>
+              SEO<br />
+              <motion.span className="logo-sub" style={{ color: logoColor }}>Mačak.</motion.span>
+            </motion.span>
           </Link>
 
+          {/* desktop nav */}
           <nav className="nav-pill nav-desktop">
             <Link to="/">{t.nav.home}</Link>
             <Link to="/izrada-sajtova/">{t.nav.webDevelopment}</Link>
@@ -67,6 +74,7 @@ export default function Header() {
             <LanguageSwitcher />
           </nav>
 
+          {/* mobile hamburger */}
           <button
             type="button"
             className="nav-hamburger"
@@ -79,6 +87,7 @@ export default function Header() {
         </div>
       </header>
 
+      {/* mobile menu overlay */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -89,6 +98,7 @@ export default function Header() {
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="mobile-menu-overlay"
           >
+            {/* subtle diagonal dot pattern bg */}
             <div aria-hidden style={{
               position: 'absolute',
               inset: 0,
@@ -99,6 +109,7 @@ export default function Header() {
               opacity: 0.4,
               pointerEvents: 'none'
             }} />
+            {/* yellow glow */}
             <div aria-hidden style={{
               position: 'absolute',
               top: '30%',
@@ -110,6 +121,7 @@ export default function Header() {
               pointerEvents: 'none'
             }} />
 
+            {/* close button */}
             <button
               type="button"
               className="mobile-menu-close"
@@ -119,6 +131,7 @@ export default function Header() {
               <span /><span />
             </button>
 
+            {/* big nav links */}
             <nav className="mobile-menu-nav">
               {navItems.map((item, i) => (
                 <motion.div
@@ -140,6 +153,7 @@ export default function Header() {
               ))}
             </nav>
 
+            {/* footer of menu — language switcher + contact */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}

@@ -1,33 +1,48 @@
-
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import Header from './Header'
-import { Link } from 'react-router-dom'
+import emailjs from '@emailjs/browser'
+import Link from './Link'
+import ScrollAwareHeader from './ScrollAwareHeader'
+import SectionTransition from './SectionTransition'
+import { Helmet } from 'react-helmet-async'
+import { useLanguage } from '../contexts/LanguageContext'
 
-const keyframes = `
-  @keyframes moveDiagonalDots {
-    from { background-position: 0px 0px; }
-    to { background-position: 60px -60px; }
-  }
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  @keyframes floatInput {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-2px); }
-  }
-`
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+// Premium Minimal — Kontakt page.
+// Single-section focused layout: hero text + direct contact info on the left,
+// the form is the right column. No filler sections — this page exists to
+// convert visitors into leads.
+
+const LIGHT_BG = '#FBFAF8'
+const ACCENT = '#FDCA40'
+const SECTION_PAD_Y = 'clamp(80px, 14vh, 140px)'
+const SECTION_PAD_X = 'clamp(24px, 5vw, 64px)'
+const CONTAINER_MAX = '1100px'
+
+const Overline = ({ children, dark = false }) => (
+  <span style={{
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '14px',
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    color: dark ? ACCENT : '#000',
+    letterSpacing: '3px',
+    textTransform: 'uppercase',
+    marginBottom: '32px'
+  }}>
+    <span style={{ display: 'inline-block', width: '40px', height: '1px', background: dark ? ACCENT : '#000' }} />
+    {children}
+  </span>
+)
 
 export default function Kontakt() {
-  const [formData, setFormData] = useState({ ime: '', email: '', telefon: '' })
-  const [submitted, setSubmitted] = useState(false)
+  const { t } = useLanguage()
+  const [formData, setFormData] = useState({ ime: '', email: '', telefon: '', poruka: '' })
+  const [status, setStatus] = useState('idle') // 'idle' | 'sending' | 'success' | 'error'
   const [focusedField, setFocusedField] = useState(null)
 
   const handleChange = (e) => {
@@ -35,382 +50,588 @@ export default function Kontakt() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setFormData({ ime: '', email: '', telefon: '' })
-    }, 3000)
+    if (status === 'sending') return
+
+    setStatus('sending')
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name: formData.ime,
+          email: formData.email,
+          phone: formData.telefon || '(nije ostavljen)',
+          message: formData.poruka,
+          time: new Date().toLocaleString('sr-RS', { dateStyle: 'long', timeStyle: 'short' })
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
+      )
+      setStatus('success')
+      setFormData({ ime: '', email: '', telefon: '', poruka: '' })
+      setTimeout(() => setStatus('idle'), 5000)
+    } catch (err) {
+      console.error('EmailJS error:', err)
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 5000)
+    }
   }
 
-  const inputStyle = (isFocused) => ({
-    padding: '18px 20px',
-    background: isFocused ? 'rgba(253, 202, 64, 0.12)' : 'rgba(253, 202, 64, 0.05)',
-    border: `2px solid ${isFocused ? '#FDCA40' : 'rgba(253, 202, 64, 0.15)'}`,
-    borderRadius: '12px',
-    color: '#fff',
-    fontSize: '1rem',
-    fontFamily: 'Poppins, Inter, sans-serif',
-    outline: 'none',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    boxSizing: 'border-box',
-    backdropFilter: 'blur(10px)',
-  })
+  const submitted = status === 'success'
+  const sending = status === 'sending'
+  const errored = status === 'error'
 
   return (
     <>
-      <style>{keyframes}</style>
-      <Header />
-      <div style={{
+      <Helmet>
+        <title>{t.contact.meta.title}</title>
+        <meta name="description" content={t.contact.meta.description} />
+        <link rel="canonical" href="https://www.seomacak.com/kontakt/" />
+        <meta property="og:title" content={t.contact.meta.title} />
+        <meta property="og:description" content={t.contact.meta.description} />
+        <meta property="og:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <meta property="og:url" content="https://www.seomacak.com/kontakt/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://www.seomacak.com/mackic-logo.png" />
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "name": "SEO Mačak",
+              "image": "https://www.seomacak.com/mackic-logo.png",
+              "@id": "",
+              "url": "https://www.seomacak.com/kontakt",
+              "telephone": "+381 60 123 4567",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "",
+                "addressLocality": "Beograd",
+                "postalCode": "",
+                "addressCountry": "RS"
+              },
+              "openingHoursSpecification": {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday"
+                ],
+                "opens": "09:00",
+                "closes": "17:00"
+              }
+            }
+          `}
+        </script>
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [{
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Početna",
+                "item": "https://www.seomacak.com/"
+              },{
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Kontakt",
+                "item": "https://www.seomacak.com/kontakt/"
+              }]
+            }
+          `}
+        </script>
+      </Helmet>
+      <ScrollAwareHeader />
+
+      {/* ─────────────────── HERO + FORM (light) ─────────────────── */}
+      <section style={{
+        background: LIGHT_BG,
+        color: '#000',
         minHeight: '100vh',
-        background: '#000',
+        padding: `clamp(140px, 18vh, 200px) ${SECTION_PAD_X} ${SECTION_PAD_Y}`,
         position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'stretch',
-        padding: '140px 0 100px',
         overflow: 'hidden'
       }}>
-        {/* Animated Background */}
-        <div style={{
+        {/* subtle dot pattern bg */}
+        <div aria-hidden style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'linear-gradient(45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%), linear-gradient(-45deg, transparent 48%, #FDCA40 49%, #FDCA40 51%, transparent 52%)',
+          backgroundImage:
+            'linear-gradient(45deg, transparent 48%, rgba(0,0,0,0.06) 49%, rgba(0,0,0,0.06) 51%, transparent 52%),' +
+            'linear-gradient(-45deg, transparent 48%, rgba(0,0,0,0.06) 49%, rgba(0,0,0,0.06) 51%, transparent 52%)',
           backgroundSize: '60px 60px',
-          opacity: 0.08,
-          animation: 'moveDiagonalDots 4s linear infinite',
-          zIndex: 0,
-          pointerEvents: 'none'
+          opacity: 0.4,
+          pointerEvents: 'none',
+          zIndex: 0
         }} />
-        
-        {/* Decorative Blobs */}
-        <motion.div 
-          style={{
-            position: 'absolute',
-            width: '400px',
-            height: '400px',
-            background: 'radial-gradient(circle, rgba(253, 202, 64, 0.15) 0%, transparent 70%)',
-            borderRadius: '50%',
-            top: '-200px',
-            left: '-200px',
-            zIndex: 0
-          }}
-          animate={{ x: [0, 50, 0], y: [0, 50, 0] }}
-          transition={{ duration: 8, repeat: Infinity }}
-        />
-        <motion.div 
-          style={{
-            position: 'absolute',
-            width: '300px',
-            height: '300px',
-            background: 'radial-gradient(circle, rgba(253, 202, 64, 0.12) 0%, transparent 70%)',
-            borderRadius: '50%',
-            bottom: '-150px',
-            right: '-150px',
-            zIndex: 0
-          }}
-          animate={{ x: [0, -40, 0], y: [0, -40, 0] }}
-          transition={{ duration: 10, repeat: Infinity }}
-        />
+        {/* yellow glow behind the form */}
+        <div aria-hidden style={{
+          position: 'absolute',
+          right: '-12%',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: 'clamp(380px, 50vw, 720px)',
+          height: 'clamp(380px, 50vw, 720px)',
+          background: 'radial-gradient(circle, rgba(253, 202, 64, 0.28) 0%, rgba(253, 202, 64, 0.06) 45%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 0
+        }} />
 
-        {/* Additional Decorative Elements */}
-        <motion.div 
-          style={{
-            position: 'absolute',
-            width: '250px',
-            height: '250px',
-            background: 'radial-gradient(circle, rgba(253, 202, 64, 0.1) 0%, transparent 70%)',
-            borderRadius: '50%',
-            top: '50%',
-            right: '5%',
-            zIndex: 0
-          }}
-          animate={{ y: [0, -30, 0], x: [0, -20, 0] }}
-          transition={{ duration: 12, repeat: Infinity }}
-        />
-        <motion.div 
-          style={{
-            position: 'absolute',
-            width: '200px',
-            height: '200px',
-            background: 'radial-gradient(circle, rgba(253, 202, 64, 0.09) 0%, transparent 70%)',
-            borderRadius: '50%',
-            bottom: '20%',
-            left: '10%',
-            zIndex: 0
-          }}
-          animate={{ y: [0, 25, 0], x: [0, 15, 0] }}
-          transition={{ duration: 14, repeat: Infinity }}
-        />
-
-        {/* Extra Decorative Blobs */}
-        <motion.div 
-          style={{
-            position: 'absolute',
-            width: '280px',
-            height: '280px',
-            background: 'radial-gradient(circle, rgba(253, 202, 64, 0.08) 0%, transparent 70%)',
-            borderRadius: '50%',
-            top: '30%',
-            left: '3%',
-            zIndex: 0
-          }}
-          animate={{ y: [0, -40, 0], x: [0, 20, 0] }}
-          transition={{ duration: 16, repeat: Infinity }}
-        />
-
-        <motion.div 
-          style={{
-            position: 'absolute',
-            width: '220px',
-            height: '220px',
-            background: 'radial-gradient(circle, rgba(253, 202, 64, 0.07) 0%, transparent 70%)',
-            borderRadius: '50%',
-            bottom: '35%',
-            right: '8%',
-            zIndex: 0
-          }}
-          animate={{ y: [0, 35, 0], x: [0, -25, 0] }}
-          transition={{ duration: 18, repeat: Infinity }}
-        />
-
-        <motion.div 
-          style={{
-            position: 'absolute',
-            width: '150px',
-            height: '150px',
-            background: 'radial-gradient(circle, rgba(253, 202, 64, 0.06) 0%, transparent 70%)',
-            borderRadius: '50%',
-            top: '70%',
-            right: '20%',
-            zIndex: 0
-          }}
-          animate={{ y: [0, -20, 0], x: [0, 25, 0] }}
-          transition={{ duration: 15, repeat: Infinity }}
-        />
-
-        <div 
-          style={{ 
-            position: 'relative', 
-            zIndex: 2, 
-            width: '100%', 
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '100px',
-            padding: '0 40px',
-            maxWidth: '1400px',
-            margin: '0 auto'
-          }}
-        >
-          {/* Left Side - Text Section */}
+        <div style={{
+          maxWidth: CONTAINER_MAX,
+          margin: '0 auto',
+          width: '100%',
+          position: 'relative',
+          zIndex: 1,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
+          gap: 'clamp(40px, 6vw, 80px)',
+          alignItems: 'start'
+        }}>
+          {/* ─── left: hero text + direct contact info ─── */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              justifyContent: 'center',
-              paddingRight: '60px',
-              paddingLeft: '20px'
-            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
           >
-            <p style={{
-              fontSize: '0.95rem',
-              fontWeight: 700,
-              color: '#FDCA40',
-              letterSpacing: '2px',
-              textTransform: 'uppercase',
-              marginBottom: '30px',
-              opacity: 0.9
-            }}>
-              Započni saradnju
-            </p>
+            <Overline>Kontakt</Overline>
+
             <h1 style={{
-              fontSize: 'clamp(2.2rem, 6vw, 3.2rem)',
+              fontSize: 'clamp(2.4rem, 6.5vw, 4.6rem)',
               fontWeight: 900,
-              color: '#fff',
-              marginBottom: '36px',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.15
+              lineHeight: 0.98,
+              letterSpacing: '-0.03em',
+              margin: '0 0 32px',
+              color: '#000'
             }}>
-              Pokreni svoj <span style={{ color: '#FDCA40', display: 'block' }}>rast</span>
+              Hajde da{' '}
+              <span style={{
+                textDecoration: 'underline',
+                textDecorationColor: ACCENT,
+                textDecorationThickness: '6px',
+                textUnderlineOffset: '8px'
+              }}>
+                pričamo
+              </span>
             </h1>
+
             <p style={{
-              fontSize: '1.1rem',
-              color: 'rgba(255, 255, 255, 0.65)',
-              lineHeight: 1.8,
-              fontWeight: 400
+              fontSize: 'clamp(1.05rem, 1.8vw, 1.2rem)',
+              lineHeight: 1.65,
+              color: '#555',
+              margin: '0 0 56px',
+              maxWidth: '480px'
             }}>
-              Popuni formu i naš tim će se javiti u roku od 24 časa. Spremni smo da vam pomognemo da postignete vaše poslovne ciljeve.
+              Popuni formu ili me direktno pozovi. Odgovaram lično, obično u roku od 24 sata.
             </p>
+
+            {/* direct contact info */}
+            <div style={{
+              borderTop: '1px solid #ddd',
+              paddingTop: '32px'
+            }}>
+              <div style={{
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                color: '#000',
+                letterSpacing: '3px',
+                textTransform: 'uppercase',
+                marginBottom: '24px'
+              }}>
+                Direktno
+              </div>
+              <ContactRow label="Email" value="kontakt@seomacak.com" href="mailto:kontakt@seomacak.com" />
+              <ContactRow label="Telefon" value="+381 60 123 4567" href="tel:+381601234567" />
+              <ContactRow label="Lokacija" value="Beograd, Srbija · Remote ready" />
+            </div>
           </motion.div>
 
-          {/* Form */}
-          <motion.form 
+          {/* ─── right: form ─── */}
+          <motion.form
             onSubmit={handleSubmit}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            style={{ 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }}
+            style={{
+              background: '#fff',
+              border: '2px solid #000',
+              borderRadius: '8px',
+              padding: 'clamp(28px, 4vw, 44px)',
+              boxShadow: '8px 8px 0px 0px #1a1a1a',
               display: 'flex',
               flexDirection: 'column',
-              gap: '42px',
-              background: 'rgba(0, 0, 0, 0.4)',
-              backdropFilter: 'blur(20px)',
-              borderRadius: '20px',
-              padding: '80px 60px',
-              border: '1px solid rgba(253, 202, 64, 0.1)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-              minHeight: 'auto',
-              justifyContent: 'center'
+              gap: '24px'
             }}
           >
-            {/* Name Row */}
-            {/* Ime Field */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <label style={{
-                display: 'block',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                color: '#FDCA40',
-                marginBottom: '10px',
-                opacity: 0.8
-              }}>
-                Ime
-              </label>
-              <input
-                type="text"
-                name="ime"
-                value={formData.ime}
-                onChange={handleChange}
-                onFocus={() => setFocusedField('ime')}
-                onBlur={() => setFocusedField(null)}
-                required
-                placeholder="Marko"
-                style={inputStyle(focusedField === 'ime')}
-              />
-            </motion.div>
+            <FormField
+              label="Ime"
+              name="ime"
+              type="text"
+              value={formData.ime}
+              onChange={handleChange}
+              placeholder="Marko Marković"
+              focused={focusedField === 'ime'}
+              onFocus={() => setFocusedField('ime')}
+              onBlur={() => setFocusedField(null)}
+              required
+            />
+            <FormField
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="marko@primer.com"
+              focused={focusedField === 'email'}
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
+              required
+            />
+            <FormField
+              label="Telefon"
+              sublabel="(opciono)"
+              name="telefon"
+              type="tel"
+              value={formData.telefon}
+              onChange={handleChange}
+              placeholder="+381 60 123 4567"
+              focused={focusedField === 'telefon'}
+              onFocus={() => setFocusedField('telefon')}
+              onBlur={() => setFocusedField(null)}
+            />
+            <FormField
+              label="Poruka"
+              name="poruka"
+              type="textarea"
+              value={formData.poruka}
+              onChange={handleChange}
+              placeholder="Reci ukratko o čemu se radi: sajt, SEO audit, redizajn, drugo..."
+              focused={focusedField === 'poruka'}
+              onFocus={() => setFocusedField('poruka')}
+              onBlur={() => setFocusedField(null)}
+              required
+            />
 
-            {/* Email */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <label style={{
-                display: 'block',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                color: '#FDCA40',
-                marginBottom: '8px',
-                opacity: 0.8
-              }}>
-                Email adresa
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField(null)}
-                required
-                placeholder="marko@example.com"
-                style={inputStyle(focusedField === 'email')}
-              />
-            </motion.div>
-
-            {/* Phone */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
-            >
-              <label style={{
-                display: 'block',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                color: '#FDCA40',
-                marginBottom: '8px',
-                opacity: 0.8
-              }}>
-                Broj telefona
-              </label>
-              <input
-                type="tel"
-                name="telefon"
-                value={formData.telefon}
-                onChange={handleChange}
-                onFocus={() => setFocusedField('telefon')}
-                onBlur={() => setFocusedField(null)}
-                required
-                placeholder="+381 60 123 4567"
-                style={inputStyle(focusedField === 'telefon')}
-              />
-            </motion.div>
-
-            {/* Submit Button */}
             <motion.button
               type="submit"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              whileHover={{ scale: 1 }}
+              disabled={submitted || sending}
               whileTap={{ scale: 0.98 }}
               style={{
-                padding: '18px 0',
-                background: submitted ? 'rgba(253, 202, 64, 0.7)' : '#FDCA40',
+                padding: '18px 32px',
+                background: submitted ? '#4a9b4a' : (sending ? '#bbb' : ACCENT),
+                color: submitted ? '#fff' : '#000',
                 border: '3px solid #000',
                 borderRadius: '50px',
-                color: '#000',
-                fontWeight: 900,
                 fontSize: '1.05rem',
-                cursor: submitted ? 'default' : 'pointer',
-                marginTop: '24px',
-                boxShadow: submitted ? 'none' : '5px 5px 0px 0px #C79F00',
-                transition: 'all 0.1s ease',
+                fontWeight: 900,
                 letterSpacing: '0.5px',
+                cursor: (submitted || sending) ? 'default' : 'pointer',
+                boxShadow: (submitted || sending) ? 'none' : '5px 5px 0px 0px #C79F00',
+                transition: 'all 0.1s ease',
+                marginTop: '12px',
                 fontFamily: 'Poppins, Inter, sans-serif'
               }}
               onMouseEnter={(e) => {
-                if (!submitted) {
-                  e.currentTarget.style.transform = 'translate(3px, 3px)';
-                  e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00';
-                }
+                if (submitted || sending) return
+                e.currentTarget.style.transform = 'translate(3px, 3px)'
+                e.currentTarget.style.boxShadow = '2px 2px 0px 0px #C79F00'
               }}
               onMouseLeave={(e) => {
-                if (!submitted) {
-                  e.currentTarget.style.transform = 'translate(0, 0)';
-                  e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00';
-                }
+                if (submitted || sending) return
+                e.currentTarget.style.transform = 'translate(0, 0)'
+                e.currentTarget.style.boxShadow = '5px 5px 0px 0px #C79F00'
               }}
-              disabled={submitted}
             >
-              {submitted ? '✓ Poruka je poslata!' : 'Pošalji poruku'}
+              {submitted ? '✓ Poruka poslata, javljam se uskoro' : (sending ? 'Šaljem...' : 'Pošalji poruku →')}
             </motion.button>
+
+            {errored && (
+              <p style={{
+                fontSize: '0.88rem',
+                color: '#c0392b',
+                margin: 0,
+                textAlign: 'center',
+                fontWeight: 600,
+                padding: '12px 16px',
+                background: 'rgba(192, 57, 43, 0.08)',
+                borderRadius: '8px',
+                border: '1px solid rgba(192, 57, 43, 0.2)'
+              }}>
+                Nešto je puklo prilikom slanja. Pokušaj ponovo ili piši direktno na email.
+              </p>
+            )}
+
+            <p style={{
+              fontSize: '0.78rem',
+              color: '#888',
+              margin: 0,
+              textAlign: 'center',
+              letterSpacing: '0.2px'
+            }}>
+              Obično odgovaram u roku od 24h. Bez spam-a, bez deljenja podataka.
+            </p>
           </motion.form>
         </div>
+      </section>
 
-        {/* FOOTER */}
-        <footer style={{ background: '#000', color: '#fff', padding: '80px 24px 40px', borderTop: '1px solid #333', width: '100%', marginTop: '160px' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
-            <p style={{ color: '#aaa', lineHeight: '1.8', fontSize: '0.9rem', marginBottom: 0 }}>
-              Strucna SEO optimizacija, web development i dizajn za vas biznis.
-            </p>
-            <div style={{ marginTop: 24, color: '#666', fontSize: '0.9rem' }}>
-              © 2024 SEO Mačak. Sva prava zadržana.
+      <SectionTransition from={LIGHT_BG} to={ACCENT} />
+
+      {/* ───────────────────────── FINAL CTA (yellow) ───────────────────────── */}
+      <section style={{
+        background: ACCENT,
+        color: '#000',
+        padding: `${SECTION_PAD_Y} ${SECTION_PAD_X}`,
+        textAlign: 'center'
+      }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6 }}
+          style={{ maxWidth: '720px', margin: '0 auto' }}
+        >
+          <h2 style={{
+            fontSize: 'clamp(2rem, 5vw, 3rem)',
+            fontWeight: 900,
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+            margin: '0 0 20px'
+          }}>
+            Ne voliš forme?
+          </h2>
+          <p style={{
+            fontSize: '1.1rem',
+            color: '#000',
+            opacity: 0.75,
+            margin: '0 0 36px',
+            lineHeight: 1.6
+          }}>
+            Javi se direktno na email, odgovaram lično, ne kroz tim ili AI.
+          </p>
+          <a
+            href="mailto:kontakt@seomacak.com"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '20px 44px',
+              background: '#000',
+              color: ACCENT,
+              borderRadius: '50px',
+              border: '3px solid #000',
+              textDecoration: 'none',
+              fontSize: '1.05rem',
+              fontWeight: 900,
+              letterSpacing: '0.5px',
+              boxShadow: '5px 5px 0px 0px #1a1a1a',
+              transition: 'all 0.1s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translate(3px, 3px)'
+              e.currentTarget.style.boxShadow = '2px 2px 0px 0px #1a1a1a'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translate(0, 0)'
+              e.currentTarget.style.boxShadow = '5px 5px 0px 0px #1a1a1a'
+            }}
+          >
+            <span>kontakt@seomacak.com</span>
+            <span aria-hidden>→</span>
+          </a>
+        </motion.div>
+      </section>
+
+      <SectionTransition from={ACCENT} to="#000000" />
+
+      {/* ─────────────────────────── FOOTER ─────────────────────────── */}
+      <footer style={{ background: '#000', color: '#fff', padding: '60px 24px 30px', borderTop: '1px solid #333' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div className="site-footer-grid">
+            <div className="columns">
+              <div>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>SEO Mačak</h3>
+                <p style={{ color: '#aaa', lineHeight: '1.8', fontSize: '0.9rem' }}>
+                  Stručna SEO optimizacija, web development i dizajn za vaš biznis.
+                </p>
+              </div>
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Linkovi</h4>
+                <FooterLinks links={[
+                  { to: '/', label: 'Početna' },
+                  { to: '/izrada-sajtova/', label: 'Izrada sajtova' },
+                  { to: '/seo/', label: 'SEO' },
+                  { to: '/blog/', label: 'Blog' }
+                ]} />
+              </div>
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kompanija</h4>
+                <FooterLinks links={[
+                  { to: '/about/', label: 'O nama' },
+                  { to: '/kontakt/', label: 'Kontakt' },
+                  { href: '#', label: 'Privatnost' },
+                  { href: '#', label: 'Uslovi' }
+                ]} />
+              </div>
+              <div>
+                <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>Kontakt</h4>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>kontakt@seomacak.com</p>
+                <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>+381 (0) 60 123 4567</p>
+                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Beograd, Srbija</p>
+              </div>
             </div>
           </div>
-        </footer>
-      </div>
+          <div style={{ borderTop: '1px solid #333', paddingTop: '30px', textAlign: 'center', color: '#666' }}>
+            <p style={{ margin: 0 }}>© 2026 SEO Mačak. Sva prava zadržana.</p>
+          </div>
+        </div>
+      </footer>
     </>
+  )
+}
+
+// ─────────────────── helpers ───────────────────
+
+function ContactRow({ label, value, href }) {
+  const content = (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'auto 1fr',
+      gap: '24px',
+      padding: '14px 0',
+      borderBottom: '1px solid #eee',
+      alignItems: 'baseline'
+    }}>
+      <span style={{
+        fontSize: '0.78rem',
+        color: '#888',
+        letterSpacing: '1.5px',
+        textTransform: 'uppercase',
+        fontWeight: 600,
+        minWidth: '70px'
+      }}>
+        {label}
+      </span>
+      <span style={{
+        fontSize: '1rem',
+        color: '#000',
+        fontWeight: 600,
+        letterSpacing: '0.2px'
+      }}>
+        {value}
+      </span>
+    </div>
+  )
+  if (href) {
+    return (
+      <a
+        href={href}
+        style={{ textDecoration: 'none', display: 'block', transition: 'opacity 0.2s ease' }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.6'}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+      >
+        {content}
+      </a>
+    )
+  }
+  return content
+}
+
+function FormField({ label, sublabel, name, type, value, onChange, placeholder, focused, onFocus, onBlur, required }) {
+  const baseStyle = {
+    width: '100%',
+    padding: '14px 16px',
+    background: focused ? '#fffdf6' : '#fafafa',
+    border: `2px solid ${focused ? ACCENT : '#e0e0e0'}`,
+    borderRadius: '6px',
+    color: '#000',
+    fontSize: '1rem',
+    fontFamily: 'Poppins, Inter, sans-serif',
+    outline: 'none',
+    transition: 'background 0.2s ease, border-color 0.2s ease',
+    boxSizing: 'border-box'
+  }
+  return (
+    <div>
+      <label style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: '8px',
+        fontSize: '0.78rem',
+        fontWeight: 800,
+        color: '#000',
+        letterSpacing: '1.5px',
+        textTransform: 'uppercase',
+        marginBottom: '8px'
+      }}>
+        {label}
+        {sublabel && (
+          <span style={{ fontSize: '0.7rem', fontWeight: 500, color: '#999', textTransform: 'none', letterSpacing: '0.3px' }}>
+            {sublabel}
+          </span>
+        )}
+      </label>
+      {type === 'textarea' ? (
+        <textarea
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          required={required}
+          rows={4}
+          style={{ ...baseStyle, resize: 'vertical', minHeight: '110px', lineHeight: 1.55 }}
+        />
+      ) : (
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          required={required}
+          style={baseStyle}
+        />
+      )}
+    </div>
+  )
+}
+
+function FooterLinks({ links }) {
+  return (
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      {links.map((l, i) => (
+        <li key={i} style={{ marginBottom: '10px' }}>
+          {l.to ? (
+            <Link
+              to={l.to}
+              style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
+              onMouseEnter={(e) => (e.target.style.color = '#fff')}
+              onMouseLeave={(e) => (e.target.style.color = '#aaa')}
+            >
+              {l.label}
+            </Link>
+          ) : (
+            <a
+              href={l.href}
+              style={{ color: '#aaa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s ease' }}
+              onMouseEnter={(e) => (e.target.style.color = '#fff')}
+              onMouseLeave={(e) => (e.target.style.color = '#aaa')}
+            >
+              {l.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
   )
 }

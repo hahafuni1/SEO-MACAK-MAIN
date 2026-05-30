@@ -1,41 +1,25 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLanguage } from '../contexts/LanguageContext'
 
-const FAQData = [
-  {
-    question: 'Šta je SEO optimizacija?',
-    answer: 'SEO (Search Engine Optimization) je proces poboljšanja vidljivosti vašeg sajta u pretražnim rezultatima. Koristi se kombinacija tehnika za povećanje organskog prometa.'
-  },
-  {
-    question: 'Koliko dugo traje da vidim rezultate?',
-    answer: 'Rezultati se obično počinju viđati između 3-6 meseci, u zavisnosti od konkurencije i vremenske linije. Dugoročni rezultati mogu biti i bolji nakon 6-12 meseci.'
-  },
-  {
-    question: 'Da li radite lokalno ili nacionalno?',
-    answer: 'Radimo na svim nivoima - lokalno, nacionalno i međunarodno. Prilagođavamo strategije prema vašim ciljevima i gde vašim kupcima trebate biti vidljivi.'
-  },
-  {
-    question: 'Koja je razlika između SEO i PPC?',
-    answer: 'SEO je organsko rangiranje koje se gradi tokom vremena, dok je PPC (plaćena pretraga) trenutna vidljivost. SEO je dugoročno rešenje, a PPC je brz rezultat.'
-  },
-  {
-    question: 'Kako će moj sajt izgledati?',
-    answer: 'Kreiramo moderne, brze i mobilno-optimizovane sajte. Svaki sajt je prilagođen vašem brendu sa intuitivnom navigacijom i boljom konverzijom korisnika.'
-  }
-]
-
-export default function FAQSection() {
+const FAQSection = () => {
+  const { t } = useLanguage()
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isAutomatic, setIsAutomatic] = useState(true)
   const [hoveredIndex, setHoveredIndex] = useState(null)
   const [isMobile, setIsMobile] = useState(false)
+  
+  // SR translations keep FAQ under t.home.faq; EN keeps it under t.seo.faq.
+  // Read both paths so SR (default) doesn't crash on t.seo being undefined.
+  const faq = t?.home?.faq || t?.seo?.faq || {}
+  const FAQData = faq.items || []
 
-  // Detect mobile
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    const mql = window.matchMedia('(max-width: 768px)')
+    const update = () => setIsMobile(mql.matches)
+    update()
+    mql.addEventListener('change', update)
+    return () => mql.removeEventListener('change', update)
   }, [])
 
   // Auto-advance questions every 10 seconds (only if automatic)
@@ -88,7 +72,7 @@ export default function FAQSection() {
             fontWeight: 800,
             textAlign: 'center'
           }}>
-            Česta <span style={{ color: '#FDCA40' }}>Pitanja</span>
+            {faq.title} <span style={{ color: '#FDCA40' }}>{faq.titleHighlight}</span>
           </h2>
 
           {/* Accordion FAQ */}
@@ -259,7 +243,7 @@ export default function FAQSection() {
             color: '#fff',
             fontWeight: 800
           }}>
-            Česta <span style={{ color: '#FDCA40' }}>Pitanja</span>
+            {faq.title} <span style={{ color: '#FDCA40' }}>{faq.titleHighlight}</span>
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', pointerEvents: 'auto' }}>
@@ -331,34 +315,6 @@ export default function FAQSection() {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          {/* STRELICA - RED CIRCLE CONTAINER */}
-          <div style={{
-            position: 'absolute',
-            top: '157%',
-            right: '-20%',
-            transform: 'translateY(-50%)',
-            width: '1000px',
-            height: '1000px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 15,
-            pointerEvents: 'auto'
-          }}>
-            <img 
-              src="/strelica.webp" 
-              alt="Strelica" 
-              style={{
-                width: '90%',
-                height: '90%',
-                objectFit: 'contain',
-                pointerEvents: 'auto',
-                cursor: 'pointer'
-              }}
-            />
-          </div>
-
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedIndex}
@@ -459,3 +415,5 @@ export default function FAQSection() {
     </section>
   )
 }
+
+export default FAQSection

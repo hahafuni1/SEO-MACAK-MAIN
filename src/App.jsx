@@ -1,21 +1,18 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import PageTransition from './components/PageTransition'
-import PinnedHeroSection from './components/PinnedHeroSection'
+import HomePage from './components/HomePage'
 import About from './components/About'
 import IzradaSajtova from './components/IzradaSajtova'
 import SEO from './components/SEO'
 import Blog from './components/Blog'
 import Kontakt from './components/Kontakt'
+import NotFound from './components/NotFound'
 
 export default function App(){
   return (
     <Router>
       <style>{`
-        @keyframes moveDiagonalDots {
-          from { background-position: 0px 0px; }
-          to { background-position: 60px -60px; }
-        }
         /* Default static cursor */
         *, *::before, *::after {
           cursor: url('/cursors/default.png') 16 16, auto;
@@ -68,12 +65,13 @@ export default function App(){
       />
       <PageTransition>
         <Routes>
-          <Route path="/" element={<PinnedHeroSection />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/about/" element={<About />} />
           <Route path="/izrada-sajtova/" element={<IzradaSajtova />} />
           <Route path="/seo/" element={<SEO />} />
           <Route path="/blog/" element={<Blog />} />
           <Route path="/kontakt/" element={<Kontakt />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </PageTransition>
     </Router>
