@@ -1,19 +1,15 @@
 import React from 'react'
-import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import Link from './Link'
+import SEOHead from './SEOHead'
 
 const NotFound = () => {
   const { t, links } = useLanguage()
 
   return (
     <>
-      <Helmet>
-        <title>404 | SEO Mačak</title>
-        {/* noindex: 404 pages must not be indexed */}
-        <meta name="robots" content="noindex, follow" />
-      </Helmet>
+      <SEOHead title="404 | SEO Mačak" robots="noindex, follow" />
       <ScrollAwareHeader />
       <div style={{ textAlign: 'center', padding: '100px 20px' }}>
         <h1>404</h1>

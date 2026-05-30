@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
-import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getHreflangUrls, BASE_URL } from '../lib/routes'
+import SEOHead from './SEOHead'
 
 // Premium Minimal — SEO page (showcase finale).
 // Intentionally the richest page: keeps three showcase elements from the
@@ -88,10 +86,6 @@ const STICKER_TEXTS = [
 
 export default function SEO() {
   const { t, links } = useLanguage()
-  const location = useLocation()
-  const canonical = BASE_URL + location.pathname
-  const hreflang = getHreflangUrls(location.pathname)
-  const seoMeta = t.seo.meta
   // ── FAQ state ──────────────────────────────────────────────────────────
   const [expandedFaq, setExpandedFaq] = useState(0)
   const [isFaqAutomatic, setIsFaqAutomatic] = useState(true)
@@ -309,56 +303,36 @@ export default function SEO() {
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        <link rel="canonical" href={canonical} />
-        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
-        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
-        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
-        <meta property="og:title" content={seoMeta.title} />
-        <meta property="og:description" content={seoMeta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
-        <meta property="og:url" content={canonical} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
+      <SEOHead>
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              "mainEntity": ${JSON.stringify(FAQ_ITEMS.map(item => ({
-                "@type": "Question",
-                "name": item.q,
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": item.a
-                }
-              })))}
-            }
-          `}
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": FAQ_ITEMS.map(item => ({
+              "@type": "Question",
+              "name": item.q,
+              "acceptedAnswer": { "@type": "Answer", "text": item.a }
+            }))
+          })}
         </script>
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [{
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Početna",
-                "item": "https://www.seomacak.com/"
-              },{
-                "@type": "ListItem",
-                "position": 2,
-                "name": "SEO Optimizacija",
-                "item": "https://www.seomacak.com/seo/"
-              }]
-            }
-          `}
+          {`{
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Početna",
+              "item": "https://www.seomacak.com/"
+            },{
+              "@type": "ListItem",
+              "position": 2,
+              "name": "SEO Optimizacija",
+              "item": "https://www.seomacak.com/seo/"
+            }]
+          }`}
         </script>
-      </Helmet>
+      </SEOHead>
       <ScrollAwareHeader />
 
       {/* ─────────────────────────── HERO (light) ─────────────────────────── */}

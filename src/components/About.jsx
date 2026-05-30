@@ -1,11 +1,9 @@
 import { motion } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getHreflangUrls, BASE_URL } from '../lib/routes'
-import { Helmet } from 'react-helmet-async'
+import SEOHead from './SEOHead'
 
 // Premium Minimal — About page.
 // Same vibe as homepage and izrada-sajtova: light hero with photo + badges,
@@ -38,11 +36,7 @@ const Overline = ({ children, dark = false }) => (
 
 export default function About() {
   const { t, links } = useLanguage()
-  const location = useLocation()
-  const canonical = BASE_URL + location.pathname
-  const hreflang = getHreflangUrls(location.pathname)
 
-  const meta = t.about.meta
   const heroSubtitle = t.about.hero.subtitle
 
   const differentiators = [
@@ -113,40 +107,25 @@ export default function About() {
 
   return (
     <>
-      <Helmet>
-        <title>{meta.title}</title>
-        <meta name="description" content={meta.description} />
-        <link rel="canonical" href={canonical} />
-        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
-        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
-        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
-        <meta property="og:title" content={meta.title} />
-        <meta property="og:description" content={meta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
-        <meta property="og:url" content={canonical} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
+      <SEOHead>
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [{
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Početna",
-                "item": "https://www.seomacak.com/"
-              },{
-                "@type": "ListItem",
-                "position": 2,
-                "name": "O Nama",
-                "item": "https://www.seomacak.com/about/"
-              }]
-            }
-          `}
+          {`{
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Početna",
+              "item": "https://www.seomacak.com/"
+            },{
+              "@type": "ListItem",
+              "position": 2,
+              "name": "O Nama",
+              "item": "https://www.seomacak.com/about/"
+            }]
+          }`}
         </script>
-      </Helmet>
+      </SEOHead>
       <ScrollAwareHeader />
 
       {/* ─────────────────────────── HERO (light) ─────────────────────────── */}

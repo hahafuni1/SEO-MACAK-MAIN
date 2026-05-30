@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import FAQSection from './FAQSection'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getHreflangUrls, BASE_URL } from '../lib/routes'
 import logoImg from '/logo.webp'
-import { Helmet } from 'react-helmet-async'
+import SEOHead from './SEOHead'
 
 // Premium Minimal homepage.
 // Layout philosophy:
@@ -44,9 +42,6 @@ const Overline = ({ children, dark = false }) => (
 
 export default function HomePage() {
   const { t, links } = useLanguage()
-  const location = useLocation()
-  const canonical = BASE_URL + location.pathname
-  const hreflang = getHreflangUrls(location.pathname)
 
   const services = [
     {
@@ -68,37 +63,22 @@ export default function HomePage() {
 
   return (
     <>
-      <Helmet>
-        <title>{t.home.meta.title}</title>
-        <meta name="description" content={t.home.meta.description} />
-        <link rel="canonical" href={canonical} />
-        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
-        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
-        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
-        <meta property="og:title" content={t.home.meta.title} />
-        <meta property="og:description" content={t.home.meta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
-        <meta property="og:url" content={canonical} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
+      <SEOHead>
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "SEO Mačak",
-              "url": "https://www.seomacak.com",
-              "logo": "https://www.seomacak.com/logo.webp",
-              "contactPoint": {
-                "@type": "ContactPoint",
-                "telephone": "+381-60-123-4567",
-                "contactType": "customer service"
-              }
+          {`{
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "SEO Mačak",
+            "url": "https://www.seomacak.com",
+            "logo": "https://www.seomacak.com/logo.webp",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "+381-60-123-4567",
+              "contactType": "customer service"
             }
-          `}
+          }`}
         </script>
-      </Helmet>
+      </SEOHead>
       <ScrollAwareHeader />
 
       {/* ─────────────────────────── HERO (light) ─────────────────────────── */}

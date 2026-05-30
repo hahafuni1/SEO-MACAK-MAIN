@@ -1,13 +1,11 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
-import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getHreflangUrls, BASE_URL } from '../lib/routes'
+import SEOHead from './SEOHead'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
@@ -43,9 +41,6 @@ const Overline = ({ children, dark = false }) => (
 
 export default function Kontakt() {
   const { t } = useLanguage()
-  const location = useLocation()
-  const canonical = BASE_URL + location.pathname
-  const hreflang = getHreflangUrls(location.pathname)
   const [formData, setFormData] = useState({ ime: '', email: '', telefon: '', poruka: '' })
   const [status, setStatus] = useState('idle') // 'idle' | 'sending' | 'success' | 'error'
   const [focusedField, setFocusedField] = useState(null)
@@ -89,72 +84,49 @@ export default function Kontakt() {
 
   return (
     <>
-      <Helmet>
-        <title>{t.contact.meta.title}</title>
-        <meta name="description" content={t.contact.meta.description} />
-        <link rel="canonical" href={canonical} />
-        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
-        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
-        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
-        <meta property="og:title" content={t.contact.meta.title} />
-        <meta property="og:description" content={t.contact.meta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
-        <meta property="og:url" content={canonical} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
+      <SEOHead>
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              "name": "SEO Mačak",
-              "image": "https://www.seomacak.com/logo.webp",
-              "@id": "",
-              "url": "https://www.seomacak.com/kontakt",
-              "telephone": "+381 60 123 4567",
-              "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "",
-                "addressLocality": "Beograd",
-                "postalCode": "",
-                "addressCountry": "RS"
-              },
-              "openingHoursSpecification": {
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": [
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday"
-                ],
-                "opens": "09:00",
-                "closes": "17:00"
-              }
+          {`{
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "SEO Mačak",
+            "image": "https://www.seomacak.com/logo.webp",
+            "@id": "https://www.seomacak.com",
+            "url": "https://www.seomacak.com/kontakt/",
+            "telephone": "+381601234567",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "TODO-owner-fill",
+              "addressLocality": "Beograd",
+              "postalCode": "TODO-owner-fill",
+              "addressCountry": "RS"
+            },
+            "openingHoursSpecification": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+              "opens": "09:00",
+              "closes": "17:00"
             }
-          `}
+          }`}
         </script>
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [{
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Početna",
-                "item": "https://www.seomacak.com/"
-              },{
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Kontakt",
-                "item": "https://www.seomacak.com/kontakt/"
-              }]
-            }
-          `}
+          {`{
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Početna",
+              "item": "https://www.seomacak.com/"
+            },{
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Kontakt",
+              "item": "https://www.seomacak.com/kontakt/"
+            }]
+          }`}
         </script>
-      </Helmet>
+      </SEOHead>
       <ScrollAwareHeader />
 
       {/* ─────────────────── HERO + FORM (light) ─────────────────── */}

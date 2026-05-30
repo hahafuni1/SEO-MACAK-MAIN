@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
-import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getHreflangUrls, BASE_URL } from '../lib/routes'
+import SEOHead from './SEOHead'
 
 // Premium Minimal — Izrada Sajtova page.
 // Same vibe as the homepage: light hero with logo/visual + floating badges,
@@ -39,9 +37,6 @@ const Overline = ({ children, dark = false }) => (
 
 export default function IzradaSajtova() {
   const { t, links } = useLanguage()
-  const location = useLocation()
-  const canonical = BASE_URL + location.pathname
-  const hreflang = getHreflangUrls(location.pathname)
   const reasons = [
     { title: 'Brzi Sajtovi', desc: 'Optimizovani za brže učitavanje, veća konverzija i bolja SEO rangiranja.' },
     { title: 'Kreativan Dizajn', desc: 'Jedinstven dizajn po meri brenda, bez šablona i bez kompromisa.' },
@@ -146,44 +141,27 @@ export default function IzradaSajtova() {
     }
   ]
 
-  const webDevMeta = t.webDevelopment.meta
-
   return (
     <>
-      <Helmet>
-        <title>{webDevMeta.title}</title>
-        <meta name="description" content={webDevMeta.description} />
-        <link rel="canonical" href={canonical} />
-        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
-        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
-        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
-        <meta property="og:title" content={webDevMeta.title} />
-        <meta property="og:description" content={webDevMeta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
-        <meta property="og:url" content={canonical} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
+      <SEOHead>
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [{
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Početna",
-                "item": "https://www.seomacak.com/"
-              },{
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Izrada Sajtova",
-                "item": "https://www.seomacak.com/izrada-sajtova/"
-              }]
-            }
-          `}
+          {`{
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Početna",
+              "item": "https://www.seomacak.com/"
+            },{
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Izrada Sajtova",
+              "item": "https://www.seomacak.com/izrada-sajtova/"
+            }]
+          }`}
         </script>
-      </Helmet>
+      </SEOHead>
       <ScrollAwareHeader />
 
       {/* ─────────────────────────── HERO (light) ─────────────────────────── */}

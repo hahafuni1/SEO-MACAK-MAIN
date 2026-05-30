@@ -1,11 +1,9 @@
 import { motion } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
 import Link from './Link'
 import ScrollAwareHeader from './ScrollAwareHeader'
 import SectionTransition from './SectionTransition'
-import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getHreflangUrls, BASE_URL } from '../lib/routes'
+import SEOHead from './SEOHead'
 
 // Premium Minimal — Blog "under construction" page.
 // Real blog grid lives in git history; bringing it back when posts are ready.
@@ -35,9 +33,6 @@ const Overline = ({ children, dark = false }) => (
 
 export default function Blog() {
   const { t, links } = useLanguage()
-  const location = useLocation()
-  const canonical = BASE_URL + location.pathname
-  const hreflang = getHreflangUrls(location.pathname)
   // Sneak peek of what categories the real blog will cover — builds anticipation
   // and tells visitors "this is intentional, not abandoned."
   const upcomingTopics = [
@@ -60,41 +55,26 @@ export default function Blog() {
 
   return (
     <>
-      <Helmet>
-        <title>{t.blog.meta.title}</title>
-        <meta name="description" content={t.blog.meta.description} />
-        <link rel="canonical" href={canonical} />
-        {hreflang && <link rel="alternate" hreflang="sr" href={hreflang.sr} />}
-        {hreflang && <link rel="alternate" hreflang="en" href={hreflang.en} />}
-        {hreflang && <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />}
-        <meta name="robots" content="noindex, follow" />
-        <meta property="og:title" content={t.blog.meta.title} />
-        <meta property="og:description" content={t.blog.meta.description} />
-        <meta property="og:image" content="https://www.seomacak.com/logo.webp" />
-        <meta property="og:url" content={canonical} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://www.seomacak.com/logo.webp" />
+      {/* noindex until 3+ real posts exist — remove robots prop when blog launches */}
+      <SEOHead robots="noindex, follow">
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [{
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Početna",
-                "item": "https://www.seomacak.com/"
-              },{
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Blog",
-                "item": "https://www.seomacak.com/blog/"
-              }]
-            }
-          `}
+          {`{
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Početna",
+              "item": "https://www.seomacak.com/"
+            },{
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Blog",
+              "item": "https://www.seomacak.com/blog/"
+            }]
+          }`}
         </script>
-      </Helmet>
+      </SEOHead>
       <ScrollAwareHeader />
 
       {/* ─────────────────────────── HERO (light) ─────────────────────────── */}
