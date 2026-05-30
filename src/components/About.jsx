@@ -259,6 +259,8 @@ export default function About() {
                 <img
                   src="/marko-founder.webp"
                   alt="Marko — osnivač SEO Mačka"
+                  width="555"
+                  height="711"
                   style={{
                     width: '100%',
                     height: '100%',

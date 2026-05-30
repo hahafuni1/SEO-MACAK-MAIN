@@ -51,6 +51,8 @@ export default function PageTransition({ children }) {
             <motion.img
               src={logoImg}
               alt="SEO Mačak"
+              width="200"
+              height="200"
               initial={{ scale: 0.8, opacity: 0, x: -50 }}
               animate={{ scale: 1, opacity: 1, x: 0 }}
               exit={{ scale: 0.8, opacity: 0, x: -50 }}

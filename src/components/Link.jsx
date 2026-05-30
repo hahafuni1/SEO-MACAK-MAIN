@@ -18,13 +18,11 @@ export default function Link({ to, children, onClick, ...props }) {
 
     e.preventDefault()
     setIsTransitioning(true)
-
-    // Wait for the transition overlay to fade in, then navigate.
-    // The overlay stays visible until the new page mounts (PageTransition useEffect).
-    setTimeout(() => {
-      window.scrollTo(0, 0)
-      navigate(to)
-    }, 480)
+    // Navigate immediately — the overlay animates in concurrently.
+    // No blocking delay: INP is measured from click to next paint, so any
+    // setTimeout before navigate() directly inflates the metric.
+    window.scrollTo(0, 0)
+    navigate(to)
   }
 
   return (

@@ -207,6 +207,9 @@ export default function HomePage() {
             <motion.img
               src={logoImg}
               alt="SEO Mačak logo"
+              width="2000"
+              height="2000"
+              fetchpriority="high"
               animate={{ y: [0, -12, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
               style={{
@@ -515,6 +518,8 @@ export default function HomePage() {
               <img
                 src="/komotraks-project.webp"
                 alt="Komotraks — ugradnja komarnika, harmonika vrata i zavesa u Beogradu"
+                width="1906"
+                height="959"
                 loading="lazy"
                 style={{
                   width: '100%',
@@ -629,6 +634,8 @@ export default function HomePage() {
                 <img
                   src="/marko-founder.webp"
                   alt="Marko — osnivač SEO Mačka"
+                  width="555"
+                  height="711"
                   loading="lazy"
                   style={{
                     width: '100%',
