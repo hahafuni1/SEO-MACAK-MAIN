@@ -83,16 +83,10 @@ export default function Kontakt() {
       setStatus('success')
       setFormData({ ime: '', email: '', telefon: '', poruka: '' })
       setTimeout(() => setStatus('idle'), 5000)
-      if (typeof window.plausible === 'function') {
-        window.plausible('Contact Form Submit', { props: { status: 'success' } })
-      }
     } catch (err) {
       console.error('EmailJS error:', err)
       setStatus('error')
       setTimeout(() => setStatus('idle'), 5000)
-      if (typeof window.plausible === 'function') {
-        window.plausible('Contact Form Submit', { props: { status: 'error' } })
-      }
     }
   }
 
@@ -206,7 +200,7 @@ export default function Kontakt() {
               }}>
                 Direktno
               </div>
-              <ContactRow label="Email" value="kontakt@seomacak.com" href="mailto:kontakt@seomacak.com" />
+              <ContactRow label="Email" value="markodevedzic30@gmail.com" href="mailto:markodevedzic30@gmail.com" />
               <ContactRow label="Telefon" value="+381 62 105 8144" href="tel:+381621058144" />
               <ContactRow label="Lokacija" value="Beograd, Srbija · Remote ready" />
             </div>
@@ -386,8 +380,7 @@ export default function Kontakt() {
             Javi se direktno na email, odgovaram lično, ne kroz tim ili AI.
           </p>
           <a
-            href="mailto:kontakt@seomacak.com"
-            className="plausible-event-name=CTA+Click"
+            href="mailto:markodevedzic30@gmail.com"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

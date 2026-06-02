@@ -114,7 +114,7 @@ function TermsSR() {
 
       <h2 style={prose.h2}>9. Kontakt</h2>
       <p style={prose.p}>
-        Za sva pitanja: <a href="mailto:kontakt@seomacak.com" style={prose.a}>kontakt@seomacak.com</a>
+        Za sva pitanja: <a href="mailto:markodevedzic30@gmail.com" style={prose.a}>markodevedzic30@gmail.com</a>
       </p>
     </>
   )
@@ -185,7 +185,7 @@ function TermsEN() {
 
       <h2 style={prose.h2}>9. Contact</h2>
       <p style={prose.p}>
-        For any questions: <a href="mailto:kontakt@seomacak.com" style={prose.a}>kontakt@seomacak.com</a>
+        For any questions: <a href="mailto:markodevedzic30@gmail.com" style={prose.a}>markodevedzic30@gmail.com</a>
       </p>
     </>
   )

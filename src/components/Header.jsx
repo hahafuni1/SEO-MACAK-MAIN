@@ -149,10 +149,10 @@ export default function Header() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
                 <LanguageSwitcher />
                 <a
-                  href="mailto:kontakt@seomacak.com"
+                  href="mailto:markodevedzic30@gmail.com"
                   style={{ color: '#888', fontSize: '0.9rem', textDecoration: 'none', letterSpacing: '0.3px' }}
                 >
-                  kontakt@seomacak.com
+                  markodevedzic30@gmail.com
                 </a>
               </div>
             </motion.div>

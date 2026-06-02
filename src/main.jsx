@@ -4,7 +4,11 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { LanguageProvider } from './contexts/LanguageContext'
 import { HelmetProvider } from 'react-helmet-async'
+import { inject } from '@vercel/analytics'
 import '/css/styles.css'
+
+// Vercel Analytics — client-only, fires after React hydrates
+inject()
 
 const rootEl = document.getElementById('root')
 

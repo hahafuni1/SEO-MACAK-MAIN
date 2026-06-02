@@ -60,7 +60,7 @@ All pages are **client-rendered**. There is no static prerendering or SSR. The s
 ### Navigation structure
 - **Desktop header** ([src/components/Header.jsx:60-68](src/components/Header.jsx#L60-L68) and equivalent [src/components/ScrollAwareHeader.jsx](src/components/ScrollAwareHeader.jsx)):
   - Početna (`/`), Izrada sajtova (`/izrada-sajtova/`), SEO (`/seo/`), Blog (`/blog/`), About (`/about/`), Kontakt (`/kontakt/` — CTA pill), Language switcher.
-- **Mobile menu** (overlay): same six links, numbered 01–06, plus `mailto:kontakt@seomacak.com` in the menu footer.
+- **Mobile menu** (overlay): same six links, numbered 01–06, plus `mailto:markodevedzic30@gmail.com` in the menu footer.
 - **Footer** (in HomePage only, [src/components/HomePage.jsx:685-728](src/components/HomePage.jsx#L685-L728)): three link groups — "Linkovi" (Početna, Izrada sajtova, SEO, Blog), "Kompanija" (About, Kontakt, Privatnost `#`, Uslovi `#`), and "Kontakt" with hardcoded `email@example.com`, `+381 (0) 123 456 789`, "Beograd, Srbija". Privatnost/Uslovi point to `#`, **not real pages**. The footer **only appears on the homepage** — other routes have no footer at all.
 
 ### Blog

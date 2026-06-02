@@ -107,8 +107,8 @@ export default function Footer() {
             <div>
               <h4 style={{ fontSize: '1rem', marginBottom: '20px', color: '#fff' }}>{contactLabel}</h4>
               <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>
-                <a href="mailto:kontakt@seomacak.com" style={{ color: '#aaa', textDecoration: 'none' }}>
-                  kontakt@seomacak.com
+                <a href="mailto:markodevedzic30@gmail.com" style={{ color: '#aaa', textDecoration: 'none' }}>
+                  markodevedzic30@gmail.com
                 </a>
               </p>
               <p style={{ color: '#aaa', marginBottom: '10px', fontSize: '0.9rem' }}>

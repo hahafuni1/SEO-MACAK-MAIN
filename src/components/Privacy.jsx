@@ -78,13 +78,13 @@ function PrivacySR() {
 
       <h2 style={prose.h2}>3. Analitika — nema kolačića</h2>
       <p style={prose.p}>
-        Koristimo <strong>Plausible Analytics</strong> — privatnost-prijateljski alat koji <em>ne koristi kolačiće</em>,
+        Koristimo <strong>Vercel Analytics</strong> — privatnost-prijateljski alat koji <em>ne koristi kolačiće</em>,
         ne prikuplja lične podatke i ne prati korisnike između sajtova. Podaci su anonimni i agregatni.
         Ne potreban je pristanak korisnika po GDPR-u.
       </p>
       <p style={prose.p}>
-        Plausible je u skladu sa GDPR, CCPA i ePrivacy direktivom. Više informacija:{' '}
-        <a href="https://plausible.io/data-policy" style={prose.a} target="_blank" rel="noopener noreferrer">plausible.io/data-policy</a>.
+        Vercel Analytics je u skladu sa GDPR, CCPA i ePrivacy direktivom. Više informacija:{' '}
+        <a href="https://vercel.com/docs/analytics/privacy-policy" style={prose.a} target="_blank" rel="noopener noreferrer">vercel.com/docs/analytics/privacy-policy</a>.
       </p>
 
       <h2 style={prose.h2}>4. Svrha obrade</h2>
@@ -109,7 +109,7 @@ function PrivacySR() {
         <li>Prigovor na obradu</li>
       </ul>
       <p style={prose.p}>
-        Zahtev možete poslati na: <a href="mailto:kontakt@seomacak.com" style={prose.a}>kontakt@seomacak.com</a>
+        Zahtev možete poslati na: <a href="mailto:markodevedzic30@gmail.com" style={prose.a}>markodevedzic30@gmail.com</a>
       </p>
 
       <h2 style={prose.h2}>7. Izmene politike</h2>
@@ -150,13 +150,13 @@ function PrivacyEN() {
 
       <h2 style={prose.h2}>3. Analytics — no cookies</h2>
       <p style={prose.p}>
-        We use <strong>Plausible Analytics</strong> — a privacy-first tool that uses <em>no cookies</em>,
+        We use <strong>Vercel Analytics</strong> — a privacy-first tool that uses <em>no cookies</em>,
         collects no personal data, and does not track users across sites. All data is anonymous and aggregated.
         No consent required under GDPR.
       </p>
       <p style={prose.p}>
-        Plausible is GDPR, CCPA, and ePrivacy compliant. More at{' '}
-        <a href="https://plausible.io/data-policy" style={prose.a} target="_blank" rel="noopener noreferrer">plausible.io/data-policy</a>.
+        Vercel Analytics is GDPR, CCPA, and ePrivacy compliant. More at{' '}
+        <a href="https://vercel.com/docs/analytics/privacy-policy" style={prose.a} target="_blank" rel="noopener noreferrer">vercel.com/docs/analytics/privacy-policy</a>.
       </p>
 
       <h2 style={prose.h2}>4. Purpose of processing</h2>
@@ -180,7 +180,7 @@ function PrivacyEN() {
         <li>Right to object to processing</li>
       </ul>
       <p style={prose.p}>
-        Submit requests to: <a href="mailto:kontakt@seomacak.com" style={prose.a}>kontakt@seomacak.com</a>
+        Submit requests to: <a href="mailto:markodevedzic30@gmail.com" style={prose.a}>markodevedzic30@gmail.com</a>
       </p>
 
       <h2 style={prose.h2}>7. Policy changes</h2>
